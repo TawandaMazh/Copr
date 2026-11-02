@@ -12,6 +12,7 @@ The app talks to project `koyosnsrparlhljvybok` (eu-west-1).
 | Storage object RLS policies | Applied |
 | Brand claim policy (`brands_claim_unowned`) | Applied |
 | Reviews status + rating rollup trigger | Applied |
+| Fulfilment RPCs (ship / confirm delivery + payout) | Applied |
 | Auth → Email provider | On |
 | Auth → Phone / SMS | Off until Twilio (or another SMS provider) is configured |
 | Auth URL Configuration | Set Site URL + redirects (see below) |

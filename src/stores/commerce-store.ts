@@ -425,6 +425,10 @@ export const useCommerceStore = create<CommerceState>()(
           hydrateSettingsFromSupabase,
           hydratePlatformBrandsFromSupabase,
         } = await import("@/lib/commerce/admin-sync");
+        const {
+          hydrateOrdersFromSupabase,
+          hydratePayoutsFromSupabase,
+        } = await import("@/lib/commerce/order-sync");
         const [
           remoteCart,
           remoteWishlist,
@@ -432,6 +436,8 @@ export const useCommerceStore = create<CommerceState>()(
           remoteReviews,
           remoteSettings,
           remoteBrands,
+          remoteOrders,
+          remotePayouts,
         ] = await Promise.all([
           hydrateCartFromSupabase(),
           hydrateWishlistFromSupabase(),
@@ -439,6 +445,8 @@ export const useCommerceStore = create<CommerceState>()(
           hydrateReviewsFromSupabase(),
           hydrateSettingsFromSupabase(),
           hydratePlatformBrandsFromSupabase(),
+          hydrateOrdersFromSupabase(),
+          hydratePayoutsFromSupabase(),
         ]);
         set((s) => {
           let platformBrands = s.platformBrands;
@@ -467,6 +475,8 @@ export const useCommerceStore = create<CommerceState>()(
             platformBrands,
             ...(remoteReviews ? { reviews: remoteReviews } : {}),
             ...(remoteSettings ? { settings: remoteSettings } : {}),
+            ...(remoteOrders ? { orders: remoteOrders } : {}),
+            ...(remotePayouts ? { payouts: remotePayouts } : {}),
           };
         });
         // Push guest cart up if remote was empty
@@ -557,6 +567,17 @@ export const useCommerceStore = create<CommerceState>()(
             }),
           };
         });
+
+        const user = get().user;
+        if (user && !user.isDemo) {
+          void import("@/lib/commerce/order-sync").then(
+            async ({ confirmDeliveryInSupabase, hydratePayoutsFromSupabase }) => {
+              await confirmDeliveryInSupabase(subOrderId);
+              const payouts = await hydratePayoutsFromSupabase();
+              if (payouts) set({ payouts });
+            },
+          );
+        }
       },
 
       markShipped: (orderId, subOrderId, note) => {
@@ -595,6 +616,19 @@ export const useCommerceStore = create<CommerceState>()(
             };
           }),
         }));
+
+        const user = get().user;
+        if (user && !user.isDemo) {
+          void import("@/lib/commerce/order-sync").then(
+            ({ markShippedInSupabase, updateSubOrderStatusInSupabase }) => {
+              if (status === "shipped") {
+                void markShippedInSupabase(subOrderId, note);
+              } else {
+                void updateSubOrderStatusInSupabase(subOrderId, status, note);
+              }
+            },
+          );
+        }
       },
 
       getOrder: (id) => get().orders.find((o) => o.id === id),
@@ -979,6 +1013,13 @@ export const useCommerceStore = create<CommerceState>()(
               : p,
           ),
         }));
+        const user = get().user;
+        if (user && !user.isDemo) {
+          void import("@/lib/commerce/order-sync").then(
+            ({ markPayoutStatusInSupabase }) =>
+              markPayoutStatusInSupabase(payoutId, status),
+          );
+        }
       },
 
       openDispute: ({ orderId, subOrderId, reason, notes }) => {
