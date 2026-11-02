@@ -9,6 +9,7 @@ import { getBrandById, getMinPrice } from "@/data";
 import { cn } from "@/lib/utils";
 import { PriceTag } from "./price-tag";
 import { Badge } from "./badge";
+import { useCommerceStore } from "@/stores/commerce-store";
 
 interface ProductCardProps {
   product: Product;
@@ -19,6 +20,10 @@ interface ProductCardProps {
 export function ProductCard({ product, className, priority }: ProductCardProps) {
   const brand = getBrandById(product.brandId);
   const price = getMinPrice(product);
+  const toggleWishlist = useCommerceStore((s) => s.toggleWishlist);
+  const wishlisted = useCommerceStore((s) =>
+    s.wishlist.includes(product.id),
+  );
 
   return (
     <motion.article
@@ -60,10 +65,25 @@ export function ProductCard({ product, className, priority }: ProductCardProps) 
 
       <button
         type="button"
-        aria-label={`Save ${product.name} to wishlist`}
+        aria-label={
+          wishlisted
+            ? `Remove ${product.name} from wishlist`
+            : `Save ${product.name} to wishlist`
+        }
+        aria-pressed={wishlisted}
+        onClick={(e) => {
+          e.preventDefault();
+          toggleWishlist(product.id);
+        }}
         className="absolute right-3 top-3 z-10 flex h-9 w-9 items-center justify-center rounded-full glass opacity-100 transition-all duration-250 hover:scale-105 sm:opacity-0 sm:group-hover:opacity-100"
       >
-        <Heart className="h-4 w-4 text-foreground" strokeWidth={1.5} />
+        <Heart
+          className={cn(
+            "h-4 w-4 text-foreground",
+            wishlisted && "fill-primary text-primary",
+          )}
+          strokeWidth={1.5}
+        />
       </button>
     </motion.article>
   );

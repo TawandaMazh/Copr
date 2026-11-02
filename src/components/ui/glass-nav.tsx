@@ -3,11 +3,16 @@
 import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, Search, ShoppingBag, X } from "lucide-react";
+import { Heart, Menu, Search, ShoppingBag, X } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { Button } from "./button";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
+import {
+  useCartCount,
+  useCommerceStore,
+  useWishlistCount,
+} from "@/stores/commerce-store";
 
 const links = [
   { href: "/shop", label: "Shop" },
@@ -19,6 +24,13 @@ export function GlassNav() {
   const pathname = usePathname();
   const [open, setOpen] = React.useState(false);
   const [scrolled, setScrolled] = React.useState(false);
+  const [mounted, setMounted] = React.useState(false);
+  const setCartOpen = useCommerceStore((s) => s.setCartOpen);
+  const user = useCommerceStore((s) => s.user);
+  const cartCount = useCartCount();
+  const wishlistCount = useWishlistCount();
+
+  React.useEffect(() => setMounted(true), []);
 
   React.useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
@@ -57,7 +69,7 @@ export function GlassNav() {
           </Button>
           <Link
             href="/"
-            className="px-2 text-xl font-semibold tracking-tight text-foreground focus-ring rounded-lg"
+            className="rounded-lg px-2 text-xl font-semibold tracking-tight text-foreground focus-ring"
           >
             copr
           </Link>
@@ -92,11 +104,39 @@ export function GlassNav() {
             </Link>
           </Button>
           <ThemeToggle />
-          <Button variant="ghost" size="icon" aria-label="Open cart">
-            <ShoppingBag className="h-4 w-4" strokeWidth={1.5} />
+          <Button variant="ghost" size="icon" asChild className="relative">
+            <Link href="/wishlist" aria-label="Wishlist">
+              <Heart className="h-4 w-4" strokeWidth={1.5} />
+              {mounted && wishlistCount > 0 && (
+                <span className="absolute right-1.5 top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-semibold text-white">
+                  {wishlistCount}
+                </span>
+              )}
+            </Link>
           </Button>
-          <Button variant="secondary" size="sm" className="ml-1 hidden sm:inline-flex" asChild>
-            <Link href="/account">Account</Link>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="relative"
+            aria-label="Open bag"
+            onClick={() => setCartOpen(true)}
+          >
+            <ShoppingBag className="h-4 w-4" strokeWidth={1.5} />
+            {mounted && cartCount > 0 && (
+              <span className="absolute right-1.5 top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-semibold text-white">
+                {cartCount}
+              </span>
+            )}
+          </Button>
+          <Button
+            variant="secondary"
+            size="sm"
+            className="ml-1 hidden max-w-[9rem] truncate sm:inline-flex"
+            asChild
+          >
+            <Link href="/account">
+              {mounted && user ? user.fullName.split(" ")[0] : "Account"}
+            </Link>
           </Button>
         </div>
       </nav>
@@ -121,6 +161,22 @@ export function GlassNav() {
                   </Link>
                 </li>
               ))}
+              <li>
+                <Link
+                  href="/wishlist"
+                  className="block rounded-2xl px-4 py-3 text-base font-medium text-foreground hover:bg-white/40 dark:hover:bg-navy/40"
+                >
+                  Wishlist
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/orders"
+                  className="block rounded-2xl px-4 py-3 text-base font-medium text-foreground hover:bg-white/40 dark:hover:bg-navy/40"
+                >
+                  Orders
+                </Link>
+              </li>
               <li>
                 <Link
                   href="/account"

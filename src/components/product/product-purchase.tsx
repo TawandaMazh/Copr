@@ -13,11 +13,17 @@ import { PriceTag } from "@/components/ui/price-tag";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { useCommerceStore } from "@/stores/commerce-store";
 
 export function ProductPurchase({ product }: { product: Product }) {
   const brand = getBrandById(product.brandId);
   const colours = getAvailableColours(product);
   const sizes = getAvailableSizes(product);
+  const addToCart = useCommerceStore((s) => s.addToCart);
+  const toggleWishlist = useCommerceStore((s) => s.toggleWishlist);
+  const wishlisted = useCommerceStore((s) =>
+    s.wishlist.includes(product.id),
+  );
 
   const [colour, setColour] = useState(colours[0]);
   const [size, setSize] = useState(sizes[0]);
@@ -122,19 +128,29 @@ export function ProductPurchase({ product }: { product: Product }) {
           size="lg"
           className="flex-1"
           disabled={variant.stock < 1}
+          onClick={() => addToCart(product.id, variant.id)}
         >
           <ShoppingBag className="h-4 w-4" strokeWidth={1.5} />
           Add to bag
         </Button>
-        <Button size="lg" variant="secondary" className="sm:w-auto">
-          <Heart className="h-4 w-4" strokeWidth={1.5} />
-          Wishlist
+        <Button
+          size="lg"
+          variant="secondary"
+          className="sm:w-auto"
+          onClick={() => toggleWishlist(product.id)}
+          aria-pressed={wishlisted}
+        >
+          <Heart
+            className={cn("h-4 w-4", wishlisted && "fill-primary text-primary")}
+            strokeWidth={1.5}
+          />
+          {wishlisted ? "Saved" : "Wishlist"}
         </Button>
       </div>
 
       <p className="text-xs leading-relaxed text-muted-foreground">
-        Delivery across Lusaka. Pickup points available at checkout. Cart and
-        payments arrive in Phase 2.
+        Delivery across Lusaka · Pickup points at checkout · Paid via mock escrow
+        (HELD until delivery).
       </p>
     </div>
   );

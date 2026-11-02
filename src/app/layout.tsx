@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import { ThemeProvider } from "@/components/layout/theme-provider";
+import { Providers } from "@/components/providers";
 import { SiteShell } from "@/components/layout/site-shell";
 import "./globals.css";
 
@@ -50,14 +50,9 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} font-sans antialiased`}
       >
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="light"
-          enableSystem
-          disableTransitionOnChange
-        >
+        <Providers>
           <SiteShell>{children}</SiteShell>
-        </ThemeProvider>
+        </Providers>
       </body>
     </html>
   );

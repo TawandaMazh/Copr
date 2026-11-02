@@ -139,6 +139,38 @@ body {
   box-shadow: var(--glass-shadow);
 }
 
+/* Form fields */
+.field {
+  display: block;
+  width: 100%;
+  height: 2.75rem;
+  border-radius: 0.9rem;
+  border: 1px solid var(--border-subtle);
+  background: color-mix(in srgb, white 55%, transparent);
+  padding: 0 0.9rem;
+  font-size: 0.925rem;
+  color: var(--foreground);
+  outline: none;
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.dark .field {
+  background: color-mix(in srgb, var(--navy) 55%, transparent);
+}
+
+.field:focus {
+  border-color: color-mix(in srgb, var(--primary) 45%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 18%, transparent);
+}
+
+textarea.field {
+  height: auto;
+  min-height: 5.5rem;
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+  resize: vertical;
+}
+
 /* Focus ring */
 .focus-ring {
   outline: none;

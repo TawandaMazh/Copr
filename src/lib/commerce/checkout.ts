@@ -1,0 +1,191 @@
+import { getBrandById, getProductById, getMinPrice } from "@/data";
+import {
+  DEFAULT_COMMISSION_PERCENT,
+  DELIVERY_FEE_KWACHA,
+  PICKUP_POINTS,
+} from "@/lib/commerce/constants";
+import { getPaymentProvider } from "@/lib/payments";
+import type { CartLine } from "@/types/commerce";
+import type {
+  DeliveryMethod,
+  OrderRecord,
+  PaymentRecord,
+  SubOrderRecord,
+} from "@/types/commerce";
+import type { CheckoutFormValues } from "@/lib/validations/checkout";
+
+function id(prefix: string) {
+  return `${prefix}_${crypto.randomUUID().replace(/-/g, "").slice(0, 12)}`;
+}
+
+export function resolveCartTotals(
+  lines: CartLine[],
+  deliveryMethod: DeliveryMethod,
+) {
+  type EnrichedLine = CartLine & {
+    product: NonNullable<ReturnType<typeof getProductById>>;
+    variant: NonNullable<
+      NonNullable<ReturnType<typeof getProductById>>["variants"][number]
+    >;
+    brand: ReturnType<typeof getBrandById>;
+    unitPrice: number;
+    lineTotal: number;
+  };
+
+  const enriched: EnrichedLine[] = [];
+  for (const line of lines) {
+    const product = getProductById(line.productId);
+    if (!product) continue;
+    const variant =
+      product.variants.find((v) => v.id === line.variantId) ??
+      product.variants[0];
+    if (!variant) continue;
+    enriched.push({
+      ...line,
+      product,
+      variant,
+      brand: getBrandById(product.brandId),
+      unitPrice: variant.price,
+      lineTotal: variant.price * line.quantity,
+    });
+  }
+
+  const subtotal = enriched.reduce((sum, l) => sum + l.lineTotal, 0);
+  const deliveryFee =
+    deliveryMethod === "delivery" && enriched.length > 0
+      ? DELIVERY_FEE_KWACHA
+      : 0;
+
+  return {
+    lines: enriched,
+    subtotal,
+    deliveryFee,
+    total: subtotal + deliveryFee,
+  };
+}
+
+export async function placeOrder(input: {
+  userId: string;
+  lines: CartLine[];
+  form: CheckoutFormValues;
+}): Promise<OrderRecord> {
+  const { lines, subtotal, deliveryFee, total } = resolveCartTotals(
+    input.lines,
+    input.form.deliveryMethod,
+  );
+
+  if (lines.length === 0) {
+    throw new Error("Your bag is empty");
+  }
+
+  let deliveryArea = input.form.area ?? "";
+  let deliveryNeighbourhood = input.form.neighbourhood ?? "";
+  let deliveryLandmark = input.form.landmark;
+  const deliveryPhone = input.form.phone;
+
+  if (input.form.deliveryMethod === "pickup") {
+    const point = PICKUP_POINTS.find((p) => p.id === input.form.pickupPointId);
+    if (!point) throw new Error("Invalid pickup point");
+    deliveryArea = point.area;
+    deliveryNeighbourhood = point.neighbourhood;
+    deliveryLandmark = point.landmark;
+  }
+
+  const orderId = id("ord");
+  const now = new Date().toISOString();
+
+  // Split by brand → sub_orders
+  const byBrand = new Map<string, typeof lines>();
+  for (const line of lines) {
+    const brandId = line.product.brandId;
+    const bucket = byBrand.get(brandId) ?? [];
+    bucket.push(line);
+    byBrand.set(brandId, bucket);
+  }
+
+  const subOrders: SubOrderRecord[] = [];
+  for (const [brandId, brandLines] of byBrand) {
+    const brandSubtotal = brandLines.reduce((s, l) => s + l.lineTotal, 0);
+    const commissionPercent = DEFAULT_COMMISSION_PERCENT;
+    const commissionAmount = Number(
+      ((brandSubtotal * commissionPercent) / 100).toFixed(2),
+    );
+    const sellerAmount = Number((brandSubtotal - commissionAmount).toFixed(2));
+    const brand = getBrandById(brandId);
+
+    subOrders.push({
+      id: id("sub"),
+      brandId,
+      brandName: brand?.name ?? "Brand",
+      status: "paid",
+      subtotal: brandSubtotal,
+      commissionPercent,
+      commissionAmount,
+      sellerAmount,
+      items: brandLines.map((l) => ({
+        productId: l.product.id,
+        variantId: l.variant.id,
+        brandId,
+        productName: l.product.name,
+        productImage: l.product.images[0] ?? "",
+        brandName: brand?.name ?? "Brand",
+        size: l.variant.size,
+        colour: l.variant.colour,
+        unitPrice: l.unitPrice,
+        quantity: l.quantity,
+        lineTotal: l.lineTotal,
+      })),
+    });
+  }
+
+  const provider = getPaymentProvider();
+  const paymentResult = await provider.createPayment({
+    orderId,
+    amount: total,
+    currency: "ZMW",
+    customerPhone: deliveryPhone,
+    metadata: { deliveryMethod: input.form.deliveryMethod },
+  });
+
+  if (!paymentResult.success) {
+    throw new Error(paymentResult.message ?? "Payment failed");
+  }
+
+  const payment: PaymentRecord = {
+    id: id("pay"),
+    provider: paymentResult.provider,
+    providerRef: paymentResult.providerRef,
+    amount: total,
+    status: "held",
+    heldAt: now,
+  };
+
+  const order: OrderRecord = {
+    id: orderId,
+    userId: input.userId,
+    status: "paid",
+    deliveryMethod: input.form.deliveryMethod,
+    deliveryArea,
+    deliveryNeighbourhood,
+    deliveryLandmark,
+    deliveryPhone,
+    subtotal,
+    deliveryFee,
+    total,
+    notes: input.form.notes,
+    paidAt: now,
+    createdAt: now,
+    updatedAt: now,
+    subOrders,
+    payment,
+  };
+
+  return order;
+}
+
+export function cartLineUnitPrice(productId: string, variantId: string) {
+  const product = getProductById(productId);
+  if (!product) return 0;
+  const variant = product.variants.find((v) => v.id === variantId);
+  return variant?.price ?? getMinPrice(product);
+}
