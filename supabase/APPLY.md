@@ -11,6 +11,7 @@ The app talks to project `koyosnsrparlhljvybok` (eu-west-1).
 | Storage buckets `product-images`, `brand-assets` | Created (public, 5 MB, jpeg/png/webp/avif) |
 | Storage object RLS policies | Applied |
 | Brand claim policy (`brands_claim_unowned`) | Applied |
+| Reviews status + rating rollup trigger | Applied |
 | Auth → Email provider | On |
 | Auth → Phone / SMS | Off until Twilio (or another SMS provider) is configured |
 | Auth URL Configuration | Set Site URL + redirects (see below) |

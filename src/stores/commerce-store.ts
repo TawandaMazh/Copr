@@ -418,33 +418,57 @@ export const useCommerceStore = create<CommerceState>()(
         const { hydrateSellerFromSupabase } = await import(
           "@/lib/commerce/seller-sync"
         );
-        const [remoteCart, remoteWishlist, remoteSeller] = await Promise.all([
+        const { hydrateReviewsFromSupabase } = await import(
+          "@/lib/commerce/reviews-sync"
+        );
+        const {
+          hydrateSettingsFromSupabase,
+          hydratePlatformBrandsFromSupabase,
+        } = await import("@/lib/commerce/admin-sync");
+        const [
+          remoteCart,
+          remoteWishlist,
+          remoteSeller,
+          remoteReviews,
+          remoteSettings,
+          remoteBrands,
+        ] = await Promise.all([
           hydrateCartFromSupabase(),
           hydrateWishlistFromSupabase(),
           hydrateSellerFromSupabase(),
+          hydrateReviewsFromSupabase(),
+          hydrateSettingsFromSupabase(),
+          hydratePlatformBrandsFromSupabase(),
         ]);
-        set((s) => ({
-          cart:
-            remoteCart && remoteCart.length > 0
-              ? remoteCart
-              : s.cart,
-          wishlist:
-            remoteWishlist && remoteWishlist.length > 0
-              ? remoteWishlist
-              : s.wishlist,
-          ...(remoteSeller?.brand
-            ? {
-                sellerBrand: remoteSeller.brand,
-                sellerProducts: remoteSeller.products,
-                platformBrands: [
-                  remoteSeller.brand,
-                  ...s.platformBrands.filter(
-                    (b) => b.id !== remoteSeller.brand!.id,
-                  ),
-                ],
-              }
-            : {}),
-        }));
+        set((s) => {
+          let platformBrands = s.platformBrands;
+          if (remoteBrands && remoteBrands.length > 0) {
+            platformBrands = remoteBrands;
+          }
+          if (remoteSeller?.brand) {
+            platformBrands = [
+              remoteSeller.brand,
+              ...platformBrands.filter((b) => b.id !== remoteSeller.brand!.id),
+            ];
+          }
+          return {
+            cart:
+              remoteCart && remoteCart.length > 0 ? remoteCart : s.cart,
+            wishlist:
+              remoteWishlist && remoteWishlist.length > 0
+                ? remoteWishlist
+                : s.wishlist,
+            ...(remoteSeller?.brand
+              ? {
+                  sellerBrand: remoteSeller.brand,
+                  sellerProducts: remoteSeller.products,
+                }
+              : {}),
+            platformBrands,
+            ...(remoteReviews ? { reviews: remoteReviews } : {}),
+            ...(remoteSettings ? { settings: remoteSettings } : {}),
+          };
+        });
         // Push guest cart up if remote was empty
         if (remoteCart && remoteCart.length === 0 && get().cart.length > 0) {
           const { syncCartToSupabase } = await import(
@@ -885,14 +909,23 @@ export const useCommerceStore = create<CommerceState>()(
         };
       },
 
-      updateSettings: (patch) =>
+      updateSettings: (patch) => {
         set((s) => ({
           settings: {
             ...s.settings,
             ...patch,
             updatedAt: new Date().toISOString(),
           },
-        })),
+        }));
+        const user = get().user;
+        if (user && !user.isDemo) {
+          const next = get().settings;
+          void import("@/lib/commerce/admin-sync").then(
+            ({ persistSettingsToSupabase }) =>
+              persistSettingsToSupabase(next),
+          );
+        }
+      },
 
       setBrandStatus: (brandId, status) => {
         set((s) => {
@@ -1037,8 +1070,11 @@ export const useCommerceStore = create<CommerceState>()(
       addReview: ({ productId, productName, rating, title, body }) => {
         const user = get().user;
         if (!user) return null;
+        const existing = get().reviews.find(
+          (r) => r.productId === productId && r.userId === user.id,
+        );
         const review: ReviewRecord = {
-          id: newId("rev"),
+          id: existing?.id ?? newId("rev"),
           productId,
           productName,
           userId: user.id,
@@ -1047,18 +1083,33 @@ export const useCommerceStore = create<CommerceState>()(
           title,
           body,
           status: "published",
-          createdAt: new Date().toISOString(),
+          createdAt: existing?.createdAt ?? new Date().toISOString(),
         };
-        set((s) => ({ reviews: [review, ...s.reviews] }));
+        set((s) => ({
+          reviews: [review, ...s.reviews.filter((r) => r.id !== review.id)],
+        }));
+        if (!user.isDemo) {
+          void import("@/lib/commerce/reviews-sync").then(
+            ({ persistReviewToSupabase }) => persistReviewToSupabase(review),
+          );
+        }
         return review;
       },
 
-      moderateReview: (reviewId, status) =>
+      moderateReview: (reviewId, status) => {
         set((s) => ({
           reviews: s.reviews.map((r) =>
             r.id === reviewId ? { ...r, status } : r,
           ),
-        })),
+        }));
+        const user = get().user;
+        if (user && !user.isDemo) {
+          void import("@/lib/commerce/reviews-sync").then(
+            ({ moderateReviewInSupabase }) =>
+              moderateReviewInSupabase(reviewId, status),
+          );
+        }
+      },
 
       getAdminAnalytics: () => {
         const orders = get().orders;
