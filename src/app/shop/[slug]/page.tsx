@@ -9,6 +9,7 @@ import {
 import { getBrandById } from "@/data/brands";
 import { ProductGallery } from "@/components/product/product-gallery";
 import { ProductPurchase } from "@/components/product/product-purchase";
+import { ProductReviews } from "@/components/product/product-reviews";
 import { ProductCard } from "@/components/ui/product-card";
 import { PageContainer } from "@/components/layout/page-container";
 
@@ -69,6 +70,8 @@ export default async function ProductPage({ params }: ProductPageProps) {
         <ProductGallery images={product.images} name={product.name} />
         <ProductPurchase product={product} />
       </div>
+
+      <ProductReviews productId={product.id} productName={product.name} />
 
       {related.length > 0 && (
         <section>

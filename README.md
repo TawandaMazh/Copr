@@ -1,8 +1,8 @@
 # copr
 
-Multi-vendor fashion marketplace for **Zambian brands** and shoppers — think ASOS, built for Lusaka. Brands hold their own stock and fulfil orders; copr takes a commission (default **15%**).
+Multi-vendor fashion marketplace for **Zambian brands** and shoppers — think ASOS, built for Lusaka. Brands hold their own stock and fulfil orders; copr takes a commission (default **15%**, configurable in admin).
 
-**Current: Phase 3** — Seller dashboard (apply, brand profile, products, orders, earnings).
+**Current: Phase 4** — Admin dashboard (brands, products, orders, payouts, disputes, reviews, settings, analytics).
 
 ---
 
@@ -13,7 +13,7 @@ Multi-vendor fashion marketplace for **Zambian brands** and shoppers — think A
 - **Supabase** — Postgres, Auth, Storage-ready, RLS on every table (`supabase/migrations/`)
 - **Zod** + **React Hook Form** for auth, checkout, seller forms
 - **PaymentProvider** + **MockProvider** escrow
-- Framer Motion, lucide-react, next-themes, zustand (local commerce state)
+- Framer Motion, lucide-react, next-themes, zustand (local commerce state, persist key `copr-commerce-v3`)
 - Deploy target: **Vercel**
 
 ---
@@ -34,18 +34,28 @@ npm run build && npm run typecheck
 
 ---
 
+## Admin dashboard (Phase 4)
+
+1. Open [/admin](http://localhost:3000/admin) → **Continue as demo admin**
+2. Routes under `/admin`:
+   - **Overview** — GMV, commission, payouts, disputes, status mix
+   - **Brands** — approve / reject / suspend applications (new applies start as `pending`)
+   - **Products** — publish / unpublish / feature seller products
+   - **Orders** — all marketplace orders + mark shipped / open dispute
+   - **Payouts** — process escrow releases (pending → processing → paid)
+   - **Disputes** — resolve for buyer or seller
+   - **Reviews** — hide / flag / restore product reviews
+   - **Settings** — commission %, Lusaka delivery fee, auto-confirm days
+
+Shopper flow still creates payouts when delivery is confirmed on `/orders/[id]`. Reviews can be posted on product pages.
+
+---
+
 ## Seller dashboard (Phase 3)
 
 1. Visit [/sell](http://localhost:3000/sell) → **Apply to join**, or open [/seller/apply](http://localhost:3000/seller/apply)
-2. **Claim a demo brand** (e.g. Chitenge House) or submit a new application (auto-approved in demo)
-3. Dashboard routes under `/seller`:
-   - Overview — stats
-   - **Products** — create/edit with images, sizes, colours, stock
-   - **Orders** — processing → shipped → delivered
-   - **Earnings** — escrow pending, available, payout records
-   - **Brand profile** — logo, banner, story
-
-Shopper confirms delivery on `/orders/[id]` → funds RELEASED → payout row created for the brand.
+2. **Claim a demo brand** (auto-approved) or submit a new application (**pending** until admin approves)
+3. Dashboard routes under `/seller`: Overview, Products, Orders, Earnings, Brand profile
 
 ---
 
@@ -73,8 +83,8 @@ See Phase 2 notes: set `NEXT_PUBLIC_SUPABASE_*`, run `supabase/migrations/*` in 
 
 1. ~~Phase 1 — Design system + catalogue~~
 2. ~~Phase 2 — Schema/RLS, auth, cart, wishlist, MockProvider checkout~~
-3. ~~Phase 3 — Seller dashboard~~ ← *you are here*
-4. **Phase 4** — Admin (commission, payouts, moderation, analytics, reviews)
+3. ~~Phase 3 — Seller dashboard~~
+4. ~~Phase 4 — Admin (commission, payouts, moderation, analytics, reviews)~~ ← *you are here*
 5. **Phase 5** — Performance, SEO, a11y polish
 
 ---

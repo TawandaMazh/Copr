@@ -16,6 +16,8 @@ export function OrderDetail({ orderId }: { orderId: string }) {
   const order = useCommerceStore((s) => s.orders.find((o) => o.id === orderId));
   const confirmDelivery = useCommerceStore((s) => s.confirmDelivery);
   const markShipped = useCommerceStore((s) => s.markShipped);
+  const openDispute = useCommerceStore((s) => s.openDispute);
+  const user = useCommerceStore((s) => s.user);
 
   if (!order) {
     return (
@@ -156,6 +158,30 @@ export function OrderDetail({ orderId }: { orderId: string }) {
               {sub.status === "completed" && (
                 <p className="text-sm text-primary dark:text-sky">
                   Escrow released to {sub.brandName}
+                </p>
+              )}
+              {user &&
+                sub.status !== "disputed" &&
+                sub.status !== "refunded" &&
+                sub.status !== "cancelled" && (
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() =>
+                      openDispute({
+                        orderId: order.id,
+                        subOrderId: sub.id,
+                        reason: "Issue with this brand shipment",
+                        notes: "Opened from order tracking",
+                      })
+                    }
+                  >
+                    Open dispute
+                  </Button>
+                )}
+              {sub.status === "disputed" && (
+                <p className="text-sm text-muted-foreground">
+                  Dispute open — admin will resolve at /admin/disputes
                 </p>
               )}
             </div>

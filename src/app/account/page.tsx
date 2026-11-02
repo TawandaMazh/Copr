@@ -48,14 +48,29 @@ export default function AccountPage() {
             </Button>
           </GlassCard>
 
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
             <Stat href="/orders" label="Orders" value={orders.length} />
             <Stat href="/wishlist" label="Wishlist" value={wishlist.length} />
             <Stat href="/account#addresses" label="Addresses" value={addresses.length} />
             <Stat
-              href={user.role === "seller" ? "/seller" : "/seller/apply"}
-              label={user.role === "seller" ? "Seller hub" : "Sell"}
-              value={user.role === "seller" ? "→" : "+"}
+              href={
+                user.role === "seller" || user.role === "admin"
+                  ? "/seller"
+                  : "/seller/apply"
+              }
+              label={
+                user.role === "seller" || user.role === "admin"
+                  ? "Seller hub"
+                  : "Sell"
+              }
+              value={
+                user.role === "seller" || user.role === "admin" ? "→" : "+"
+              }
+            />
+            <Stat
+              href="/admin"
+              label="Admin"
+              value={user.role === "admin" ? "→" : "··"}
             />
           </div>
 

@@ -74,16 +74,29 @@ export async function placeOrder(input: {
   form: CheckoutFormValues;
   productResolver?: ProductResolver;
   brandResolver?: BrandResolver;
+  commissionPercent?: number;
+  deliveryFeeOverride?: number;
 }): Promise<OrderRecord> {
   const productResolver = input.productResolver ?? getProductById;
   const brandResolver = input.brandResolver ?? getBrandById;
+  const commissionPercent =
+    input.commissionPercent ?? DEFAULT_COMMISSION_PERCENT;
 
-  const { lines, subtotal, deliveryFee, total } = resolveCartTotals(
+  const totals = resolveCartTotals(
     input.lines,
     input.form.deliveryMethod,
     productResolver,
     brandResolver,
   );
+  const lines = totals.lines;
+  const subtotal = totals.subtotal;
+  const deliveryFee =
+    input.deliveryFeeOverride !== undefined
+      ? input.form.deliveryMethod === "delivery" && lines.length > 0
+        ? input.deliveryFeeOverride
+        : 0
+      : totals.deliveryFee;
+  const total = subtotal + deliveryFee;
 
   if (lines.length === 0) {
     throw new Error("Your bag is empty");
@@ -116,7 +129,6 @@ export async function placeOrder(input: {
   const subOrders: SubOrderRecord[] = [];
   for (const [brandId, brandLines] of byBrand) {
     const brandSubtotal = brandLines.reduce((s, l) => s + l.lineTotal, 0);
-    const commissionPercent = DEFAULT_COMMISSION_PERCENT;
     const commissionAmount = Number(
       ((brandSubtotal * commissionPercent) / 100).toFixed(2),
     );

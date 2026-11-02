@@ -59,6 +59,10 @@ export function SellerShell({ children }: { children: React.ReactNode }) {
     );
   }
 
+  const isPending = brand.status === "pending";
+  const isBlocked =
+    brand.status === "rejected" || brand.status === "suspended";
+
   return (
     <div className="grid gap-6 lg:grid-cols-[220px_1fr]">
       <aside className="space-y-3 lg:sticky lg:top-24 lg:self-start">
@@ -94,19 +98,55 @@ export function SellerShell({ children }: { children: React.ReactNode }) {
             })}
           </nav>
           <div className="p-2 pt-3">
-            <Button asChild size="sm" className="w-full">
-              <Link href="/seller/products/new">
+            {isBlocked ? (
+              <Button size="sm" className="w-full" disabled>
                 <Plus className="h-4 w-4" strokeWidth={1.5} />
                 New product
-              </Link>
-            </Button>
+              </Button>
+            ) : (
+              <Button asChild size="sm" className="w-full">
+                <Link href="/seller/products/new">
+                  <Plus className="h-4 w-4" strokeWidth={1.5} />
+                  New product
+                </Link>
+              </Button>
+            )}
           </div>
         </GlassCard>
         <Button variant="ghost" size="sm" className="w-full" asChild>
           <Link href={`/brands/${brand.slug}`}>View public page</Link>
         </Button>
       </aside>
-      <div className="min-w-0">{children}</div>
+      <div className="min-w-0 space-y-4">
+        {isPending && (
+          <GlassCard className="border-primary/20 bg-primary/5 p-4">
+            <p className="font-semibold text-primary dark:text-sky">
+              Application pending
+            </p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              An admin must approve {brand.name} before you go fully live.
+              You can draft products; publishing waits on approval. Demo admins
+              approve at{" "}
+              <Link href="/admin/brands" className="text-primary hover:underline">
+                /admin/brands
+              </Link>
+              .
+            </p>
+          </GlassCard>
+        )}
+        {isBlocked && (
+          <GlassCard className="border-red-500/20 bg-red-500/5 p-4">
+            <p className="font-semibold capitalize text-red-700 dark:text-red-300">
+              Brand {brand.status}
+            </p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Contact copr support or wait for an admin to re-approve your
+              brand.
+            </p>
+          </GlassCard>
+        )}
+        {children}
+      </div>
     </div>
   );
 }

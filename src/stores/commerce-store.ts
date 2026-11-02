@@ -9,8 +9,16 @@ import type {
   SavedAddress,
   ShopperProfile,
 } from "@/types/commerce";
-import type { SellerBrand } from "@/types/seller";
+import type { SellerBrand, BrandApplicationStatus } from "@/types/seller";
 import type { Product, ProductVariant } from "@/types";
+import type {
+  AdminAnalytics,
+  DisputeRecord,
+  DisputeStatus,
+  MarketplaceSettings,
+  ReviewRecord,
+  ReviewStatus,
+} from "@/types/admin";
 import { placeOrder } from "@/lib/commerce/checkout";
 import { resolveProduct } from "@/lib/catalogue";
 import type { CheckoutFormValues } from "@/lib/validations/checkout";
@@ -22,9 +30,22 @@ import type {
 import { formatPhoneZM } from "@/lib/format";
 import { brands as seedBrands, getBrandById } from "@/data/brands";
 import { getProductsByBrand } from "@/data/products";
-import { DEFAULT_COMMISSION_PERCENT } from "@/lib/commerce/constants";
+import {
+  DEFAULT_COMMISSION_PERCENT,
+  DELIVERY_CITY,
+  DELIVERY_FEE_KWACHA,
+  AUTO_CONFIRM_DAYS,
+} from "@/lib/commerce/constants";
 
 export type SellerProduct = Product & { isPublished: boolean };
+
+const defaultSettings = (): MarketplaceSettings => ({
+  commissionPercent: DEFAULT_COMMISSION_PERCENT,
+  deliveryFeeKwacha: DELIVERY_FEE_KWACHA,
+  deliveryCity: DELIVERY_CITY,
+  autoConfirmDays: AUTO_CONFIRM_DAYS,
+  updatedAt: new Date().toISOString(),
+});
 
 interface CommerceState {
   user: ShopperProfile | null;
@@ -39,6 +60,12 @@ interface CommerceState {
   sellerBrand: SellerBrand | null;
   sellerProducts: SellerProduct[];
 
+  /** All seller brand applications (for admin). */
+  platformBrands: SellerBrand[];
+  settings: MarketplaceSettings;
+  reviews: ReviewRecord[];
+  disputes: DisputeRecord[];
+
   setCartOpen: (open: boolean) => void;
   signInDemo: (input: {
     fullName: string;
@@ -48,6 +75,7 @@ interface CommerceState {
   }) => void;
   signOut: () => void;
   setUserFromSupabase: (user: ShopperProfile | null) => void;
+  signInAdminDemo: () => void;
 
   addToCart: (productId: string, variantId: string, quantity?: number) => void;
   updateCartQuantity: (variantId: string, quantity: number) => void;
@@ -91,6 +119,44 @@ interface CommerceState {
     lifetimeCommission: number;
     orderCount: number;
   };
+
+  // Admin
+  updateSettings: (patch: Partial<MarketplaceSettings>) => void;
+  setBrandStatus: (
+    brandId: string,
+    status: BrandApplicationStatus,
+  ) => void;
+  moderateProduct: (
+    productId: string,
+    patch: Partial<Pick<SellerProduct, "isPublished" | "featured">>,
+  ) => void;
+  markPayoutStatus: (
+    payoutId: string,
+    status: PayoutRecord["status"],
+  ) => void;
+  openDispute: (input: {
+    orderId: string;
+    subOrderId: string;
+    reason: string;
+    notes?: string;
+  }) => DisputeRecord | null;
+  resolveDispute: (
+    disputeId: string,
+    status: Extract<
+      DisputeStatus,
+      "resolved_buyer" | "resolved_seller" | "closed" | "under_review"
+    >,
+    resolution: string,
+  ) => void;
+  addReview: (input: {
+    productId: string;
+    productName: string;
+    rating: number;
+    title: string;
+    body: string;
+  }) => ReviewRecord | null;
+  moderateReview: (reviewId: string, status: ReviewStatus) => void;
+  getAdminAnalytics: () => AdminAnalytics;
 }
 
 function newId(prefix: string) {
@@ -122,6 +188,10 @@ export const useCommerceStore = create<CommerceState>()(
       cartOpen: false,
       sellerBrand: null,
       sellerProducts: [],
+      platformBrands: [],
+      settings: defaultSettings(),
+      reviews: [],
+      disputes: [],
 
       setCartOpen: (open) => set({ cartOpen: open }),
 
@@ -133,6 +203,18 @@ export const useCommerceStore = create<CommerceState>()(
             email,
             phone: phone ? formatPhoneZM(phone) : undefined,
             role,
+            isDemo: true,
+          },
+        });
+      },
+
+      signInAdminDemo: () => {
+        set({
+          user: {
+            id: "demo_admin_copr",
+            fullName: "Copr Admin",
+            email: "admin@copr.zm",
+            role: "admin",
             isDemo: true,
           },
         });
@@ -240,6 +322,7 @@ export const useCommerceStore = create<CommerceState>()(
         }
 
         const brand = get().sellerBrand;
+        const settings = get().settings;
         const order = await placeOrder({
           userId: user.id,
           lines: state.cart,
@@ -249,8 +332,13 @@ export const useCommerceStore = create<CommerceState>()(
           },
           productResolver: (id) =>
             resolveProduct(id, get().sellerProducts),
-          brandResolver: (id) =>
-            (brand?.id === id ? brand : getBrandById(id)) ?? undefined,
+          brandResolver: (id) => {
+            if (brand?.id === id) return brand;
+            const platform = get().platformBrands.find((b) => b.id === id);
+            return platform ?? getBrandById(id) ?? undefined;
+          },
+          commissionPercent: settings.commissionPercent,
+          deliveryFeeOverride: settings.deliveryFeeKwacha,
         });
 
         set((s) => ({
@@ -422,13 +510,20 @@ export const useCommerceStore = create<CommerceState>()(
           banner: values.banner || DEFAULT_BANNER,
           featured: false,
           foundedYear: values.foundedYear,
-          status: "approved", // demo auto-approve; Phase 4 admin gate
+          status: "pending",
           contactEmail: values.contactEmail,
           contactPhone: formatPhoneZM(values.contactPhone),
           updatedAt: new Date().toISOString(),
         };
 
-        set({ user, sellerBrand: brand });
+        set((s) => ({
+          user,
+          sellerBrand: brand,
+          platformBrands: [
+            brand,
+            ...s.platformBrands.filter((b) => b.id !== brand.id),
+          ],
+        }));
         return brand;
       },
 
@@ -470,6 +565,10 @@ export const useCommerceStore = create<CommerceState>()(
             ...existing,
             ...state.sellerProducts.filter((p) => p.brandId !== brandId),
           ],
+          platformBrands: [
+            brand,
+            ...state.platformBrands.filter((b) => b.id !== brand.id),
+          ],
         });
         return brand;
       },
@@ -477,24 +576,29 @@ export const useCommerceStore = create<CommerceState>()(
       updateSellerBrand: (values) => {
         const brand = get().sellerBrand;
         if (!brand) return;
-        set({
-          sellerBrand: {
-            ...brand,
-            name: values.name,
-            slug: slugify(values.name),
-            tagline: values.tagline,
-            story: values.story,
-            location: values.location,
-            foundedYear: values.foundedYear,
-            logo: values.logo || brand.logo,
-            banner: values.banner || brand.banner,
-            contactEmail: values.contactEmail || brand.contactEmail,
-            contactPhone: values.contactPhone
-              ? formatPhoneZM(values.contactPhone)
-              : brand.contactPhone,
-            updatedAt: new Date().toISOString(),
-          },
-        });
+        const next: SellerBrand = {
+          ...brand,
+          name: values.name,
+          slug: slugify(values.name),
+          tagline: values.tagline,
+          story: values.story,
+          location: values.location,
+          foundedYear: values.foundedYear,
+          logo: values.logo || brand.logo,
+          banner: values.banner || brand.banner,
+          contactEmail: values.contactEmail || brand.contactEmail,
+          contactPhone: values.contactPhone
+            ? formatPhoneZM(values.contactPhone)
+            : brand.contactPhone,
+          updatedAt: new Date().toISOString(),
+        };
+        set((s) => ({
+          sellerBrand: next,
+          platformBrands: [
+            next,
+            ...s.platformBrands.filter((b) => b.id !== next.id),
+          ],
+        }));
       },
 
       upsertSellerProduct: (input, productId) => {
@@ -646,7 +750,6 @@ export const useCommerceStore = create<CommerceState>()(
           .reduce((s, { subOrder }) => s + subOrder.sellerAmount, 0);
 
         void pendingPayoutIds;
-        void DEFAULT_COMMISSION_PERCENT;
 
         return {
           available,
@@ -657,9 +760,215 @@ export const useCommerceStore = create<CommerceState>()(
           orderCount: rows.length,
         };
       },
+
+      updateSettings: (patch) =>
+        set((s) => ({
+          settings: {
+            ...s.settings,
+            ...patch,
+            updatedAt: new Date().toISOString(),
+          },
+        })),
+
+      setBrandStatus: (brandId, status) => {
+        set((s) => {
+          const sync = (b: SellerBrand | null) =>
+            b && b.id === brandId
+              ? { ...b, status, updatedAt: new Date().toISOString() }
+              : b;
+          return {
+            sellerBrand: sync(s.sellerBrand),
+            platformBrands: s.platformBrands.map((b) =>
+              b.id === brandId
+                ? { ...b, status, updatedAt: new Date().toISOString() }
+                : b,
+            ),
+          };
+        });
+      },
+
+      moderateProduct: (productId, patch) =>
+        set((s) => ({
+          sellerProducts: s.sellerProducts.map((p) =>
+            p.id === productId ? { ...p, ...patch } : p,
+          ),
+        })),
+
+      markPayoutStatus: (payoutId, status) => {
+        const now = new Date().toISOString();
+        set((s) => ({
+          payouts: s.payouts.map((p) =>
+            p.id === payoutId
+              ? {
+                  ...p,
+                  status,
+                  paidAt: status === "paid" ? now : p.paidAt,
+                }
+              : p,
+          ),
+        }));
+      },
+
+      openDispute: ({ orderId, subOrderId, reason, notes }) => {
+        const order = get().orders.find((o) => o.id === orderId);
+        const sub = order?.subOrders.find((s) => s.id === subOrderId);
+        const user = get().user;
+        if (!order || !sub || !user) return null;
+
+        const dispute: DisputeRecord = {
+          id: newId("disp"),
+          orderId,
+          subOrderId,
+          brandId: sub.brandId,
+          brandName: sub.brandName,
+          reason,
+          notes,
+          status: "open",
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          openedBy: user.id,
+        };
+
+        set((s) => ({
+          disputes: [dispute, ...s.disputes],
+          orders: s.orders.map((o) =>
+            o.id === orderId
+              ? {
+                  ...o,
+                  status: "disputed",
+                  subOrders: o.subOrders.map((so) =>
+                    so.id === subOrderId
+                      ? { ...so, status: "disputed" as const }
+                      : so,
+                  ),
+                  updatedAt: new Date().toISOString(),
+                }
+              : o,
+          ),
+        }));
+        return dispute;
+      },
+
+      resolveDispute: (disputeId, status, resolution) => {
+        const now = new Date().toISOString();
+        set((s) => {
+          const dispute = s.disputes.find((d) => d.id === disputeId);
+          return {
+            disputes: s.disputes.map((d) =>
+              d.id === disputeId
+                ? { ...d, status, resolution, updatedAt: now }
+                : d,
+            ),
+            orders: dispute
+              ? s.orders.map((o) =>
+                  o.id === dispute.orderId
+                    ? {
+                        ...o,
+                        status:
+                          status === "resolved_buyer"
+                            ? ("refunded" as const)
+                            : status === "resolved_seller"
+                              ? ("completed" as const)
+                              : o.status === "disputed"
+                                ? ("paid" as const)
+                                : o.status,
+                        subOrders: o.subOrders.map((so) =>
+                          so.id === dispute.subOrderId
+                            ? {
+                                ...so,
+                                status:
+                                  status === "resolved_buyer"
+                                    ? ("refunded" as const)
+                                    : status === "resolved_seller"
+                                      ? ("completed" as const)
+                                      : ("paid" as const),
+                                trackingNote: resolution,
+                              }
+                            : so,
+                        ),
+                        updatedAt: now,
+                      }
+                    : o,
+                )
+              : s.orders,
+          };
+        });
+      },
+
+      addReview: ({ productId, productName, rating, title, body }) => {
+        const user = get().user;
+        if (!user) return null;
+        const review: ReviewRecord = {
+          id: newId("rev"),
+          productId,
+          productName,
+          userId: user.id,
+          userName: user.fullName,
+          rating,
+          title,
+          body,
+          status: "published",
+          createdAt: new Date().toISOString(),
+        };
+        set((s) => ({ reviews: [review, ...s.reviews] }));
+        return review;
+      },
+
+      moderateReview: (reviewId, status) =>
+        set((s) => ({
+          reviews: s.reviews.map((r) =>
+            r.id === reviewId ? { ...r, status } : r,
+          ),
+        })),
+
+      getAdminAnalytics: () => {
+        const orders = get().orders;
+        const payouts = get().payouts;
+        const disputes = get().disputes;
+        const products = get().sellerProducts;
+        const brands = get().platformBrands;
+
+        let gmv = 0;
+        let commissionEarned = 0;
+        let subOrderCount = 0;
+        const statusBreakdown: AdminAnalytics["statusBreakdown"] = {};
+
+        for (const order of orders) {
+          gmv += order.subtotal;
+          statusBreakdown[order.status] =
+            (statusBreakdown[order.status] ?? 0) + 1;
+          for (const sub of order.subOrders) {
+            subOrderCount += 1;
+            commissionEarned += sub.commissionAmount;
+          }
+        }
+
+        return {
+          gmv,
+          orderCount: orders.length,
+          subOrderCount,
+          commissionEarned,
+          pendingPayouts: payouts
+            .filter((p) => p.status === "pending" || p.status === "processing")
+            .reduce((s, p) => s + p.amount, 0),
+          paidPayouts: payouts
+            .filter((p) => p.status === "paid")
+            .reduce((s, p) => s + p.amount, 0),
+          openDisputes: disputes.filter(
+            (d) => d.status === "open" || d.status === "under_review",
+          ).length,
+          pendingBrands: brands.filter((b) => b.status === "pending").length,
+          liveProducts: products.filter((p) => p.isPublished).length,
+          averageOrderValue:
+            orders.length === 0
+              ? 0
+              : Number((gmv / orders.length).toFixed(2)),
+          statusBreakdown,
+        };
+      },
     }),
     {
-      name: "copr-commerce-v2",
+      name: "copr-commerce-v3",
       partialize: (state) => ({
         user: state.user,
         cart: state.cart,
@@ -669,6 +978,10 @@ export const useCommerceStore = create<CommerceState>()(
         payouts: state.payouts,
         sellerBrand: state.sellerBrand,
         sellerProducts: state.sellerProducts,
+        platformBrands: state.platformBrands,
+        settings: state.settings,
+        reviews: state.reviews,
+        disputes: state.disputes,
       }),
     },
   ),
