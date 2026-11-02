@@ -58,10 +58,10 @@ Open [/admin](http://localhost:3000/admin) → **Continue as demo admin**. Moder
 
 ## Connect Supabase
 
-1. Copy `.env.example` → `.env.local` and set:
-   - `NEXT_PUBLIC_SUPABASE_URL` — `https://<project-ref>.supabase.co` (no `/rest/v1`)
-   - `NEXT_PUBLIC_SUPABASE_ANON_KEY` — publishable (`sb_publishable_…`) or legacy anon JWT
-2. Apply schema + RLS (see [`supabase/APPLY.md`](supabase/APPLY.md))
+Live project: `koyosnsrparlhljvybok` · production: [copr-phi.vercel.app](https://copr-phi.vercel.app)
+
+1. Copy `.env.example` → `.env.local` (URL + keys are documented in [`supabase/APPLY.md`](supabase/APPLY.md))
+2. Schema, RLS, seed, and storage buckets are applied; finish Auth URLs + storage RLS via the checklist in `APPLY.md`
 3. Auth → Email OTP (Phone optional for +260 SMS)
 
 With keys set, the app loads **brands/products/categories from Supabase** (falls back to local seed if the API is unreachable). Signed-in shoppers sync **cart, wishlist, addresses, and orders** to Supabase; guests stay on local zustand.

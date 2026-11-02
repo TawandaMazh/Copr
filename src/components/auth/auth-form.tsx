@@ -17,6 +17,7 @@ import { useCommerceStore } from "@/stores/commerce-store";
 import { Button } from "@/components/ui/button";
 import { GlassCard } from "@/components/ui/glass-card";
 import { formatPhoneZM } from "@/lib/format";
+import { getSiteUrl } from "@/lib/site";
 import { cn } from "@/lib/utils";
 
 type Mode = "email" | "phone";
@@ -80,6 +81,7 @@ export function AuthForm({
         options: {
           data: { full_name: values.fullName },
           shouldCreateUser: true,
+          emailRedirectTo: `${getSiteUrl()}/account`,
         },
       });
       if (err) {
