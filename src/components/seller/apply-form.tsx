@@ -12,6 +12,8 @@ import { useCommerceStore } from "@/stores/commerce-store";
 import { brands } from "@/data/brands";
 import { Button } from "@/components/ui/button";
 import { GlassCard } from "@/components/ui/glass-card";
+import { ImageUploadField } from "@/components/seller/image-upload-field";
+import { BRAND_ASSETS_BUCKET } from "@/lib/supabase/storage";
 
 export function ApplyForm() {
   const router = useRouter();
@@ -50,7 +52,8 @@ export function ApplyForm() {
       <div className="space-y-2 text-center">
         <h1 className="text-3xl font-semibold tracking-tight">Apply to sell</h1>
         <p className="text-muted-foreground">
-          Demo mode auto-approves applications. Phase 4 adds admin review.
+          New brands stay pending until an admin approves them. Claim a demo
+          brand to edit live catalogue inventory right away.
         </p>
       </div>
 
@@ -131,24 +134,33 @@ export function ApplyForm() {
               {...form.register("foundedYear", { valueAsNumber: true })}
             />
           </Field>
-          <Field label="Logo image URL" error={form.formState.errors.logo?.message}>
-            <input
-              className="field"
-              placeholder="https://…"
-              {...form.register("logo")}
-            />
-          </Field>
-          <Field
-            label="Banner image URL"
-            error={form.formState.errors.banner?.message}
+          <ImageUploadField
+            label="Logo"
+            bucket={BRAND_ASSETS_BUCKET}
+            pathPrefix="brands/applications/logo"
+            value={form.watch("logo")}
+            onChange={(next) =>
+              form.setValue("logo", next, {
+                shouldDirty: true,
+                shouldValidate: true,
+              })
+            }
+            error={form.formState.errors.logo?.message}
+          />
+          <ImageUploadField
             className="sm:col-span-2"
-          >
-            <input
-              className="field"
-              placeholder="https://…"
-              {...form.register("banner")}
-            />
-          </Field>
+            label="Banner"
+            bucket={BRAND_ASSETS_BUCKET}
+            pathPrefix="brands/applications/banner"
+            value={form.watch("banner")}
+            onChange={(next) =>
+              form.setValue("banner", next, {
+                shouldDirty: true,
+                shouldValidate: true,
+              })
+            }
+            error={form.formState.errors.banner?.message}
+          />
         </GlassCard>
         <Button type="submit" size="lg" className="w-full" disabled={pending}>
           Submit application

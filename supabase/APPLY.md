@@ -9,7 +9,8 @@ The app talks to project `koyosnsrparlhljvybok` (eu-west-1).
 | `schema` + `rls` + `seed` | Applied (8 categories, 10 brands, 60 products, 120 images, 719 variants) |
 | Profile trigger `on_auth_user_created` | Applied |
 | Storage buckets `product-images`, `brand-assets` | Created (public, 5 MB, jpeg/png/webp/avif) |
-| Storage object RLS policies | **Run** `migrations/20260322000004_storage.sql` in the [SQL Editor](https://supabase.com/dashboard/project/koyosnsrparlhljvybok/sql/new) (pooler cannot own `storage.objects`) |
+| Storage object RLS policies | Applied |
+| Brand claim policy (`brands_claim_unowned`) | Applied |
 | Auth → Email provider | On |
 | Auth → Phone / SMS | Off until Twilio (or another SMS provider) is configured |
 | Auth URL Configuration | Set Site URL + redirects (see below) |
@@ -45,6 +46,7 @@ Phone OTP is optional: Auth → Providers → Phone + SMS provider credentials f
    - `migrations/20260322000002_rls.sql`
    - (optional) `migrations/20260322000003_seed.sql` — large seed for DB catalogue
    - `migrations/20260322000004_storage.sql` — buckets + storage RLS
+   - `migrations/20260322000005_claim_brand.sql` — claim unowned brands
 3. Confirm Auth → Providers → **Email** is on. Enable **Phone** only if you want +260 SMS.
 
 ### Option B — CLI (needs DB password or access token)

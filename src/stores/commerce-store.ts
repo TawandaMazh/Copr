@@ -415,9 +415,13 @@ export const useCommerceStore = create<CommerceState>()(
           hydrateCartFromSupabase,
           hydrateWishlistFromSupabase,
         } = await import("@/lib/commerce/supabase-sync");
-        const [remoteCart, remoteWishlist] = await Promise.all([
+        const { hydrateSellerFromSupabase } = await import(
+          "@/lib/commerce/seller-sync"
+        );
+        const [remoteCart, remoteWishlist, remoteSeller] = await Promise.all([
           hydrateCartFromSupabase(),
           hydrateWishlistFromSupabase(),
+          hydrateSellerFromSupabase(),
         ]);
         set((s) => ({
           cart:
@@ -428,6 +432,18 @@ export const useCommerceStore = create<CommerceState>()(
             remoteWishlist && remoteWishlist.length > 0
               ? remoteWishlist
               : s.wishlist,
+          ...(remoteSeller?.brand
+            ? {
+                sellerBrand: remoteSeller.brand,
+                sellerProducts: remoteSeller.products,
+                platformBrands: [
+                  remoteSeller.brand,
+                  ...s.platformBrands.filter(
+                    (b) => b.id !== remoteSeller.brand!.id,
+                  ),
+                ],
+              }
+            : {}),
         }));
         // Push guest cart up if remote was empty
         if (remoteCart && remoteCart.length === 0 && get().cart.length > 0) {
@@ -601,6 +617,11 @@ export const useCommerceStore = create<CommerceState>()(
             ...s.platformBrands.filter((b) => b.id !== brand.id),
           ],
         }));
+        if (!user.isDemo) {
+          void import("@/lib/commerce/seller-sync").then(
+            ({ persistBrandApplication }) => persistBrandApplication(brand),
+          );
+        }
         return brand;
       },
 
@@ -647,6 +668,11 @@ export const useCommerceStore = create<CommerceState>()(
             ...state.platformBrands.filter((b) => b.id !== brand.id),
           ],
         });
+        if (!user.isDemo) {
+          void import("@/lib/commerce/seller-sync").then(
+            ({ claimBrandInSupabase }) => claimBrandInSupabase(brandId),
+          );
+        }
         return brand;
       },
 
@@ -676,6 +702,12 @@ export const useCommerceStore = create<CommerceState>()(
             ...s.platformBrands.filter((b) => b.id !== next.id),
           ],
         }));
+        const user = get().user;
+        if (user && !user.isDemo) {
+          void import("@/lib/commerce/seller-sync").then(
+            ({ updateBrandInSupabase }) => updateBrandInSupabase(next),
+          );
+        }
       },
 
       upsertSellerProduct: (input, productId) => {
@@ -726,13 +758,28 @@ export const useCommerceStore = create<CommerceState>()(
           ],
         }));
 
+        const user = get().user;
+        if (user && !user.isDemo) {
+          void import("@/lib/commerce/seller-sync").then(
+            ({ upsertProductInSupabase }) => upsertProductInSupabase(product),
+          );
+        }
+
         return product;
       },
 
-      deleteSellerProduct: (productId) =>
+      deleteSellerProduct: (productId) => {
         set((state) => ({
           sellerProducts: state.sellerProducts.filter((p) => p.id !== productId),
-        })),
+        }));
+        const user = get().user;
+        if (user && !user.isDemo) {
+          void import("@/lib/commerce/seller-sync").then(
+            ({ deleteProductInSupabase }) =>
+              deleteProductInSupabase(productId),
+          );
+        }
+      },
 
       getSellerOrders: () => {
         const brandId = get().sellerBrand?.id;
@@ -862,14 +909,29 @@ export const useCommerceStore = create<CommerceState>()(
             ),
           };
         });
+        const user = get().user;
+        if (user && !user.isDemo) {
+          void import("@/lib/commerce/seller-sync").then(
+            ({ setBrandStatusInSupabase }) =>
+              setBrandStatusInSupabase(brandId, status),
+          );
+        }
       },
 
-      moderateProduct: (productId, patch) =>
+      moderateProduct: (productId, patch) => {
         set((s) => ({
           sellerProducts: s.sellerProducts.map((p) =>
             p.id === productId ? { ...p, ...patch } : p,
           ),
-        })),
+        }));
+        const user = get().user;
+        if (user && !user.isDemo) {
+          void import("@/lib/commerce/seller-sync").then(
+            ({ moderateProductInSupabase }) =>
+              moderateProductInSupabase(productId, patch),
+          );
+        }
+      },
 
       markPayoutStatus: (payoutId, status) => {
         const now = new Date().toISOString();

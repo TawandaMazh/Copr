@@ -15,6 +15,8 @@ import {
 import { useCommerceStore, type SellerProduct } from "@/stores/commerce-store";
 import { Button } from "@/components/ui/button";
 import { GlassCard } from "@/components/ui/glass-card";
+import { ImageUploadField } from "@/components/seller/image-upload-field";
+import { PRODUCT_IMAGES_BUCKET } from "@/lib/supabase/storage";
 import { Plus, Trash2 } from "lucide-react";
 
 export function ProductForm({ product }: { product?: SellerProduct }) {
@@ -111,22 +113,25 @@ export function ProductForm({ product }: { product?: SellerProduct }) {
         >
           <textarea className="field" rows={4} {...form.register("description")} />
         </Field>
-        <Field
-          label="Image URLs (one per line)"
+        <ImageUploadField
+          className="sm:col-span-2"
+          label="Images (upload or paste URLs, one per line)"
+          bucket={PRODUCT_IMAGES_BUCKET}
+          pathPrefix={`products/${product?.id ?? "new"}`}
+          multiline
+          value={form.watch("images")}
+          onChange={(next) =>
+            form.setValue("images", next, {
+              shouldDirty: true,
+              shouldValidate: true,
+            })
+          }
           error={
             typeof form.formState.errors.images?.message === "string"
               ? form.formState.errors.images.message
               : undefined
           }
-          className="sm:col-span-2"
-        >
-          <textarea
-            className="field"
-            rows={3}
-            placeholder="https://images.unsplash.com/…"
-            {...form.register("images")}
-          />
-        </Field>
+        />
         <label className="flex items-center gap-2 text-sm">
           <input type="checkbox" {...form.register("isPublished")} />
           Published on shop

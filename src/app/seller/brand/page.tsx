@@ -10,6 +10,8 @@ import {
 import { useCommerceStore } from "@/stores/commerce-store";
 import { GlassCard } from "@/components/ui/glass-card";
 import { Button } from "@/components/ui/button";
+import { ImageUploadField } from "@/components/seller/image-upload-field";
+import { BRAND_ASSETS_BUCKET } from "@/lib/supabase/storage";
 
 export default function SellerBrandPage() {
   const brand = useCommerceStore((s) => s.sellerBrand);
@@ -94,20 +96,34 @@ export default function SellerBrandPage() {
               {...form.register("foundedYear", { valueAsNumber: true })}
             />
           </Field>
-          <Field
-            label="Logo URL"
+          <ImageUploadField
+            className="sm:col-span-2"
+            label="Logo"
+            bucket={BRAND_ASSETS_BUCKET}
+            pathPrefix={`brands/${brand.id}/logo`}
+            value={form.watch("logo")}
+            onChange={(next) =>
+              form.setValue("logo", next, {
+                shouldDirty: true,
+                shouldValidate: true,
+              })
+            }
             error={form.formState.errors.logo?.message}
+          />
+          <ImageUploadField
             className="sm:col-span-2"
-          >
-            <input className="field" {...form.register("logo")} />
-          </Field>
-          <Field
-            label="Banner URL"
+            label="Banner"
+            bucket={BRAND_ASSETS_BUCKET}
+            pathPrefix={`brands/${brand.id}/banner`}
+            value={form.watch("banner")}
+            onChange={(next) =>
+              form.setValue("banner", next, {
+                shouldDirty: true,
+                shouldValidate: true,
+              })
+            }
             error={form.formState.errors.banner?.message}
-            className="sm:col-span-2"
-          >
-            <input className="field" {...form.register("banner")} />
-          </Field>
+          />
         </GlassCard>
         <div className="flex items-center gap-3">
           <Button type="submit" disabled={pending}>
