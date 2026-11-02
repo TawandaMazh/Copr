@@ -1,6 +1,14 @@
 # Apply copr schema to your Supabase project
 
-The app talks to project `koyosnsrparlhljvybok`. Catalogue/checkout still use local demo data; **auth + future tables** need these migrations.
+The app talks to project `koyosnsrparlhljvybok` (eu-west-1).
+
+**Status (Nov 2026):** `schema` + `rls` + `seed` have been applied on the live project
+(8 categories, 10 brands, 60 products). Catalogue/checkout in the Next app can still
+use local seed until we switch readers to Supabase; **auth + profiles** are ready.
+
+---
+
+## Re-apply / fresh project
 
 ## Option A — SQL Editor (no secret key)
 
