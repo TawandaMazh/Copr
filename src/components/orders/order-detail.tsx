@@ -9,6 +9,11 @@ import { PriceTag } from "@/components/ui/price-tag";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { AUTO_CONFIRM_DAYS } from "@/lib/commerce/constants";
+import {
+  orderStatusHint,
+  orderStatusLabel,
+  paymentStatusLabel,
+} from "@/lib/commerce/status-labels";
 
 export function OrderDetail({ orderId }: { orderId: string }) {
   const searchParams = useSearchParams();
@@ -19,12 +24,16 @@ export function OrderDetail({ orderId }: { orderId: string }) {
   const openDispute = useCommerceStore((s) => s.openDispute);
   const user = useCommerceStore((s) => s.user);
 
+  const canManageFulfilment =
+    user?.role === "seller" || user?.role === "admin";
+
   if (!order) {
     return (
       <GlassCard className="space-y-4 p-8 text-center">
         <p className="text-lg font-medium">Order not found</p>
         <p className="text-sm text-muted-foreground">
-          This order may be from another device or session.
+          Sign in with the same account you used at checkout, or check your
+          email for the order link.
         </p>
         <Button asChild>
           <Link href="/orders">Back to orders</Link>
@@ -33,28 +42,38 @@ export function OrderDetail({ orderId }: { orderId: string }) {
     );
   }
 
+  const hint = orderStatusHint(order.status);
+
   return (
     <div className="space-y-6">
       {justPlaced && (
         <GlassCard className="border-primary/20 bg-primary/5 p-5">
           <p className="font-semibold text-primary dark:text-sky">
-            Order placed — payment HELD in mock escrow
+            Order placed — payment secured
           </p>
           <p className="mt-1 text-sm text-muted-foreground">
-            Brands will fulfil separately. Confirm delivery (or wait{" "}
-            {AUTO_CONFIRM_DAYS} days) to RELEASE funds minus commission.
+            Each brand packs and ships its own items. When a parcel arrives,
+            confirm delivery (or we’ll auto-confirm after {AUTO_CONFIRM_DAYS}{" "}
+            days) so that brand gets paid.
           </p>
         </GlassCard>
       )}
 
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="space-y-1">
-          <h1 className="text-3xl font-semibold tracking-tight">Order tracking</h1>
-          <p className="font-mono text-sm text-muted-foreground">{order.id}</p>
+          <h1 className="text-3xl font-semibold tracking-tight">Your order</h1>
+          <p className="text-sm text-muted-foreground">
+            Placed{" "}
+            {new Date(order.createdAt).toLocaleString("en-ZM", {
+              dateStyle: "medium",
+              timeStyle: "short",
+            })}
+          </p>
+          {hint && (
+            <p className="max-w-xl text-sm text-muted-foreground">{hint}</p>
+          )}
         </div>
-        <Badge variant="secondary" className="capitalize">
-          {order.status.replaceAll("_", " ")}
-        </Badge>
+        <Badge variant="secondary">{orderStatusLabel(order.status)}</Badge>
       </div>
 
       <div className="grid gap-4 lg:grid-cols-3">
@@ -62,7 +81,9 @@ export function OrderDetail({ orderId }: { orderId: string }) {
           <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
             Delivery
           </p>
-          <p className="font-medium capitalize">{order.deliveryMethod}</p>
+          <p className="font-medium capitalize">
+            {order.deliveryMethod === "pickup" ? "Pickup" : "Home delivery"}
+          </p>
           <p className="text-sm text-muted-foreground">
             {order.deliveryArea} · {order.deliveryNeighbourhood}
             {order.deliveryLandmark ? ` · ${order.deliveryLandmark}` : ""}
@@ -74,12 +95,12 @@ export function OrderDetail({ orderId }: { orderId: string }) {
           <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
             Payment
           </p>
-          <p className="font-medium capitalize">
-            {order.payment?.status ?? "pending"} · {order.payment?.provider}
+          <p className="font-medium">
+            {paymentStatusLabel(order.payment?.status ?? "pending")}
           </p>
           <PriceTag amount={order.total} />
-          <p className="truncate text-xs text-muted-foreground">
-            Ref {order.payment?.providerRef}
+          <p className="text-xs text-muted-foreground">
+            Payment is held safely until you confirm each brand delivery.
           </p>
         </GlassCard>
       </div>
@@ -88,25 +109,33 @@ export function OrderDetail({ orderId }: { orderId: string }) {
         <h2 className="text-xl font-semibold tracking-tight">
           Brand shipments
         </h2>
+        <p className="text-sm text-muted-foreground">
+          Multi-brand baskets split into separate parcels — track each one
+          below.
+        </p>
         {order.subOrders.map((sub) => (
           <GlassCard key={sub.id} className="space-y-4 p-5">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <div>
                 <p className="font-semibold">{sub.brandName}</p>
                 <p className="text-sm text-muted-foreground">
-                  Seller receives{" "}
-                  <PriceTag amount={sub.sellerAmount} size="sm" className="inline" />{" "}
-                  after release (commission {sub.commissionPercent}%)
+                  Subtotal{" "}
+                  <PriceTag
+                    amount={sub.subtotal}
+                    size="sm"
+                    className="inline"
+                  />
                 </p>
               </div>
-              <Badge variant="outline" className="capitalize">
-                {sub.status.replaceAll("_", " ")}
-              </Badge>
+              <Badge variant="outline">{orderStatusLabel(sub.status)}</Badge>
             </div>
 
             <ul className="space-y-3">
               {sub.items.map((item) => (
-                <li key={`${item.variantId}-${item.productId}`} className="flex gap-3">
+                <li
+                  key={`${item.variantId}-${item.productId}`}
+                  className="flex gap-3"
+                >
                   <div className="relative h-16 w-14 overflow-hidden rounded-xl bg-ice dark:bg-navy/40">
                     {item.productImage && (
                       <Image
@@ -119,7 +148,9 @@ export function OrderDetail({ orderId }: { orderId: string }) {
                     )}
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-medium">{item.productName}</p>
+                    <p className="truncate text-sm font-medium">
+                      {item.productName}
+                    </p>
                     <p className="text-xs text-muted-foreground">
                       {item.colour} · {item.size} · ×{item.quantity}
                     </p>
@@ -131,39 +162,42 @@ export function OrderDetail({ orderId }: { orderId: string }) {
 
             {sub.trackingNote && (
               <p className="text-sm text-muted-foreground">
-                Note: {sub.trackingNote}
+                Courier note: {sub.trackingNote}
               </p>
             )}
 
             <div className="flex flex-wrap gap-2">
-              {(sub.status === "paid" || sub.status === "processing") && (
-                <Button
-                  size="sm"
-                  variant="secondary"
-                  onClick={() =>
-                    markShipped(order.id, sub.id, "Handed to Lusaka rider")
-                  }
-                >
-                  Mark shipped (demo)
-                </Button>
-              )}
+              {canManageFulfilment &&
+                (sub.status === "paid" || sub.status === "processing") && (
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    onClick={() =>
+                      markShipped(order.id, sub.id, "Handed to Lusaka rider")
+                    }
+                  >
+                    Mark as shipped
+                  </Button>
+                )}
               {(sub.status === "shipped" || sub.status === "delivered") && (
                 <Button
                   size="sm"
                   onClick={() => confirmDelivery(order.id, sub.id)}
                 >
-                  Confirm delivery · release escrow
+                  Confirm delivery
                 </Button>
               )}
               {sub.status === "completed" && (
                 <p className="text-sm text-primary dark:text-sky">
-                  Escrow released to {sub.brandName}
+                  Delivery confirmed — {sub.brandName} will be paid.
                 </p>
               )}
               {user &&
+                user.role === "shopper" &&
                 sub.status !== "disputed" &&
                 sub.status !== "refunded" &&
-                sub.status !== "cancelled" && (
+                sub.status !== "cancelled" &&
+                sub.status !== "completed" && (
                   <Button
                     size="sm"
                     variant="ghost"
@@ -176,12 +210,13 @@ export function OrderDetail({ orderId }: { orderId: string }) {
                       })
                     }
                   >
-                    Open dispute
+                    Report a problem
                   </Button>
                 )}
               {sub.status === "disputed" && (
                 <p className="text-sm text-muted-foreground">
-                  Dispute open — admin will resolve at /admin/disputes
+                  We’ve flagged this shipment for review. Our team will follow
+                  up.
                 </p>
               )}
             </div>

@@ -6,6 +6,7 @@ import { GlassCard } from "@/components/ui/glass-card";
 import { PriceTag } from "@/components/ui/price-tag";
 import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/empty-state";
+import { orderStatusLabel } from "@/lib/commerce/status-labels";
 
 export function OrdersList() {
   const orders = useCommerceStore((s) => s.orders);
@@ -14,7 +15,7 @@ export function OrdersList() {
     return (
       <EmptyState
         title="No orders yet"
-        description="When you check out, tracking and escrow status will show here."
+        description="After checkout, you’ll track each brand’s shipment here and confirm delivery when parcels arrive."
         actionHref="/shop"
         actionLabel="Start shopping"
       />
@@ -29,7 +30,10 @@ export function OrdersList() {
             <GlassCard hover className="flex flex-col gap-3 p-5 sm:flex-row sm:items-center sm:justify-between">
               <div className="space-y-1">
                 <p className="font-semibold tracking-tight">
-                  Order {order.id.slice(0, 14)}…
+                  {order.subOrders.map((s) => s.brandName).slice(0, 2).join(" · ")}
+                  {order.subOrders.length > 2
+                    ? ` +${order.subOrders.length - 2}`
+                    : ""}
                 </p>
                 <p className="text-sm text-muted-foreground">
                   {new Date(order.createdAt).toLocaleString("en-ZM", {
@@ -42,8 +46,8 @@ export function OrdersList() {
                 </p>
               </div>
               <div className="flex items-center gap-3">
-                <Badge variant="secondary" className="capitalize">
-                  {order.status.replaceAll("_", " ")}
+                <Badge variant="secondary">
+                  {orderStatusLabel(order.status)}
                 </Badge>
                 <PriceTag amount={order.total} />
               </div>

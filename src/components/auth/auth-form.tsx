@@ -63,7 +63,9 @@ export function AuthForm({
 
   const finishDemo = (fullName: string, email?: string, phone?: string) => {
     signInDemo({ fullName, email, phone });
-    setMessage("Signed in with local demo session (no Supabase keys).");
+    setMessage(
+      "Signed in on this device only. Use email sign-in when available to sync across phones.",
+    );
     onSuccess?.();
   };
 
@@ -182,41 +184,37 @@ export function AuthForm({
         <h2 className="text-xl font-semibold tracking-tight">Sign in to copr</h2>
         <p className="text-sm text-muted-foreground">
           {supabaseReady
-            ? "Email OTP via Supabase (phone SMS not enabled on this project yet)"
-            : "Email or phone OTP · demo mode (local) until Supabase is linked"}
+            ? "We’ll email you a 6-digit code — no password needed."
+            : "Try the shop with a quick demo sign-in on this device."}
         </p>
       </div>
 
       {step === "identify" && (
         <>
-          <div className="flex gap-2 rounded-full glass p-1">
-            {(["email", "phone"] as const).map((m) => (
-              <button
-                key={m}
-                type="button"
-                onClick={() => {
-                  setMode(m);
-                  setError(null);
-                }}
-                className={cn(
-                  "flex-1 rounded-full px-3 py-2 text-sm font-medium transition-colors",
-                  mode === m
-                    ? "bg-primary text-white"
-                    : "text-muted-foreground hover:text-foreground",
-                )}
-              >
-                {m === "email" ? "Email" : "Phone"}
-              </button>
-            ))}
-          </div>
-          {supabaseReady && mode === "phone" && (
-            <p className="text-xs text-muted-foreground">
-              Phone OTP needs SMS enabled in the Supabase dashboard (Auth →
-              Providers → Phone). Prefer email for now.
-            </p>
+          {!supabaseReady && (
+            <div className="flex gap-2 rounded-full glass p-1">
+              {(["email", "phone"] as const).map((m) => (
+                <button
+                  key={m}
+                  type="button"
+                  onClick={() => {
+                    setMode(m);
+                    setError(null);
+                  }}
+                  className={cn(
+                    "flex-1 rounded-full px-3 py-2 text-sm font-medium transition-colors",
+                    mode === m
+                      ? "bg-primary text-white"
+                      : "text-muted-foreground hover:text-foreground",
+                  )}
+                >
+                  {m === "email" ? "Email" : "Phone"}
+                </button>
+              ))}
+            </div>
           )}
 
-          {mode === "email" ? (
+          {supabaseReady || mode === "email" ? (
             <form
               className="space-y-3"
               onSubmit={emailForm.handleSubmit(requestEmail)}
@@ -243,7 +241,7 @@ export function AuthForm({
                 />
               </Field>
               <Button type="submit" className="w-full" disabled={pending}>
-                {supabaseReady ? "Send code" : "Continue (demo)"}
+                {supabaseReady ? "Email me a code" : "Continue on this device"}
               </Button>
             </form>
           ) : (
@@ -273,7 +271,7 @@ export function AuthForm({
                 />
               </Field>
               <Button type="submit" className="w-full" disabled={pending}>
-                {supabaseReady ? "Send SMS code" : "Continue (demo)"}
+                Continue on this device
               </Button>
             </form>
           )}

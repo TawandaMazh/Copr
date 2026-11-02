@@ -29,14 +29,15 @@ export default function AdminPayoutsPage() {
       <div>
         <h1 className="text-3xl font-semibold tracking-tight">Payouts</h1>
         <p className="text-muted-foreground">
-          Escrow releases create payout rows. Mark them processing → paid.
+          When a shopper confirms delivery, a payout appears here. Move it
+          processing → paid once you’ve sent money to the brand.
         </p>
       </div>
 
       {payouts.length === 0 ? (
         <GlassCard className="p-8 text-center text-sm text-muted-foreground">
-          No payouts yet. Confirm delivery on an order to release escrow and
-          create a payout.
+          No payouts yet. They appear after a shopper confirms delivery on a
+          brand shipment.
         </GlassCard>
       ) : (
         <>

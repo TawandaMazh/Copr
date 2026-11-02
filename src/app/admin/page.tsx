@@ -5,6 +5,7 @@ import { useCommerceStore } from "@/stores/commerce-store";
 import { GlassCard } from "@/components/ui/glass-card";
 import { PriceTag } from "@/components/ui/price-tag";
 import { Button } from "@/components/ui/button";
+import { orderStatusLabel } from "@/lib/commerce/status-labels";
 
 export default function AdminOverviewPage() {
   const user = useCommerceStore((s) => s.user);
@@ -21,8 +22,12 @@ export default function AdminOverviewPage() {
         <div>
           <h1 className="text-3xl font-semibold tracking-tight">Overview</h1>
           <p className="text-muted-foreground">
-            Marketplace pulse · commission {settings.commissionPercent}% ·{" "}
-            {settings.deliveryCity}
+            Marketplace pulse · {settings.commissionPercent}% commission ·{" "}
+            {settings.deliveryCity} delivery
+          </p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Today: approve pending brands, clear payouts after confirmed
+            deliveries, and resolve open disputes.
           </p>
         </div>
         <Button variant="secondary" asChild>
@@ -64,8 +69,8 @@ export default function AdminOverviewPage() {
                 key={status}
                 className="flex justify-between rounded-2xl bg-white/40 px-3 py-2 text-sm dark:bg-navy/30"
               >
-                <span className="capitalize text-muted-foreground">
-                  {status.replaceAll("_", " ")}
+                <span className="text-muted-foreground">
+                  {orderStatusLabel(status)}
                 </span>
                 <span className="font-semibold">{count}</span>
               </li>

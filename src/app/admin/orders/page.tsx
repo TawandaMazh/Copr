@@ -6,6 +6,7 @@ import { GlassCard } from "@/components/ui/glass-card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { PriceTag } from "@/components/ui/price-tag";
+import { orderStatusLabel } from "@/lib/commerce/status-labels";
 
 export default function AdminOrdersPage() {
   const user = useCommerceStore((s) => s.user);
@@ -20,13 +21,14 @@ export default function AdminOrdersPage() {
       <div>
         <h1 className="text-3xl font-semibold tracking-tight">Orders</h1>
         <p className="text-muted-foreground">
-          All marketplace orders and brand sub-shipments.
+          Every checkout splits into per-brand shipments. Help sellers ship, or
+          open a dispute if a shopper reports a problem.
         </p>
       </div>
 
       {orders.length === 0 ? (
         <GlassCard className="p-8 text-center text-sm text-muted-foreground">
-          No orders yet. Place a checkout from the shop to populate this list.
+          No orders yet. Once shoppers check out, brand shipments appear here.
         </GlassCard>
       ) : (
         <ul className="space-y-4">
@@ -46,8 +48,8 @@ export default function AdminOrdersPage() {
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Badge variant="secondary" className="capitalize">
-                    {order.status.replaceAll("_", " ")}
+                  <Badge variant="secondary">
+                    {orderStatusLabel(order.status)}
                   </Badge>
                   <PriceTag amount={order.total} size="sm" />
                   <Button variant="ghost" size="sm" asChild>
@@ -83,8 +85,8 @@ export default function AdminOrdersPage() {
                       </p>
                     </div>
                     <div className="flex flex-wrap items-center gap-2">
-                      <Badge variant="outline" className="capitalize">
-                        {sub.status.replaceAll("_", " ")}
+                      <Badge variant="outline">
+                        {orderStatusLabel(sub.status)}
                       </Badge>
                       {(sub.status === "paid" ||
                         sub.status === "processing") && (

@@ -41,13 +41,16 @@ export default function AdminSettingsPage() {
         <h1 className="text-3xl font-semibold tracking-tight">Settings</h1>
         <p className="text-muted-foreground">
           Marketplace commission, delivery fee, and auto-confirm window.
+          {user.isDemo
+            ? " Demo admin saves stay on this device."
+            : " Saves update the live marketplace settings."}
         </p>
       </div>
 
       <GlassCard className="mx-auto max-w-lg space-y-4 p-6">
         <Field
           label="Commission %"
-          hint="Applied to new orders at checkout (per brand subtotal)."
+          hint="Taken from each brand’s order subtotal at checkout."
         >
           <input
             type="number"
@@ -85,7 +88,7 @@ export default function AdminSettingsPage() {
 
         <Field
           label="Auto-confirm days"
-          hint="Days after delivery before escrow auto-releases (display only in demo)."
+          hint="Days after a parcel is marked delivered before payment auto-releases to the brand."
         >
           <input
             type="number"

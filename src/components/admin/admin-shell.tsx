@@ -71,18 +71,19 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           <Shield className="mx-auto h-8 w-8 text-primary" strokeWidth={1.5} />
           <p className="text-xl font-semibold tracking-tight">Admin access</p>
           <p className="text-sm text-muted-foreground">
-            Sign in with an admin account to moderate brands, payouts, and
-            disputes.
+            Use a live admin account from Account, or explore with a demo
+            session on this device (demo changes stay local unless you already
+            signed in with admin rights).
           </p>
           <Button
             type="button"
             className="w-full"
             onClick={() => signInAdminDemo()}
           >
-            Continue as demo admin
+            Explore as demo admin
           </Button>
           <Button variant="ghost" asChild className="w-full">
-            <Link href="/account">Shopper / seller sign in</Link>
+            <Link href="/account">Sign in via Account</Link>
           </Button>
         </GlassCard>
       </div>
@@ -94,10 +95,13 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
       <aside className="space-y-3 lg:sticky lg:top-24 lg:self-start">
         <GlassCard strong className="space-y-1 p-3">
           <p className="px-3 pt-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-            Admin
+            Admin {user.isDemo ? "· demo" : "· live"}
           </p>
-          <p className="truncate px-3 pb-2 text-xs text-muted-foreground">
+          <p className="truncate px-3 text-xs text-muted-foreground">
             {user.fullName}
+          </p>
+          <p className="px-3 pb-2 text-[11px] leading-snug text-muted-foreground">
+            Start with pending brands, then payouts, then disputes.
           </p>
           <nav className="flex flex-col gap-0.5">
             {nav.map((item) => {
