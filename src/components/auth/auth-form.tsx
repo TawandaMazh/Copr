@@ -165,8 +165,9 @@ export function AuthForm({
       <div className="space-y-1">
         <h2 className="text-xl font-semibold tracking-tight">Sign in to copr</h2>
         <p className="text-sm text-muted-foreground">
-          Email or phone OTP
-          {!supabaseReady && " · demo mode (local) until Supabase is linked"}
+          {supabaseReady
+            ? "Email OTP via Supabase (phone SMS not enabled on this project yet)"
+            : "Email or phone OTP · demo mode (local) until Supabase is linked"}
         </p>
       </div>
 
@@ -192,6 +193,12 @@ export function AuthForm({
               </button>
             ))}
           </div>
+          {supabaseReady && mode === "phone" && (
+            <p className="text-xs text-muted-foreground">
+              Phone OTP needs SMS enabled in the Supabase dashboard (Auth →
+              Providers → Phone). Prefer email for now.
+            </p>
+          )}
 
           {mode === "email" ? (
             <form

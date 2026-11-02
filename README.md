@@ -56,9 +56,15 @@ Open [/admin](http://localhost:3000/admin) → **Continue as demo admin**. Moder
 
 ---
 
-## Connect Supabase (optional)
+## Connect Supabase
 
-Set `NEXT_PUBLIC_SUPABASE_*`, run `supabase/migrations/*` in order, enable Email/Phone OTP.
+1. Copy `.env.example` → `.env.local` and set:
+   - `NEXT_PUBLIC_SUPABASE_URL` — `https://<project-ref>.supabase.co` (no `/rest/v1`)
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY` — publishable (`sb_publishable_…`) or legacy anon JWT
+2. Apply schema + RLS (see [`supabase/APPLY.md`](supabase/APPLY.md))
+3. Auth → Email OTP (Phone optional for +260 SMS)
+
+Until migrations are applied, the shop/catalogue still use local seed data; sign-in uses Supabase OTP when keys are present.
 
 ---
 
