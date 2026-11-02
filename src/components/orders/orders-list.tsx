@@ -5,22 +5,19 @@ import { useCommerceStore } from "@/stores/commerce-store";
 import { GlassCard } from "@/components/ui/glass-card";
 import { PriceTag } from "@/components/ui/price-tag";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { EmptyState } from "@/components/ui/empty-state";
 
 export function OrdersList() {
   const orders = useCommerceStore((s) => s.orders);
 
   if (orders.length === 0) {
     return (
-      <GlassCard className="space-y-4 p-8 text-center">
-        <p className="text-lg font-medium">No orders yet</p>
-        <p className="text-sm text-muted-foreground">
-          When you check out, tracking and escrow status will show here.
-        </p>
-        <Button asChild>
-          <Link href="/shop">Start shopping</Link>
-        </Button>
-      </GlassCard>
+      <EmptyState
+        title="No orders yet"
+        description="When you check out, tracking and escrow status will show here."
+        actionHref="/shop"
+        actionLabel="Start shopping"
+      />
     );
   }
 

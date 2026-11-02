@@ -5,8 +5,11 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import type { Brand } from "@/types";
 import { GlassCard } from "@/components/ui/glass-card";
+import { usePrefersReducedMotion } from "@/lib/motion";
 
 export function FeaturedBrands({ brands }: { brands: Brand[] }) {
+  const reduced = usePrefersReducedMotion();
+
   return (
     <section className="mb-20">
       <div className="mb-8 flex items-end justify-between gap-4">
@@ -30,12 +33,12 @@ export function FeaturedBrands({ brands }: { brands: Brand[] }) {
         {brands.slice(0, 6).map((brand, i) => (
           <motion.div
             key={brand.id}
-            initial={{ opacity: 0, y: 12 }}
+            initial={reduced ? false : { opacity: 0, y: 12 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-40px" }}
             transition={{
-              duration: 0.28,
-              delay: i * 0.04,
+              duration: reduced ? 0 : 0.28,
+              delay: reduced ? 0 : i * 0.04,
               ease: [0.22, 1, 0.36, 1],
             }}
           >
@@ -44,7 +47,7 @@ export function FeaturedBrands({ brands }: { brands: Brand[] }) {
                 <div className="relative h-36 w-full sm:h-40">
                   <Image
                     src={brand.banner}
-                    alt=""
+                    alt={`${brand.name} banner`}
                     fill
                     sizes="(max-width: 640px) 100vw, 33vw"
                     className="object-cover"
@@ -55,7 +58,7 @@ export function FeaturedBrands({ brands }: { brands: Brand[] }) {
                   <div className="relative h-12 w-12 overflow-hidden rounded-2xl bg-ice dark:bg-navy">
                     <Image
                       src={brand.logo}
-                      alt=""
+                      alt={`${brand.name} logo`}
                       fill
                       sizes="48px"
                       className="object-cover"

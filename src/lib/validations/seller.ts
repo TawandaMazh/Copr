@@ -106,8 +106,7 @@ export function parseProductForm(values: ProductFormValues): ProductFormParsed {
   }
   for (const url of images) {
     try {
-      // eslint-disable-next-line no-new
-      new URL(url);
+      void new URL(url);
     } catch {
       throw new Error(`Invalid image URL: ${url}`);
     }

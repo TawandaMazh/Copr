@@ -4,8 +4,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
+import { fadeUp, usePrefersReducedMotion } from "@/lib/motion";
 
 export function Hero() {
+  const reduced = usePrefersReducedMotion();
+  const motionProps = fadeUp(reduced);
+
   return (
     <section className="relative mb-16 w-full overflow-hidden">
       <div className="relative min-h-[85vh] w-full sm:min-h-[78vh] lg:min-h-[85vh]">
@@ -22,9 +26,7 @@ export function Hero() {
         <div className="absolute inset-0 flex items-end">
           <div className="mx-auto w-full max-w-6xl px-4 pb-14 pt-28 sm:pb-20">
             <motion.div
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+              {...motionProps}
               className="max-w-xl space-y-5 text-white"
             >
               <p className="text-4xl font-semibold tracking-tight sm:text-5xl lg:text-6xl">

@@ -7,6 +7,7 @@ import { motion } from "framer-motion";
 import type { Product } from "@/types";
 import { getBrandById, getMinPrice } from "@/data";
 import { cn } from "@/lib/utils";
+import { fadeInView, usePrefersReducedMotion } from "@/lib/motion";
 import { PriceTag } from "./price-tag";
 import { Badge } from "./badge";
 import { useCommerceStore } from "@/stores/commerce-store";
@@ -20,6 +21,7 @@ interface ProductCardProps {
 export function ProductCard({ product, className, priority }: ProductCardProps) {
   const brand = getBrandById(product.brandId);
   const price = getMinPrice(product);
+  const reduced = usePrefersReducedMotion();
   const toggleWishlist = useCommerceStore((s) => s.toggleWishlist);
   const wishlisted = useCommerceStore((s) =>
     s.wishlist.includes(product.id),
@@ -27,10 +29,7 @@ export function ProductCard({ product, className, priority }: ProductCardProps) 
 
   return (
     <motion.article
-      initial={{ opacity: 0, y: 12 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-40px" }}
-      transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+      {...fadeInView(reduced)}
       className={cn("group relative", className)}
     >
       <Link href={`/shop/${product.slug}`} className="block focus-ring rounded-3xl">

@@ -24,6 +24,14 @@ export async function generateMetadata({
   return {
     title: brand.name,
     description: brand.story,
+    openGraph: {
+      title: `${brand.name} · copr`,
+      description: brand.tagline,
+      images: [brand.banner],
+    },
+    alternates: {
+      canonical: `/brands/${brand.slug}`,
+    },
   };
 }
 
@@ -40,7 +48,7 @@ export default async function BrandPage({ params }: BrandPageProps) {
         <div className="relative h-56 w-full sm:h-80">
           <Image
             src={brand.banner}
-            alt=""
+            alt={`${brand.name} banner`}
             fill
             priority
             sizes="100vw"
@@ -53,7 +61,7 @@ export default async function BrandPage({ params }: BrandPageProps) {
             <div className="relative h-16 w-16 overflow-hidden rounded-2xl ring-2 ring-white/40 sm:h-20 sm:w-20">
               <Image
                 src={brand.logo}
-                alt=""
+                alt={`${brand.name} logo`}
                 fill
                 sizes="80px"
                 className="object-cover"

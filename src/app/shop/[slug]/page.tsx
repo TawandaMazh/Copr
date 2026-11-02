@@ -5,6 +5,7 @@ import {
   getProductBySlug,
   getProductsByBrand,
   products,
+  getMinPrice,
 } from "@/data/products";
 import { getBrandById } from "@/data/brands";
 import { ProductGallery } from "@/components/product/product-gallery";
@@ -12,6 +13,8 @@ import { ProductPurchase } from "@/components/product/product-purchase";
 import { ProductReviews } from "@/components/product/product-reviews";
 import { ProductCard } from "@/components/ui/product-card";
 import { PageContainer } from "@/components/layout/page-container";
+import { JsonLd, productJsonLd } from "@/components/seo/json-ld";
+import { getSiteUrl } from "@/lib/site";
 
 interface ProductPageProps {
   params: Promise<{ slug: string }>;
@@ -35,6 +38,15 @@ export async function generateMetadata({
       title: `${product.name} · ${brand?.name ?? "copr"}`,
       images: product.images.slice(0, 1),
     },
+    twitter: {
+      card: "summary_large_image",
+      title: product.name,
+      description: product.description,
+      images: product.images.slice(0, 1),
+    },
+    alternates: {
+      canonical: `/shop/${product.slug}`,
+    },
   };
 }
 
@@ -47,10 +59,23 @@ export default async function ProductPage({ params }: ProductPageProps) {
   const related = getProductsByBrand(product.brandId)
     .filter((p) => p.id !== product.id)
     .slice(0, 4);
+  const inStock = product.variants.some((v) => v.stock > 0);
 
   return (
     <PageContainer className="space-y-16">
-      <nav className="text-sm text-muted-foreground">
+      <JsonLd
+        data={productJsonLd({
+          siteUrl: getSiteUrl(),
+          name: product.name,
+          description: product.description,
+          slug: product.slug,
+          image: product.images[0] ?? "",
+          brandName: brand?.name ?? "copr",
+          price: getMinPrice(product),
+          inStock,
+        })}
+      />
+      <nav aria-label="Breadcrumb" className="text-sm text-muted-foreground">
         <Link href="/shop" className="hover:text-primary">
           Shop
         </Link>

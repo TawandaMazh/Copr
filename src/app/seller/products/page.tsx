@@ -11,9 +11,8 @@ import { getMinPrice } from "@/data";
 
 export default function SellerProductsPage() {
   const brand = useCommerceStore((s) => s.sellerBrand);
-  const products = useCommerceStore((s) =>
-    s.sellerProducts.filter((p) => p.brandId === s.sellerBrand?.id),
-  );
+  const sellerProducts = useCommerceStore((s) => s.sellerProducts);
+  const products = sellerProducts.filter((p) => p.brandId === brand?.id);
 
   if (!brand) return null;
 

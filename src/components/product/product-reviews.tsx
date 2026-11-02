@@ -15,12 +15,11 @@ export function ProductReviews({
   productName: string;
 }) {
   const user = useCommerceStore((s) => s.user);
-  const reviews = useCommerceStore((s) =>
-    s.reviews.filter(
-      (r) => r.productId === productId && r.status === "published",
-    ),
-  );
+  const allReviews = useCommerceStore((s) => s.reviews);
   const addReview = useCommerceStore((s) => s.addReview);
+  const reviews = allReviews.filter(
+    (r) => r.productId === productId && r.status === "published",
+  );
 
   const [rating, setRating] = useState(5);
   const [title, setTitle] = useState("");

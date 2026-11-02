@@ -10,9 +10,8 @@ export default function SellerEarningsPage() {
   const brand = useCommerceStore((s) => s.sellerBrand);
   const getSellerEarnings = useCommerceStore((s) => s.getSellerEarnings);
   const getSellerOrders = useCommerceStore((s) => s.getSellerOrders);
-  const payouts = useCommerceStore((s) =>
-    s.payouts.filter((p) => p.brandId === s.sellerBrand?.id),
-  );
+  const allPayouts = useCommerceStore((s) => s.payouts);
+  const payouts = allPayouts.filter((p) => p.brandId === brand?.id);
 
   if (!brand) return null;
 

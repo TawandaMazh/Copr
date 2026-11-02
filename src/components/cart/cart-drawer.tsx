@@ -1,5 +1,6 @@
 "use client";
 
+import * as React from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Minus, Plus, ShoppingBag, Trash2, X } from "lucide-react";
@@ -11,6 +12,7 @@ import { PriceTag } from "@/components/ui/price-tag";
 import { Button } from "@/components/ui/button";
 import { DELIVERY_FEE_KWACHA } from "@/lib/commerce/constants";
 import { resolveCartTotals } from "@/lib/commerce/checkout";
+import { usePrefersReducedMotion } from "@/lib/motion";
 
 export function CartDrawer() {
   const open = useCommerceStore((s) => s.cartOpen);
@@ -20,6 +22,8 @@ export function CartDrawer() {
   const sellerBrand = useCommerceStore((s) => s.sellerBrand);
   const updateCartQuantity = useCommerceStore((s) => s.updateCartQuantity);
   const removeFromCart = useCommerceStore((s) => s.removeFromCart);
+  const reduced = usePrefersReducedMotion();
+  const closeRef = React.useRef<HTMLButtonElement>(null);
 
   const { lines, subtotal, deliveryFee, total } = resolveCartTotals(
     cart,
@@ -27,6 +31,21 @@ export function CartDrawer() {
     (id) => resolveProduct(id, sellerProducts),
     (id) => (sellerBrand?.id === id ? sellerBrand : getBrandById(id)),
   );
+
+  React.useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setCartOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    closeRef.current?.focus();
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      document.body.style.overflow = prev;
+    };
+  }, [open, setCartOpen]);
 
   return (
     <AnimatePresence>
@@ -36,19 +55,23 @@ export function CartDrawer() {
             type="button"
             aria-label="Close bag"
             className="fixed inset-0 z-[60] bg-navy/40 backdrop-blur-sm"
-            initial={{ opacity: 0 }}
+            initial={reduced ? false : { opacity: 0 }}
             animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+            exit={reduced ? undefined : { opacity: 0 }}
+            transition={{ duration: reduced ? 0 : 0.2 }}
             onClick={() => setCartOpen(false)}
           />
           <motion.aside
             role="dialog"
             aria-modal="true"
             aria-label="Shopping bag"
-            initial={{ x: "100%" }}
+            initial={reduced ? false : { x: "100%" }}
             animate={{ x: 0 }}
-            exit={{ x: "100%" }}
-            transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+            exit={reduced ? undefined : { x: "100%" }}
+            transition={{
+              duration: reduced ? 0 : 0.28,
+              ease: [0.22, 1, 0.36, 1],
+            }}
             className="glass-strong fixed inset-y-0 right-0 z-[70] flex w-full max-w-md flex-col shadow-glass-lg"
           >
             <div className="flex items-center justify-between border-b border-border-subtle px-5 py-4">
@@ -60,10 +83,11 @@ export function CartDrawer() {
                 </span>
               </div>
               <Button
+                ref={closeRef}
                 variant="ghost"
                 size="icon"
                 onClick={() => setCartOpen(false)}
-                aria-label="Close"
+                aria-label="Close bag"
               >
                 <X className="h-4 w-4" strokeWidth={1.5} />
               </Button>

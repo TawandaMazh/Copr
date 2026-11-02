@@ -1,9 +1,8 @@
 "use client";
 
-import Link from "next/link";
 import { PageContainer } from "@/components/layout/page-container";
 import { ProductCard } from "@/components/ui/product-card";
-import { Button } from "@/components/ui/button";
+import { EmptyState } from "@/components/ui/empty-state";
 import { useCommerceStore } from "@/stores/commerce-store";
 import { resolveProduct } from "@/lib/catalogue";
 
@@ -26,15 +25,12 @@ export default function WishlistPage() {
       </div>
 
       {products.length === 0 ? (
-        <div className="glass rounded-3xl px-6 py-16 text-center">
-          <p className="text-lg font-medium">Nothing saved yet</p>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Tap the heart on any product to save it here.
-          </p>
-          <Button asChild className="mt-6">
-            <Link href="/shop">Browse shop</Link>
-          </Button>
-        </div>
+        <EmptyState
+          title="Nothing saved yet"
+          description="Tap the heart on any product to save it here."
+          actionHref="/shop"
+          actionLabel="Browse shop"
+        />
       ) : (
         <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4 lg:gap-6">
           {products.map((product) => (

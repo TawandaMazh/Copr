@@ -8,6 +8,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { Button } from "./button";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
+import { usePrefersReducedMotion } from "@/lib/motion";
 import {
   useCartCount,
   useCommerceStore,
@@ -31,6 +32,7 @@ export function GlassNav() {
   const user = useCommerceStore((s) => s.user);
   const cartCount = useCartCount();
   const wishlistCount = useWishlistCount();
+  const reduced = usePrefersReducedMotion();
 
   React.useEffect(() => setMounted(true), []);
 
@@ -61,6 +63,7 @@ export function GlassNav() {
             className="lg:hidden"
             aria-label={open ? "Close menu" : "Open menu"}
             aria-expanded={open}
+            aria-controls="mobile-nav"
             onClick={() => setOpen((v) => !v)}
           >
             {open ? (
@@ -146,11 +149,15 @@ export function GlassNav() {
       <AnimatePresence>
         {open && (
           <motion.div
-            initial={{ opacity: 0, y: -8 }}
+            initial={reduced ? false : { opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+            exit={reduced ? undefined : { opacity: 0, y: -8 }}
+            transition={{
+              duration: reduced ? 0 : 0.22,
+              ease: [0.22, 1, 0.36, 1],
+            }}
             className="glass-strong mx-auto mt-2 max-w-6xl overflow-hidden rounded-3xl p-4 lg:hidden"
+            id="mobile-nav"
           >
             <ul className="flex flex-col gap-1">
               {links.map((link) => (

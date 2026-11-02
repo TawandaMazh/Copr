@@ -38,8 +38,8 @@
 .dark {
   --background: #050a14;
   --foreground: #f5f8ff;
-  --muted: #8fa6d4;
-  --muted-foreground: #8fa6d4;
+  --muted: #7f96c4;
+  --muted-foreground: #b6c6e8;
   --card: rgba(10, 26, 63, 0.55);
   --card-solid: #0a1a3f;
   --border: rgba(127, 178, 255, 0.15);
@@ -180,6 +180,30 @@ textarea.field {
   box-shadow: 0 0 0 2px var(--background), 0 0 0 4px var(--ring);
 }
 
+/* Screen-reader only (Tailwind-compatible) */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+.focus\:not-sr-only:focus {
+  position: static;
+  width: auto;
+  height: auto;
+  padding: inherit;
+  margin: inherit;
+  overflow: visible;
+  clip: auto;
+  white-space: normal;
+}
+
 /* Skeleton shimmer */
 .skeleton {
   background: linear-gradient(
@@ -199,6 +223,25 @@ textarea.field {
   }
   100% {
     background-position: 200% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .skeleton {
+    animation: none;
+    background: color-mix(in srgb, var(--sky) 18%, transparent);
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }
 

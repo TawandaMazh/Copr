@@ -2,33 +2,75 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Providers } from "@/components/providers";
 import { SiteShell } from "@/components/layout/site-shell";
+import {
+  JsonLd,
+  organizationJsonLd,
+  websiteJsonLd,
+} from "@/components/seo/json-ld";
+import {
+  getSiteUrl,
+  SITE_DESCRIPTION,
+  SITE_NAME,
+  SITE_TAGLINE,
+} from "@/lib/site";
 import "./globals.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
+  display: "swap",
 });
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+  display: "swap",
 });
 
+const siteUrl = getSiteUrl();
+
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl),
   title: {
-    default: "copr — Zambian fashion marketplace",
-    template: "%s · copr",
+    default: `${SITE_NAME} — ${SITE_TAGLINE}`,
+    template: `%s · ${SITE_NAME}`,
   },
-  description:
-    "Shop dresses, chitenge, and city staples from local Zambian brands. Multi-vendor marketplace with Lusaka delivery.",
-  metadataBase: new URL("https://copr.vercel.app"),
+  description: SITE_DESCRIPTION,
+  applicationName: SITE_NAME,
+  authors: [{ name: "copr" }],
+  creator: "copr",
+  keywords: [
+    "Zambia",
+    "Lusaka",
+    "fashion",
+    "marketplace",
+    "chitenge",
+    "Kwacha",
+    "Zambian brands",
+  ],
+  alternates: {
+    canonical: "/",
+  },
   openGraph: {
-    title: "copr — Zambian fashion marketplace",
+    title: `${SITE_NAME} — ${SITE_TAGLINE}`,
     description:
       "Local brands. Local shoppers. Fashion priced in Kwacha, delivered in Lusaka.",
     locale: "en_ZM",
     type: "website",
+    url: siteUrl,
+    siteName: SITE_NAME,
   },
+  twitter: {
+    card: "summary_large_image",
+    title: `${SITE_NAME} — ${SITE_TAGLINE}`,
+    description:
+      "Local brands. Local shoppers. Fashion priced in Kwacha, delivered in Lusaka.",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
+  category: "shopping",
 };
 
 export const viewport: Viewport = {
@@ -50,6 +92,8 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} font-sans antialiased`}
       >
+        <JsonLd data={organizationJsonLd(siteUrl)} />
+        <JsonLd data={websiteJsonLd(siteUrl)} />
         <Providers>
           <SiteShell>{children}</SiteShell>
         </Providers>

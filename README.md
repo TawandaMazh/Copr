@@ -2,7 +2,7 @@
 
 Multi-vendor fashion marketplace for **Zambian brands** and shoppers — think ASOS, built for Lusaka. Brands hold their own stock and fulfil orders; copr takes a commission (default **15%**, configurable in admin).
 
-**Current: Phase 4** — Admin dashboard (brands, products, orders, payouts, disputes, reviews, settings, analytics).
+**Current: Phase 5** — Performance, SEO, accessibility, empty/error states, dark-mode polish.
 
 ---
 
@@ -13,7 +13,7 @@ Multi-vendor fashion marketplace for **Zambian brands** and shoppers — think A
 - **Supabase** — Postgres, Auth, Storage-ready, RLS on every table (`supabase/migrations/`)
 - **Zod** + **React Hook Form** for auth, checkout, seller forms
 - **PaymentProvider** + **MockProvider** escrow
-- Framer Motion, lucide-react, next-themes, zustand (local commerce state, persist key `copr-commerce-v3`)
+- Framer Motion (respects `prefers-reduced-motion`), lucide-react, next-themes, zustand (`copr-commerce-v3`)
 - Deploy target: **Vercel**
 
 ---
@@ -34,34 +34,31 @@ npm run build && npm run typecheck
 
 ---
 
-## Admin dashboard (Phase 4)
+## Phase 5 polish
 
-1. Open [/admin](http://localhost:3000/admin) → **Continue as demo admin**
-2. Routes under `/admin`:
-   - **Overview** — GMV, commission, payouts, disputes, status mix
-   - **Brands** — approve / reject / suspend applications (new applies start as `pending`)
-   - **Products** — publish / unpublish / feature seller products
-   - **Orders** — all marketplace orders + mark shipped / open dispute
-   - **Payouts** — process escrow releases (pending → processing → paid)
-   - **Disputes** — resolve for buyer or seller
-   - **Reviews** — hide / flag / restore product reviews
-   - **Settings** — commission %, Lusaka delivery fee, auto-confirm days
-
-Shopper flow still creates payouts when delivery is confirmed on `/orders/[id]`. Reviews can be posted on product pages.
+- **SEO** — `sitemap.xml`, `robots.txt`, web manifest, richer Open Graph / Twitter metadata, Organization + WebSite + Product JSON-LD
+- **Performance** — route `loading.tsx` skeletons, AVIF/WebP image sizes, font `display: swap`, reduced-motion for Framer Motion + CSS
+- **Accessibility** — skip-to-content, `sr-only`, breadcrumb/`aria-*` fixes, cart Escape + body scroll lock, meaningful image alts
+- **Empty / error** — shared `EmptyState`, polished `not-found`, `error.tsx` + `global-error.tsx`
+- **Dark mode** — improved muted text contrast on navy glass
 
 ---
 
-## Seller dashboard (Phase 3)
+## Admin (Phase 4)
 
-1. Visit [/sell](http://localhost:3000/sell) → **Apply to join**, or open [/seller/apply](http://localhost:3000/seller/apply)
-2. **Claim a demo brand** (auto-approved) or submit a new application (**pending** until admin approves)
-3. Dashboard routes under `/seller`: Overview, Products, Orders, Earnings, Brand profile
+Open [/admin](http://localhost:3000/admin) → **Continue as demo admin**. Moderate brands, products, orders, payouts, disputes, reviews, and commission settings.
+
+---
+
+## Seller (Phase 3)
+
+[/sell](http://localhost:3000/sell) → apply or claim a demo brand. New applications stay **pending** until admin approval.
 
 ---
 
 ## Connect Supabase (optional)
 
-See Phase 2 notes: set `NEXT_PUBLIC_SUPABASE_*`, run `supabase/migrations/*` in order, enable Email/Phone OTP.
+Set `NEXT_PUBLIC_SUPABASE_*`, run `supabase/migrations/*` in order, enable Email/Phone OTP.
 
 ---
 
@@ -69,7 +66,7 @@ See Phase 2 notes: set `NEXT_PUBLIC_SUPABASE_*`, run `supabase/migrations/*` in 
 
 | Variable | Notes |
 |---|---|
-| `NEXT_PUBLIC_APP_URL` | App origin |
+| `NEXT_PUBLIC_APP_URL` | Canonical origin (sitemap / OG / JSON-LD) |
 | `NEXT_PUBLIC_SUPABASE_URL` / `ANON_KEY` | Optional until wired |
 | `SUPABASE_SERVICE_ROLE_KEY` | Server-only |
 | `PAYMENT_PROVIDER` | `mock` |
@@ -84,8 +81,8 @@ See Phase 2 notes: set `NEXT_PUBLIC_SUPABASE_*`, run `supabase/migrations/*` in 
 1. ~~Phase 1 — Design system + catalogue~~
 2. ~~Phase 2 — Schema/RLS, auth, cart, wishlist, MockProvider checkout~~
 3. ~~Phase 3 — Seller dashboard~~
-4. ~~Phase 4 — Admin (commission, payouts, moderation, analytics, reviews)~~ ← *you are here*
-5. **Phase 5** — Performance, SEO, a11y polish
+4. ~~Phase 4 — Admin (commission, payouts, moderation, analytics, reviews)~~
+5. ~~Phase 5 — Performance, SEO, a11y, empty/error states, dark-mode QA~~ ← *you are here*
 
 ---
 
