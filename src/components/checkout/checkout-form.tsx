@@ -14,6 +14,8 @@ import {
   PICKUP_POINTS,
 } from "@/lib/commerce/constants";
 import { resolveCartTotals } from "@/lib/commerce/checkout";
+import { resolveProduct } from "@/lib/catalogue";
+import { getBrandById } from "@/data";
 import { useCommerceStore } from "@/stores/commerce-store";
 import { Button } from "@/components/ui/button";
 import { GlassCard } from "@/components/ui/glass-card";
@@ -26,6 +28,8 @@ export function CheckoutForm() {
   const cart = useCommerceStore((s) => s.cart);
   const user = useCommerceStore((s) => s.user);
   const addresses = useCommerceStore((s) => s.addresses);
+  const sellerProducts = useCommerceStore((s) => s.sellerProducts);
+  const sellerBrand = useCommerceStore((s) => s.sellerBrand);
   const checkout = useCommerceStore((s) => s.checkout);
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
@@ -48,8 +52,14 @@ export function CheckoutForm() {
 
   const method = form.watch("deliveryMethod");
   const totals = useMemo(
-    () => resolveCartTotals(cart, method),
-    [cart, method],
+    () =>
+      resolveCartTotals(
+        cart,
+        method,
+        (id) => resolveProduct(id, sellerProducts),
+        (id) => (sellerBrand?.id === id ? sellerBrand : getBrandById(id)),
+      ),
+    [cart, method, sellerProducts, sellerBrand],
   );
 
   if (cart.length === 0) {

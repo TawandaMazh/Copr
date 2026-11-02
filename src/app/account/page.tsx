@@ -48,10 +48,15 @@ export default function AccountPage() {
             </Button>
           </GlassCard>
 
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             <Stat href="/orders" label="Orders" value={orders.length} />
             <Stat href="/wishlist" label="Wishlist" value={wishlist.length} />
             <Stat href="/account#addresses" label="Addresses" value={addresses.length} />
+            <Stat
+              href={user.role === "seller" ? "/seller" : "/seller/apply"}
+              label={user.role === "seller" ? "Seller hub" : "Sell"}
+              value={user.role === "seller" ? "→" : "+"}
+            />
           </div>
 
           <GlassCard id="addresses" className="space-y-3 p-6">
@@ -91,7 +96,7 @@ function Stat({
 }: {
   href: string;
   label: string;
-  value: number;
+  value: number | string;
 }) {
   return (
     <Link href={href} className="focus-ring rounded-3xl">

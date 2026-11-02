@@ -13,28 +13,32 @@ import type {
   SubOrderRecord,
 } from "@/types/commerce";
 import type { CheckoutFormValues } from "@/lib/validations/checkout";
+import type { Brand, Product } from "@/types";
 
 function id(prefix: string) {
   return `${prefix}_${crypto.randomUUID().replace(/-/g, "").slice(0, 12)}`;
 }
 
+type ProductResolver = (id: string) => Product | undefined;
+type BrandResolver = (id: string) => Brand | undefined;
+
 export function resolveCartTotals(
   lines: CartLine[],
   deliveryMethod: DeliveryMethod,
+  productResolver: ProductResolver = getProductById,
+  brandResolver: BrandResolver = getBrandById,
 ) {
   type EnrichedLine = CartLine & {
-    product: NonNullable<ReturnType<typeof getProductById>>;
-    variant: NonNullable<
-      NonNullable<ReturnType<typeof getProductById>>["variants"][number]
-    >;
-    brand: ReturnType<typeof getBrandById>;
+    product: Product;
+    variant: Product["variants"][number];
+    brand: Brand | undefined;
     unitPrice: number;
     lineTotal: number;
   };
 
   const enriched: EnrichedLine[] = [];
   for (const line of lines) {
-    const product = getProductById(line.productId);
+    const product = productResolver(line.productId);
     if (!product) continue;
     const variant =
       product.variants.find((v) => v.id === line.variantId) ??
@@ -44,7 +48,7 @@ export function resolveCartTotals(
       ...line,
       product,
       variant,
-      brand: getBrandById(product.brandId),
+      brand: brandResolver(product.brandId),
       unitPrice: variant.price,
       lineTotal: variant.price * line.quantity,
     });
@@ -68,10 +72,17 @@ export async function placeOrder(input: {
   userId: string;
   lines: CartLine[];
   form: CheckoutFormValues;
+  productResolver?: ProductResolver;
+  brandResolver?: BrandResolver;
 }): Promise<OrderRecord> {
+  const productResolver = input.productResolver ?? getProductById;
+  const brandResolver = input.brandResolver ?? getBrandById;
+
   const { lines, subtotal, deliveryFee, total } = resolveCartTotals(
     input.lines,
     input.form.deliveryMethod,
+    productResolver,
+    brandResolver,
   );
 
   if (lines.length === 0) {
@@ -94,7 +105,6 @@ export async function placeOrder(input: {
   const orderId = id("ord");
   const now = new Date().toISOString();
 
-  // Split by brand → sub_orders
   const byBrand = new Map<string, typeof lines>();
   for (const line of lines) {
     const brandId = line.product.brandId;
@@ -111,7 +121,7 @@ export async function placeOrder(input: {
       ((brandSubtotal * commissionPercent) / 100).toFixed(2),
     );
     const sellerAmount = Number((brandSubtotal - commissionAmount).toFixed(2));
-    const brand = getBrandById(brandId);
+    const brand = brandResolver(brandId);
 
     subOrders.push({
       id: id("sub"),
@@ -160,7 +170,7 @@ export async function placeOrder(input: {
     heldAt: now,
   };
 
-  const order: OrderRecord = {
+  return {
     id: orderId,
     userId: input.userId,
     status: "paid",
@@ -179,12 +189,14 @@ export async function placeOrder(input: {
     subOrders,
     payment,
   };
-
-  return order;
 }
 
-export function cartLineUnitPrice(productId: string, variantId: string) {
-  const product = getProductById(productId);
+export function cartLineUnitPrice(
+  productId: string,
+  variantId: string,
+  productResolver: ProductResolver = getProductById,
+) {
+  const product = productResolver(productId);
   if (!product) return 0;
   const variant = product.variants.find((v) => v.id === variantId);
   return variant?.price ?? getMinPrice(product);

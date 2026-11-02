@@ -13,7 +13,8 @@ const columns = [
     title: "Sell",
     links: [
       { href: "/sell", label: "Sell on copr" },
-      { href: "/sell#how-it-works", label: "How it works" },
+      { href: "/seller/apply", label: "Apply to join" },
+      { href: "/seller", label: "Seller dashboard" },
     ],
   },
   {
@@ -59,7 +60,7 @@ export function SiteFooter() {
       <div className="border-t border-border-subtle">
         <div className="mx-auto flex max-w-6xl flex-col gap-2 px-4 py-6 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
           <p>© {new Date().getFullYear()} copr. Prices in Zambian Kwacha (K).</p>
-          <p>Phase 2 · Auth, cart, wishlist & mock escrow checkout</p>
+          <p>Phase 3 · Seller dashboard</p>
         </div>
       </div>
     </footer>

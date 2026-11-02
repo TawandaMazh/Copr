@@ -5,12 +5,13 @@ import { PageContainer } from "@/components/layout/page-container";
 import { ProductCard } from "@/components/ui/product-card";
 import { Button } from "@/components/ui/button";
 import { useCommerceStore } from "@/stores/commerce-store";
-import { getProductById } from "@/data";
+import { resolveProduct } from "@/lib/catalogue";
 
 export default function WishlistPage() {
   const wishlist = useCommerceStore((s) => s.wishlist);
+  const sellerProducts = useCommerceStore((s) => s.sellerProducts);
   const products = wishlist
-    .map((id) => getProductById(id))
+    .map((id) => resolveProduct(id, sellerProducts))
     .filter(Boolean);
 
   return (

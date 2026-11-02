@@ -5,7 +5,8 @@ import Link from "next/link";
 import { Minus, Plus, ShoppingBag, Trash2, X } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useCommerceStore } from "@/stores/commerce-store";
-import { getBrandById, getProductById } from "@/data";
+import { getBrandById } from "@/data";
+import { resolveProduct } from "@/lib/catalogue";
 import { PriceTag } from "@/components/ui/price-tag";
 import { Button } from "@/components/ui/button";
 import { DELIVERY_FEE_KWACHA } from "@/lib/commerce/constants";
@@ -15,12 +16,16 @@ export function CartDrawer() {
   const open = useCommerceStore((s) => s.cartOpen);
   const setCartOpen = useCommerceStore((s) => s.setCartOpen);
   const cart = useCommerceStore((s) => s.cart);
+  const sellerProducts = useCommerceStore((s) => s.sellerProducts);
+  const sellerBrand = useCommerceStore((s) => s.sellerBrand);
   const updateCartQuantity = useCommerceStore((s) => s.updateCartQuantity);
   const removeFromCart = useCommerceStore((s) => s.removeFromCart);
 
   const { lines, subtotal, deliveryFee, total } = resolveCartTotals(
     cart,
     "delivery",
+    (id) => resolveProduct(id, sellerProducts),
+    (id) => (sellerBrand?.id === id ? sellerBrand : getBrandById(id)),
   );
 
   return (
@@ -82,8 +87,8 @@ export function CartDrawer() {
               ) : (
                 <ul className="space-y-4">
                   {lines.map((line) => {
-                    const product = getProductById(line.productId)!;
-                    const brand = getBrandById(product.brandId);
+                    const product = line.product;
+                    const brand = line.brand;
                     return (
                       <li key={line.variantId} className="flex gap-3">
                         <Link

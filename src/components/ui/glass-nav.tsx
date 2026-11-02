@@ -18,6 +18,7 @@ const links = [
   { href: "/shop", label: "Shop" },
   { href: "/brands", label: "Brands" },
   { href: "/sell", label: "Sell on copr" },
+  { href: "/seller", label: "Seller" },
 ];
 
 export function GlassNav() {

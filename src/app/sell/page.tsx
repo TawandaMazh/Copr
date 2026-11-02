@@ -33,16 +33,16 @@ export default function SellPage() {
           Sell fashion to Zambian shoppers — keep your stock, tell your story.
         </h1>
         <p className="mx-auto max-w-xl text-base leading-relaxed text-muted-foreground">
-          copr is built for local brands. You fulfil orders; we handle discovery,
-          checkout, and escrow. Default commission 15% — seller dashboard arrives
-          in Phase 3.
+          You fulfil orders; we handle discovery, checkout, and escrow. Default
+          commission 15%. Open the seller dashboard to manage products, orders,
+          and earnings.
         </p>
         <div className="flex flex-wrap justify-center gap-3 pt-2">
-          <Button size="lg" disabled title="Applications open in Phase 3">
-            Apply to join
+          <Button size="lg" asChild>
+            <Link href="/seller/apply">Apply to join</Link>
           </Button>
           <Button size="lg" variant="secondary" asChild>
-            <Link href="/brands">See brands on copr</Link>
+            <Link href="/seller">Seller dashboard</Link>
           </Button>
         </div>
       </div>
