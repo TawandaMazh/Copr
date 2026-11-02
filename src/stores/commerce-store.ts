@@ -157,6 +157,8 @@ interface CommerceState {
   }) => ReviewRecord | null;
   moderateReview: (reviewId: string, status: ReviewStatus) => void;
   getAdminAnalytics: () => AdminAnalytics;
+  /** Pull cart/wishlist from Supabase for the signed-in user. */
+  hydrateFromSupabase: () => Promise<void>;
 }
 
 function newId(prefix: string) {
@@ -246,6 +248,9 @@ export const useCommerceStore = create<CommerceState>()(
             cartOpen: true,
           };
         });
+        void import("@/lib/commerce/supabase-sync").then(({ syncCartToSupabase }) =>
+          syncCartToSupabase(get().cart),
+        );
       },
 
       updateCartQuantity: (variantId, quantity) => {
@@ -257,21 +262,38 @@ export const useCommerceStore = create<CommerceState>()(
                   l.variantId === variantId ? { ...l, quantity } : l,
                 ),
         }));
+        void import("@/lib/commerce/supabase-sync").then(({ syncCartToSupabase }) =>
+          syncCartToSupabase(get().cart),
+        );
       },
 
-      removeFromCart: (variantId) =>
+      removeFromCart: (variantId) => {
         set((state) => ({
           cart: state.cart.filter((l) => l.variantId !== variantId),
-        })),
+        }));
+        void import("@/lib/commerce/supabase-sync").then(({ syncCartToSupabase }) =>
+          syncCartToSupabase(get().cart),
+        );
+      },
 
-      clearCart: () => set({ cart: [] }),
+      clearCart: () => {
+        set({ cart: [] });
+        void import("@/lib/commerce/supabase-sync").then(({ syncCartToSupabase }) =>
+          syncCartToSupabase([]),
+        );
+      },
 
-      toggleWishlist: (productId) =>
+      toggleWishlist: (productId) => {
         set((state) => ({
           wishlist: state.wishlist.includes(productId)
             ? state.wishlist.filter((id) => id !== productId)
             : [...state.wishlist, productId],
-        })),
+        }));
+        void import("@/lib/commerce/supabase-sync").then(
+          ({ syncWishlistToSupabase }) =>
+            syncWishlistToSupabase(get().wishlist),
+        );
+      },
 
       isWishlisted: (productId) => get().wishlist.includes(productId),
 
@@ -341,34 +363,89 @@ export const useCommerceStore = create<CommerceState>()(
           deliveryFeeOverride: settings.deliveryFeeKwacha,
         });
 
-        set((s) => ({
-          orders: [order, ...s.orders],
-          cart: [],
-          cartOpen: false,
-          addresses:
-            form.deliveryMethod === "delivery"
-              ? s.addresses.some(
-                  (a) =>
-                    a.area === form.area &&
-                    a.neighbourhood === form.neighbourhood,
-                )
-                ? s.addresses
-                : [
-                    ...s.addresses,
-                    {
-                      id: newId("addr"),
-                      area: form.area!,
-                      neighbourhood: form.neighbourhood!,
-                      landmark: form.landmark,
-                      phone: formatPhoneZM(form.phone),
-                      isDefault: s.addresses.length === 0,
-                      isPickupPoint: false,
-                    },
-                  ]
+        let savedAddress: SavedAddress | null = null;
+        set((s) => {
+          if (
+            form.deliveryMethod === "delivery" &&
+            !s.addresses.some(
+              (a) =>
+                a.area === form.area &&
+                a.neighbourhood === form.neighbourhood,
+            )
+          ) {
+            savedAddress = {
+              id: newId("addr"),
+              area: form.area!,
+              neighbourhood: form.neighbourhood!,
+              landmark: form.landmark,
+              phone: formatPhoneZM(form.phone),
+              isDefault: s.addresses.length === 0,
+              isPickupPoint: false,
+            };
+          }
+          return {
+            orders: [order, ...s.orders],
+            cart: [],
+            cartOpen: false,
+            addresses: savedAddress
+              ? [...s.addresses, savedAddress]
               : s.addresses,
-        }));
+          };
+        });
+
+        void import("@/lib/commerce/supabase-sync").then(
+          async ({
+            persistOrderToSupabase,
+            syncAddressToSupabase,
+            syncCartToSupabase,
+          }) => {
+            await persistOrderToSupabase(order);
+            await syncCartToSupabase([]);
+            if (savedAddress) await syncAddressToSupabase(savedAddress);
+          },
+        );
 
         return order;
+      },
+
+      hydrateFromSupabase: async () => {
+        const user = get().user;
+        if (!user || user.isDemo) return;
+        const {
+          hydrateCartFromSupabase,
+          hydrateWishlistFromSupabase,
+        } = await import("@/lib/commerce/supabase-sync");
+        const [remoteCart, remoteWishlist] = await Promise.all([
+          hydrateCartFromSupabase(),
+          hydrateWishlistFromSupabase(),
+        ]);
+        set((s) => ({
+          cart:
+            remoteCart && remoteCart.length > 0
+              ? remoteCart
+              : s.cart,
+          wishlist:
+            remoteWishlist && remoteWishlist.length > 0
+              ? remoteWishlist
+              : s.wishlist,
+        }));
+        // Push guest cart up if remote was empty
+        if (remoteCart && remoteCart.length === 0 && get().cart.length > 0) {
+          const { syncCartToSupabase } = await import(
+            "@/lib/commerce/supabase-sync"
+          );
+          await syncCartToSupabase(get().cart);
+        }
+        if (
+          remoteWishlist &&
+          remoteWishlist.length === 0 &&
+          get().wishlist.length > 0
+        ) {
+          const { syncWishlistToSupabase } = await import(
+            "@/lib/commerce/supabase-sync"
+          );
+          await syncWishlistToSupabase(get().wishlist);
+        }
       },
 
       confirmDelivery: (orderId, subOrderId) => {

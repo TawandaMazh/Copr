@@ -2,9 +2,9 @@
 
 The app talks to project `koyosnsrparlhljvybok` (eu-west-1).
 
-**Status (Nov 2026):** `schema` + `rls` + `seed` have been applied on the live project
-(8 categories, 10 brands, 60 products). Catalogue/checkout in the Next app can still
-use local seed until we switch readers to Supabase; **auth + profiles** are ready.
+**Status (Nov 2026):** `schema` + `rls` + `seed` applied (8 categories, 10 brands, 60 products).
+The Next app reads the catalogue from Supabase when env keys are set, and syncs
+cart/wishlist/orders for authenticated users. Local seed remains the offline fallback.
 
 ---
 

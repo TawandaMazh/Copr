@@ -1,9 +1,8 @@
 import type { MetadataRoute } from "next";
-import { brands } from "@/data/brands";
-import { products } from "@/data/products";
+import { listBrandSlugs, listProducts } from "@/lib/catalogue/service";
 import { getSiteUrl } from "@/lib/site";
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const base = getSiteUrl();
   const now = new Date();
 
@@ -23,8 +22,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: path === "" ? 1 : path === "/shop" ? 0.9 : 0.7,
   }));
 
-  const brandRoutes: MetadataRoute.Sitemap = brands.map((brand) => ({
-    url: `${base}/brands/${brand.slug}`,
+  const [brandSlugs, products] = await Promise.all([
+    listBrandSlugs(),
+    listProducts(),
+  ]);
+
+  const brandRoutes: MetadataRoute.Sitemap = brandSlugs.map((slug) => ({
+    url: `${base}/brands/${slug}`,
     lastModified: now,
     changeFrequency: "weekly",
     priority: 0.8,

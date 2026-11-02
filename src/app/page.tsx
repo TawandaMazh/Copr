@@ -4,15 +4,17 @@ import { NewIn } from "@/components/home/new-in";
 import { TrendingCategories } from "@/components/home/trending-categories";
 import { PageContainer } from "@/components/layout/page-container";
 import {
-  getCategoriesWithCounts,
-  getFeaturedBrands,
-  getNewProducts,
-} from "@/data";
+  listCategoriesWithCounts,
+  listFeaturedBrands,
+  listNewProducts,
+} from "@/lib/catalogue/service";
 
-export default function HomePage() {
-  const featuredBrands = getFeaturedBrands();
-  const newProducts = getNewProducts();
-  const categories = getCategoriesWithCounts();
+export default async function HomePage() {
+  const [featuredBrands, newProducts, categories] = await Promise.all([
+    listFeaturedBrands(),
+    listNewProducts(8),
+    listCategoriesWithCounts(),
+  ]);
 
   return (
     <>

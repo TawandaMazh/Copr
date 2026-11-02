@@ -64,7 +64,7 @@ Open [/admin](http://localhost:3000/admin) → **Continue as demo admin**. Moder
 2. Apply schema + RLS (see [`supabase/APPLY.md`](supabase/APPLY.md))
 3. Auth → Email OTP (Phone optional for +260 SMS)
 
-Until migrations are applied, the shop/catalogue still use local seed data; sign-in uses Supabase OTP when keys are present.
+With keys set, the app loads **brands/products/categories from Supabase** (falls back to local seed if the API is unreachable). Signed-in shoppers sync **cart, wishlist, addresses, and orders** to Supabase; guests stay on local zustand.
 
 ---
 

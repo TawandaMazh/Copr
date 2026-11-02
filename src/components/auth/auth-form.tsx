@@ -141,6 +141,16 @@ export function AuthForm({
       }
       const u = data.user;
       if (u) {
+        let role: "shopper" | "seller" | "admin" = "shopper";
+        try {
+          const { fetchProfileRole } = await import(
+            "@/lib/commerce/supabase-sync"
+          );
+          const dbRole = await fetchProfileRole(u.id);
+          if (dbRole) role = dbRole;
+        } catch {
+          /* profile may lag trigger; default shopper */
+        }
         setUserFromSupabase({
           id: u.id,
           fullName:
@@ -151,8 +161,12 @@ export function AuthForm({
             "Shopper",
           email: u.email,
           phone: u.phone,
-          role: "shopper",
+          role,
           isDemo: false,
+        });
+        // Hydrate cart/wishlist from Supabase in the background
+        void import("@/stores/commerce-store").then(({ useCommerceStore }) => {
+          useCommerceStore.getState().hydrateFromSupabase();
         });
       }
       setMessage("You're signed in.");

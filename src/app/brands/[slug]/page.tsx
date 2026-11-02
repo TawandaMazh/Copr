@@ -1,8 +1,11 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import { notFound } from "next/navigation";
-import { brands, getBrandBySlug } from "@/data/brands";
-import { getProductsByBrand } from "@/data/products";
+import {
+  getBrandBySlugService,
+  listBrandSlugs,
+  listProductsByBrand,
+} from "@/lib/catalogue/service";
 import { ProductCard } from "@/components/ui/product-card";
 import { GlassCard } from "@/components/ui/glass-card";
 import { PageContainer } from "@/components/layout/page-container";
@@ -12,14 +15,15 @@ interface BrandPageProps {
 }
 
 export async function generateStaticParams() {
-  return brands.map((brand) => ({ slug: brand.slug }));
+  const slugs = await listBrandSlugs();
+  return slugs.map((slug) => ({ slug }));
 }
 
 export async function generateMetadata({
   params,
 }: BrandPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const brand = getBrandBySlug(slug);
+  const brand = await getBrandBySlugService(slug);
   if (!brand) return { title: "Brand not found" };
   return {
     title: brand.name,
@@ -37,10 +41,10 @@ export async function generateMetadata({
 
 export default async function BrandPage({ params }: BrandPageProps) {
   const { slug } = await params;
-  const brand = getBrandBySlug(slug);
+  const brand = await getBrandBySlugService(slug);
   if (!brand) notFound();
 
-  const products = getProductsByBrand(brand.id);
+  const products = await listProductsByBrand(brand.id);
 
   return (
     <>

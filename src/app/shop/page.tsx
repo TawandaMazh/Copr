@@ -2,7 +2,7 @@ import { Suspense } from "react";
 import type { Metadata } from "next";
 import { FilterPanel } from "@/components/shop/filter-panel";
 import { ProductGrid } from "@/components/shop/product-grid";
-import { filterProducts } from "@/data";
+import { filterCatalogue } from "@/lib/catalogue/service";
 import type { CategorySlug, ProductColour, ProductSize } from "@/types";
 import { GlassCard } from "@/components/ui/glass-card";
 import { ShopToolbar } from "@/components/shop/shop-toolbar";
@@ -38,7 +38,7 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
     | "popular"
     | undefined) ?? "newest";
 
-  const products = filterProducts({
+  const products = await filterCatalogue({
     q,
     category,
     brand,

@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import { getMinPrice } from "@/data/products";
 import {
-  getProductBySlug,
-  getProductsByBrand,
-  products,
-  getMinPrice,
-} from "@/data/products";
-import { getBrandById } from "@/data/brands";
+  getProductBySlugService,
+  listBrands,
+  listProductSlugs,
+  listProductsByBrand,
+} from "@/lib/catalogue/service";
 import { ProductGallery } from "@/components/product/product-gallery";
 import { ProductPurchase } from "@/components/product/product-purchase";
 import { ProductReviews } from "@/components/product/product-reviews";
@@ -21,16 +21,18 @@ interface ProductPageProps {
 }
 
 export async function generateStaticParams() {
-  return products.map((product) => ({ slug: product.slug }));
+  const slugs = await listProductSlugs();
+  return slugs.map((slug) => ({ slug }));
 }
 
 export async function generateMetadata({
   params,
 }: ProductPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const product = getProductBySlug(slug);
+  const product = await getProductBySlugService(slug);
   if (!product) return { title: "Product not found" };
-  const brand = getBrandById(product.brandId);
+  const brands = await listBrands();
+  const brand = brands.find((b) => b.id === product.brandId);
   return {
     title: product.name,
     description: product.description,
@@ -52,11 +54,12 @@ export async function generateMetadata({
 
 export default async function ProductPage({ params }: ProductPageProps) {
   const { slug } = await params;
-  const product = getProductBySlug(slug);
+  const product = await getProductBySlugService(slug);
   if (!product) notFound();
 
-  const brand = getBrandById(product.brandId);
-  const related = getProductsByBrand(product.brandId)
+  const brands = await listBrands();
+  const brand = brands.find((b) => b.id === product.brandId);
+  const related = (await listProductsByBrand(product.brandId))
     .filter((p) => p.id !== product.id)
     .slice(0, 4);
   const inStock = product.variants.some((v) => v.stock > 0);
