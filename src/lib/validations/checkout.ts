@@ -35,6 +35,8 @@ export const checkoutSchema = z
     phone: z.string().min(9, "Phone required"),
     notes: z.string().max(240).optional(),
     fullName: z.string().min(2, "Name required"),
+    /** Order confirmation email for the buyer. */
+    email: z.string().trim().email("Enter a valid email").max(160),
     /** Opt-in: save this delivery address for next time. */
     saveAddress: z.boolean().optional(),
     paymentMethod: z.enum(["mtn_momo", "airtel_money", "card"]),

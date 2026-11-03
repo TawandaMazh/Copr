@@ -74,7 +74,11 @@ export function OrderDetail({ orderId }: { orderId: string }) {
             </h2>
             <Slogan id="happyWithCopd" variant="quote" className="mt-2" />
             <p className="text-sm text-muted-foreground">
-              Payment secured. We’ll update you as each brand packs and ships.
+              Payment secured
+              {order.contactEmail
+                ? ` · confirmation emailed to ${order.contactEmail}`
+                : ""}
+              . We’ll update you as each brand packs and ships.
             </p>
           </div>
           <div className="grid gap-3 sm:grid-cols-2">

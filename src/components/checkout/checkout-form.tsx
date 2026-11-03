@@ -43,6 +43,7 @@ export function CheckoutForm() {
     defaultValues: {
       deliveryMethod: "delivery",
       fullName: user?.fullName ?? "",
+      email: user?.email ?? "",
       phone: user?.phone ?? defaultAddress?.phone ?? "",
       savedAddressId: defaultAddress?.id,
       area: defaultAddress?.area ?? LUSAKA_AREAS[0],
@@ -130,6 +131,27 @@ export function CheckoutForm() {
             {form.formState.errors.fullName && (
               <span className="text-xs text-destructive">
                 {form.formState.errors.fullName.message}
+              </span>
+            )}
+          </label>
+          <label className="block space-y-1.5">
+            <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              Email
+            </span>
+            <input
+              className="field"
+              type="email"
+              autoComplete="email"
+              placeholder="you@email.com"
+              {...form.register("email")}
+            />
+            {form.formState.errors.email ? (
+              <span className="text-xs text-destructive">
+                {form.formState.errors.email.message}
+              </span>
+            ) : (
+              <span className="text-xs text-muted-foreground">
+                We’ll send your order confirmation here.
               </span>
             )}
           </label>

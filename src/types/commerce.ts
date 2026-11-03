@@ -88,6 +88,8 @@ export interface OrderRecord {
   total: number;
   notes?: string;
   contactName?: string;
+  /** Buyer email for order confirmation (also used for owner alerts). */
+  contactEmail?: string;
   paidAt?: string;
   createdAt: string;
   updatedAt: string;
