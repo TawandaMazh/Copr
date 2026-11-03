@@ -88,7 +88,8 @@ With keys set, the app loads **brands/products/categories from Supabase** (falls
 2. ~~Phase 2 — Schema/RLS, auth, cart, wishlist, MockProvider checkout~~
 3. ~~Phase 3 — Seller dashboard~~
 4. ~~Phase 4 — Admin (commission, payouts, moderation, analytics, reviews)~~
-5. ~~Phase 5 — Performance, SEO, a11y, empty/error states, dark-mode QA~~ ← *you are here*
+5. ~~Phase 5 — Performance, SEO, a11y, empty/error states, dark-mode QA~~
+6. Theme system preset + auth/session fixes · global search · delivery auto-confirm ← *you are here*
 
 ---
 

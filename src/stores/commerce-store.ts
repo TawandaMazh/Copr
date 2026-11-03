@@ -159,6 +159,8 @@ interface CommerceState {
   getAdminAnalytics: () => AdminAnalytics;
   /** Pull cart/wishlist from Supabase for the signed-in user. */
   hydrateFromSupabase: () => Promise<void>;
+  /** Complete shipped parcels past the marketplace auto-confirm window. */
+  runAutoConfirms: () => number;
 }
 
 function newId(prefix: string) {
@@ -479,6 +481,10 @@ export const useCommerceStore = create<CommerceState>()(
             ...(remotePayouts ? { payouts: remotePayouts } : {}),
           };
         });
+        // Auto-confirm overdue shipments after local + remote orders are merged.
+        queueMicrotask(() => {
+          get().runAutoConfirms();
+        });
         // Push guest cart up if remote was empty
         if (remoteCart && remoteCart.length === 0 && get().cart.length > 0) {
           const { syncCartToSupabase } = await import(
@@ -496,6 +502,26 @@ export const useCommerceStore = create<CommerceState>()(
           );
           await syncWishlistToSupabase(get().wishlist);
         }
+      },
+
+      runAutoConfirms: () => {
+        const days = get().settings.autoConfirmDays || AUTO_CONFIRM_DAYS;
+        const cutoff = Date.now() - days * 24 * 60 * 60 * 1000;
+        const due: Array<{ orderId: string; subOrderId: string }> = [];
+        for (const order of get().orders) {
+          for (const sub of order.subOrders) {
+            if (sub.status !== "shipped" && sub.status !== "delivered") continue;
+            const shippedMs = sub.shippedAt
+              ? Date.parse(sub.shippedAt)
+              : Number.NaN;
+            if (!Number.isFinite(shippedMs) || shippedMs > cutoff) continue;
+            due.push({ orderId: order.id, subOrderId: sub.id });
+          }
+        }
+        for (const item of due) {
+          get().confirmDelivery(item.orderId, item.subOrderId);
+        }
+        return due.length;
       },
 
       confirmDelivery: (orderId, subOrderId) => {

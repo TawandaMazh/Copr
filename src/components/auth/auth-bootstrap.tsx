@@ -39,12 +39,23 @@ async function profileFromUser(user: User): Promise<ShopperProfile> {
 /**
  * Keeps Zustand shopper state aligned with the Supabase auth session so
  * refresh / new tabs restore a real account instead of dropping to signed-out.
+ * Also runs local auto-confirm for overdue shipments.
  */
 export function AuthBootstrap() {
   useEffect(() => {
-    if (!isSupabaseConfigured()) return;
+    useCommerceStore.getState().runAutoConfirms();
+    const autoConfirmTimer = window.setInterval(() => {
+      useCommerceStore.getState().runAutoConfirms();
+    }, 60_000);
+
+    if (!isSupabaseConfigured()) {
+      return () => window.clearInterval(autoConfirmTimer);
+    }
+
     const supabase = createClient();
-    if (!supabase) return;
+    if (!supabase) {
+      return () => window.clearInterval(autoConfirmTimer);
+    }
 
     let cancelled = false;
 
@@ -86,6 +97,7 @@ export function AuthBootstrap() {
     return () => {
       cancelled = true;
       subscription.unsubscribe();
+      window.clearInterval(autoConfirmTimer);
     };
   }, []);
 

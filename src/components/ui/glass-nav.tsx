@@ -8,6 +8,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { Button } from "./button";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
+import { SearchDialog } from "@/components/shop/search-dialog";
 import { presenceExit, usePrefersReducedMotion } from "@/lib/motion";
 import {
   useCartCount,
@@ -24,6 +25,7 @@ const baseLinks = [
 export function GlassNav() {
   const pathname = usePathname();
   const [open, setOpen] = React.useState(false);
+  const [searchOpen, setSearchOpen] = React.useState(false);
   const [scrolled, setScrolled] = React.useState(false);
   const [mounted, setMounted] = React.useState(false);
   const setCartOpen = useCommerceStore((s) => s.setCartOpen);
@@ -43,7 +45,19 @@ export function GlassNav() {
 
   React.useEffect(() => {
     setOpen(false);
+    setSearchOpen(false);
   }, [pathname]);
+
+  React.useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        setSearchOpen(true);
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
 
   const links = React.useMemo(() => {
     const next = [...baseLinks];
@@ -112,10 +126,13 @@ export function GlassNav() {
         </ul>
 
         <div className="flex items-center gap-0.5">
-          <Button variant="ghost" size="icon" asChild>
-            <Link href="/shop" aria-label="Search products">
-              <Search className="h-4 w-4" strokeWidth={1.5} />
-            </Link>
+          <Button
+            variant="ghost"
+            size="icon"
+            aria-label="Search products"
+            onClick={() => setSearchOpen(true)}
+          >
+            <Search className="h-4 w-4" strokeWidth={1.5} />
           </Button>
           <ThemeToggle />
           <Button variant="ghost" size="icon" asChild className="relative">
@@ -207,6 +224,8 @@ export function GlassNav() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      <SearchDialog open={searchOpen} onOpenChange={setSearchOpen} />
     </header>
   );
 }
