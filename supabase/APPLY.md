@@ -14,7 +14,7 @@ The app talks to project `koyosnsrparlhljvybok` (eu-west-1).
 | Reviews status + rating rollup trigger | Applied |
 | Fulfilment RPCs (ship / confirm delivery + payout) | Applied |
 | Order item `product_image` column | Applied |
-| Auto-confirm due shipments RPC | Apply `20260322000008_auto_confirm.sql` (optional cron) |
+| Auto-confirm due shipments RPC | Applied (`20260322000008_auto_confirm.sql`; cron `/api/cron/auto-confirm`) |
 | Auth → Email provider | On |
 | Auth → Phone / SMS | Off until Twilio (or another SMS provider) is configured |
 | Auth URL Configuration | Set Site URL + redirects (see below) |
