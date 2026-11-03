@@ -79,10 +79,15 @@ export interface OrderRecord {
   deliveryNeighbourhood: string;
   deliveryLandmark?: string;
   deliveryPhone: string;
+  /** Human ETA like "1–2" days from checkout. */
+  expectedDeliveryEtaDays?: string;
+  /** Shopper-facing line, e.g. "Expected delivery in 1–2 days". */
+  expectedDeliveryLabel?: string;
   subtotal: number;
   deliveryFee: number;
   total: number;
   notes?: string;
+  contactName?: string;
   paidAt?: string;
   createdAt: string;
   updatedAt: string;

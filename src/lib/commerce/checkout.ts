@@ -4,6 +4,7 @@ import {
   DELIVERY_FEE_KWACHA,
   PICKUP_POINTS,
 } from "@/lib/commerce/constants";
+import { resolveDeliveryEta } from "@/lib/commerce/delivery-eta";
 import { getPaymentProvider } from "@/lib/payments";
 import type { CartLine } from "@/types/commerce";
 import type {
@@ -182,6 +183,8 @@ export async function placeOrder(input: {
     heldAt: now,
   };
 
+  const eta = resolveDeliveryEta(input.form.deliveryMethod, deliveryArea);
+
   return {
     id: orderId,
     userId: input.userId,
@@ -191,10 +194,13 @@ export async function placeOrder(input: {
     deliveryNeighbourhood,
     deliveryLandmark,
     deliveryPhone,
+    expectedDeliveryEtaDays: eta.etaDays,
+    expectedDeliveryLabel: eta.label,
     subtotal,
     deliveryFee,
     total,
     notes: input.form.notes,
+    contactName: input.form.fullName,
     paidAt: now,
     createdAt: now,
     updatedAt: now,

@@ -387,8 +387,12 @@ export const useCommerceStore = create<CommerceState>()(
 
         let savedAddress: SavedAddress | null = null;
         set((s) => {
-          if (
+          const shouldSave =
+            form.saveAddress === true &&
             form.deliveryMethod === "delivery" &&
+            Boolean(form.area && form.neighbourhood);
+          if (
+            shouldSave &&
             !s.addresses.some(
               (a) =>
                 a.area === form.area &&
@@ -397,6 +401,7 @@ export const useCommerceStore = create<CommerceState>()(
           ) {
             savedAddress = {
               id: newId("addr"),
+              label: "Home",
               area: form.area!,
               neighbourhood: form.neighbourhood!,
               landmark: form.landmark,

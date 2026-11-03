@@ -16,7 +16,7 @@ export default function CheckoutPage() {
           Checkout
         </h1>
         <p className="text-muted-foreground">
-          Lusaka delivery or pickup · Escrow via MockProvider
+          Lusaka delivery or pickup · confirmation with expected delivery
         </p>
       </div>
       <CheckoutForm />
