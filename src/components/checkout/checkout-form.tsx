@@ -14,6 +14,7 @@ import {
   PICKUP_POINTS,
 } from "@/lib/commerce/constants";
 import { resolveCartTotals } from "@/lib/commerce/checkout";
+import { resolveDeliveryEta } from "@/lib/commerce/delivery-eta";
 import { resolveBrand, resolveProduct } from "@/lib/catalogue";
 import { useCommerceStore } from "@/stores/commerce-store";
 import { Button } from "@/components/ui/button";
@@ -34,7 +35,8 @@ export function CheckoutForm() {
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
 
-  const defaultAddress = addresses.find((a) => a.isDefault) ?? addresses[0];
+  const savedHomes = addresses.filter((a) => !a.isPickupPoint);
+  const defaultAddress = savedHomes.find((a) => a.isDefault) ?? savedHomes[0];
 
   const form = useForm<CheckoutFormValues>({
     resolver: zodResolver(checkoutSchema),
@@ -42,11 +44,13 @@ export function CheckoutForm() {
       deliveryMethod: "delivery",
       fullName: user?.fullName ?? "",
       phone: user?.phone ?? defaultAddress?.phone ?? "",
+      savedAddressId: defaultAddress?.id,
       area: defaultAddress?.area ?? LUSAKA_AREAS[0],
       neighbourhood: defaultAddress?.neighbourhood ?? "",
       landmark: defaultAddress?.landmark ?? "",
       pickupPointId: PICKUP_POINTS[0].id,
       notes: "",
+      saveAddress: !defaultAddress,
       paymentMethod: "mtn_momo",
       mobileMoneyPhone: user?.phone ?? "",
       whatsappUpdates: true,
@@ -55,6 +59,13 @@ export function CheckoutForm() {
 
   const method = form.watch("deliveryMethod");
   const paymentMethod = form.watch("paymentMethod");
+  const area = form.watch("area");
+  const savedAddressId = form.watch("savedAddressId");
+  const eta = useMemo(
+    () => resolveDeliveryEta(method, method === "delivery" ? area : undefined),
+    [method, area],
+  );
+
   const totals = useMemo(
     () =>
       resolveCartTotals(
@@ -65,6 +76,17 @@ export function CheckoutForm() {
       ),
     [cart, method, sellerProducts, sellerBrand, platformBrands],
   );
+
+  const applySavedAddress = (id: string) => {
+    const addr = savedHomes.find((a) => a.id === id);
+    if (!addr) return;
+    form.setValue("savedAddressId", addr.id);
+    form.setValue("area", addr.area);
+    form.setValue("neighbourhood", addr.neighbourhood);
+    form.setValue("landmark", addr.landmark ?? "");
+    form.setValue("phone", addr.phone);
+    form.setValue("saveAddress", false);
+  };
 
   if (cart.length === 0) {
     return (
@@ -131,7 +153,7 @@ export function CheckoutForm() {
         <GlassCard className="space-y-4 p-6">
           <h2 className="text-lg font-semibold tracking-tight">Delivery</h2>
           <p className="text-sm text-muted-foreground">
-            Lusaka only for MVP · Flat fee{" "}
+            Lusaka only · Flat fee{" "}
             <PriceTag amount={DELIVERY_FEE_KWACHA} size="sm" className="inline" />
           </p>
           <div className="flex gap-2 rounded-full glass p-1">
@@ -153,38 +175,100 @@ export function CheckoutForm() {
           </div>
 
           {method === "delivery" ? (
-            <div className="grid gap-3 sm:grid-cols-2">
-              <label className="block space-y-1.5 sm:col-span-2">
-                <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                  Area / neighbourhood zone
-                </span>
-                <select className="field" {...form.register("area")}>
-                  {LUSAKA_AREAS.map((area) => (
-                    <option key={area} value={area}>
-                      {area}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <label className="block space-y-1.5 sm:col-span-2">
-                <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                  Neighbourhood / street
-                </span>
+            <div className="space-y-3">
+              {savedHomes.length > 0 && (
+                <div className="space-y-2">
+                  <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    Saved addresses
+                  </p>
+                  <div className="grid gap-2">
+                    {savedHomes.map((addr) => (
+                      <button
+                        key={addr.id}
+                        type="button"
+                        onClick={() => applySavedAddress(addr.id)}
+                        className={cn(
+                          "rounded-2xl border border-border-subtle px-4 py-3 text-left transition-colors",
+                          savedAddressId === addr.id &&
+                            "border-primary/40 bg-primary/5",
+                        )}
+                      >
+                        <span className="block text-sm font-medium">
+                          {addr.label || addr.neighbourhood}
+                          {addr.isDefault ? " · Default" : ""}
+                        </span>
+                        <span className="text-xs text-muted-foreground">
+                          {addr.area} · {addr.neighbourhood}
+                          {addr.landmark ? ` · ${addr.landmark}` : ""}
+                        </span>
+                      </button>
+                    ))}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        form.setValue("savedAddressId", undefined);
+                        form.setValue("neighbourhood", "");
+                        form.setValue("landmark", "");
+                        form.setValue("saveAddress", true);
+                      }}
+                      className={cn(
+                        "rounded-2xl border border-dashed border-border-subtle px-4 py-3 text-left text-sm text-muted-foreground transition-colors hover:text-foreground",
+                        !savedAddressId && "border-primary/40 text-foreground",
+                      )}
+                    >
+                      Use a new address
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              <div className="grid gap-3 sm:grid-cols-2">
+                <label className="block space-y-1.5 sm:col-span-2">
+                  <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    Area / neighbourhood zone
+                  </span>
+                  <select className="field" {...form.register("area")}>
+                    {LUSAKA_AREAS.map((a) => (
+                      <option key={a} value={a}>
+                        {a}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label className="block space-y-1.5 sm:col-span-2">
+                  <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    Neighbourhood / street
+                  </span>
+                  <input
+                    className="field"
+                    placeholder="e.g. Twin Palm Road"
+                    {...form.register("neighbourhood")}
+                  />
+                </label>
+                <label className="block space-y-1.5 sm:col-span-2">
+                  <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    Landmark
+                  </span>
+                  <input
+                    className="field"
+                    placeholder="Blue gate near the bakery"
+                    {...form.register("landmark")}
+                  />
+                </label>
+              </div>
+
+              <label className="flex cursor-pointer items-start gap-3 rounded-2xl border border-border-subtle px-4 py-3">
                 <input
-                  className="field"
-                  placeholder="e.g. Twin Palm Road"
-                  {...form.register("neighbourhood")}
+                  type="checkbox"
+                  className="mt-1 accent-primary"
+                  {...form.register("saveAddress")}
                 />
-              </label>
-              <label className="block space-y-1.5 sm:col-span-2">
-                <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                  Landmark
+                <span className="text-sm leading-relaxed">
+                  Save this address for next time
+                  <span className="mt-0.5 block text-xs text-muted-foreground">
+                    Keep it on your account for faster checkout.
+                  </span>
                 </span>
-                <input
-                  className="field"
-                  placeholder="Blue gate near the bakery"
-                  {...form.register("landmark")}
-                />
               </label>
             </div>
           ) : (
@@ -214,6 +298,14 @@ export function CheckoutForm() {
               ))}
             </div>
           )}
+
+          <div className="rounded-2xl bg-primary/5 px-4 py-3 text-sm">
+            <p className="font-medium text-primary dark:text-sky">{eta.label}</p>
+            <p className="mt-0.5 text-xs text-muted-foreground">
+              Brands pack after payment is secured. You’ll get updates when each
+              parcel ships.
+            </p>
+          </div>
 
           <label className="block space-y-1.5">
             <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
@@ -296,12 +388,14 @@ export function CheckoutForm() {
       </div>
 
       <GlassCard strong className="h-fit space-y-4 p-6 lg:sticky lg:top-24">
-        <h2 className="text-lg font-semibold tracking-tight">Secure checkout</h2>
+        <h2 className="text-lg font-semibold tracking-tight">Order summary</h2>
         <p className="text-sm leading-relaxed text-muted-foreground">
-          Your payment is secured at checkout. Each brand ships separately —
-          confirm delivery when a parcel arrives (or we auto-confirm after a few
-          days) so that brand gets paid.
+          You’ll get an order confirmation next, with your expected delivery
+          window. Each brand ships its own parcel.
         </p>
+        <div className="rounded-2xl border border-border-subtle px-4 py-3 text-sm">
+          <p className="font-medium">{eta.label}</p>
+        </div>
         <div className="space-y-2 border-t border-border-subtle pt-3 text-sm">
           <div className="flex justify-between">
             <span className="text-muted-foreground">Subtotal</span>

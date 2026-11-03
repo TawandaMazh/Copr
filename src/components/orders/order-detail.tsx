@@ -10,6 +10,10 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { AUTO_CONFIRM_DAYS } from "@/lib/commerce/constants";
 import {
+  expectedDeliveryWindow,
+  resolveDeliveryEta,
+} from "@/lib/commerce/delivery-eta";
+import {
   orderStatusHint,
   orderStatusLabel,
   paymentStatusLabel,
@@ -43,25 +47,75 @@ export function OrderDetail({ orderId }: { orderId: string }) {
   }
 
   const hint = orderStatusHint(order.status);
+  const eta =
+    order.expectedDeliveryLabel && order.expectedDeliveryEtaDays
+      ? {
+          label: order.expectedDeliveryLabel,
+          etaDays: order.expectedDeliveryEtaDays,
+        }
+      : resolveDeliveryEta(order.deliveryMethod, order.deliveryArea);
+  const deliveryWindow = expectedDeliveryWindow(
+    eta.etaDays,
+    order.createdAt,
+  );
 
   return (
     <div className="space-y-6">
       {justPlaced && (
-        <GlassCard className="border-primary/20 bg-primary/5 p-5">
-          <p className="font-semibold text-primary dark:text-sky">
-            Order placed — payment secured
+        <GlassCard className="space-y-4 border-primary/20 bg-primary/5 p-6">
+          <div className="space-y-1">
+            <p className="text-xs font-semibold uppercase tracking-wider text-primary dark:text-sky">
+              Order confirmation
+            </p>
+            <h2 className="text-2xl font-semibold tracking-tight">
+              Thanks{order.contactName ? `, ${order.contactName.split(" ")[0]}` : ""}
+              — we’ve got your order
+            </h2>
+            <p className="text-sm text-muted-foreground">
+              Payment secured. We’ll update you as each brand packs and ships.
+            </p>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div className="rounded-2xl bg-background/70 px-4 py-3">
+              <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                Expected{" "}
+                {order.deliveryMethod === "pickup" ? "pickup" : "delivery"}
+              </p>
+              <p className="mt-1 font-medium">{deliveryWindow}</p>
+              <p className="text-xs text-muted-foreground">{eta.label}</p>
+            </div>
+            <div className="rounded-2xl bg-background/70 px-4 py-3">
+              <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                Order total
+              </p>
+              <p className="mt-1">
+                <PriceTag amount={order.total} />
+              </p>
+              <p className="text-xs text-muted-foreground">
+                Ref {order.id.slice(-8).toUpperCase()}
+              </p>
+            </div>
+          </div>
+          <p className="text-sm text-muted-foreground">
+            When a parcel arrives, confirm delivery (or we’ll auto-confirm after{" "}
+            {AUTO_CONFIRM_DAYS} days) so that brand gets paid.
           </p>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Each brand packs and ships its own items. When a parcel arrives,
-            confirm delivery (or we’ll auto-confirm after {AUTO_CONFIRM_DAYS}{" "}
-            days) so that brand gets paid.
-          </p>
+          <div className="flex flex-wrap gap-2">
+            <Button asChild size="sm">
+              <Link href="/shop">Continue shopping</Link>
+            </Button>
+            <Button asChild size="sm" variant="secondary">
+              <Link href="/orders">View all orders</Link>
+            </Button>
+          </div>
         </GlassCard>
       )}
 
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="space-y-1">
-          <h1 className="text-3xl font-semibold tracking-tight">Your order</h1>
+          <h1 className="text-3xl font-semibold tracking-tight">
+            {justPlaced ? "Order details" : "Your order"}
+          </h1>
           <p className="text-sm text-muted-foreground">
             Placed{" "}
             {new Date(order.createdAt).toLocaleString("en-ZM", {
@@ -89,6 +143,10 @@ export function OrderDetail({ orderId }: { orderId: string }) {
             {order.deliveryLandmark ? ` · ${order.deliveryLandmark}` : ""}
           </p>
           <p className="text-sm text-muted-foreground">{order.deliveryPhone}</p>
+          <p className="pt-1 text-sm font-medium text-primary dark:text-sky">
+            {deliveryWindow}
+          </p>
+          <p className="text-xs text-muted-foreground">{eta.label}</p>
         </GlassCard>
 
         <GlassCard className="space-y-2 p-5">

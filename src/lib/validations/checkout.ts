@@ -28,12 +28,15 @@ export const checkoutSchema = z
   .object({
     deliveryMethod: z.enum(["delivery", "pickup"]),
     pickupPointId: z.string().optional(),
+    savedAddressId: z.string().optional(),
     area: z.string().optional(),
     neighbourhood: z.string().optional(),
     landmark: z.string().optional(),
     phone: z.string().min(9, "Phone required"),
     notes: z.string().max(240).optional(),
     fullName: z.string().min(2, "Name required"),
+    /** Opt-in: save this delivery address for next time. */
+    saveAddress: z.boolean().optional(),
     paymentMethod: z.enum(["mtn_momo", "airtel_money", "card"]),
     mobileMoneyPhone: z.string().optional(),
     whatsappUpdates: z.boolean().optional(),
