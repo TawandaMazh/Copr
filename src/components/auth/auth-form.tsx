@@ -30,6 +30,10 @@ function toE164ZM(phone: string) {
   return `+260${digits}`;
 }
 
+function normalizeOtp(token: string) {
+  return token.replace(/\D/g, "").slice(0, 8);
+}
+
 export function AuthForm({
   onSuccess,
   compact,
@@ -49,15 +53,15 @@ export function AuthForm({
   const supabaseReady = isSupabaseConfigured();
 
   const emailForm = useForm<EmailAuthValues>({
-    resolver: zodResolver(emailAuthSchema),
+    resolver: zodResolver(emailAuthSchema) as never,
     defaultValues: { email: "", fullName: "" },
   });
   const phoneForm = useForm<PhoneAuthValues>({
-    resolver: zodResolver(phoneAuthSchema),
+    resolver: zodResolver(phoneAuthSchema) as never,
     defaultValues: { phone: "", fullName: "" },
   });
   const otpForm = useForm<OtpValues>({
-    resolver: zodResolver(otpSchema),
+    resolver: zodResolver(otpSchema) as never,
     defaultValues: { token: "" },
   });
 
@@ -67,6 +71,36 @@ export function AuthForm({
       "Signed in on this device only. Use email sign-in when available to sync across phones.",
     );
     onSuccess?.();
+  };
+
+  const ensureProfile = async (
+    userId: string,
+    fullName: string,
+    email?: string | null,
+    phone?: string | null,
+  ) => {
+    const supabase = createClient();
+    if (!supabase) return;
+    const { error: profileErr } = await supabase.from("profiles").upsert(
+      {
+        id: userId,
+        full_name: fullName,
+        email: email ?? null,
+        phone: phone ?? null,
+      },
+      { onConflict: "id" },
+    );
+    if (profileErr) {
+      // Trigger may have created the row; try update only.
+      await supabase
+        .from("profiles")
+        .update({
+          full_name: fullName,
+          email: email ?? null,
+          phone: phone ?? null,
+        })
+        .eq("id", userId);
+    }
   };
 
   const requestEmail = (values: EmailAuthValues) => {
@@ -79,21 +113,28 @@ export function AuthForm({
       const supabase = createClient();
       if (!supabase) return;
       const { error: err } = await supabase.auth.signInWithOtp({
-        email: values.email,
+        email: values.email.trim(),
         options: {
-          data: { full_name: values.fullName },
+          data: { full_name: values.fullName.trim() },
           shouldCreateUser: true,
-          emailRedirectTo: `${getSiteUrl()}/account`,
+          emailRedirectTo: `${getSiteUrl()}/auth/callback?next=/account`,
         },
       });
       if (err) {
-        setError(err.message);
+        setError(
+          err.message.includes("rate")
+            ? "Too many codes sent. Wait a minute and try again."
+            : err.message,
+        );
         return;
       }
-      setPendingContact(values.email);
-      setPendingName(values.fullName || "");
+      setPendingContact(values.email.trim());
+      setPendingName(values.fullName.trim());
       setStep("otp");
-      setMessage("Check your email for a 6-digit code.");
+      setMessage(
+        "Check your email for a 6-digit code (and spam folder). Codes expire quickly.",
+      );
+      otpForm.reset({ token: "" });
     });
   };
 
@@ -114,18 +155,45 @@ export function AuthForm({
       const { error: err } = await supabase.auth.signInWithOtp({
         phone: e164,
         options: {
-          data: { full_name: values.fullName },
+          data: { full_name: values.fullName.trim() },
           shouldCreateUser: true,
         },
       });
       if (err) {
-        setError(err.message);
+        setError(
+          err.message.includes("sms") || err.message.includes("Phone")
+            ? "Phone sign-in isn’t available yet. Use email instead."
+            : err.message,
+        );
         return;
       }
       setPendingContact(e164);
-      setPendingName(values.fullName || "");
+      setPendingName(values.fullName.trim());
       setStep("otp");
       setMessage("We sent an SMS code to your phone.");
+      otpForm.reset({ token: "" });
+    });
+  };
+
+  const resendCode = () => {
+    setError(null);
+    if (mode === "email") {
+      const values = emailForm.getValues();
+      if (!values.email) {
+        setError("Enter your email again to resend.");
+        setStep("identify");
+        return;
+      }
+      requestEmail({
+        email: pendingContact || values.email,
+        fullName: pendingName || values.fullName || "Shopper",
+      });
+      return;
+    }
+    const values = phoneForm.getValues();
+    requestPhone({
+      phone: pendingContact || values.phone,
+      fullName: pendingName || values.fullName || "Shopper",
     });
   };
 
@@ -134,45 +202,76 @@ export function AuthForm({
     startTransition(async () => {
       const supabase = createClient();
       if (!supabase) return;
-      const payload =
-        mode === "email"
-          ? { email: pendingContact, token: values.token, type: "email" as const }
-          : { phone: pendingContact, token: values.token, type: "sms" as const };
-      const { data, error: err } = await supabase.auth.verifyOtp(payload);
-      if (err) {
-        setError(err.message);
+      const token = normalizeOtp(values.token);
+      if (token.length < 6) {
+        setError("Enter the 6-digit code from your email.");
         return;
       }
-      const u = data.user;
-      if (u) {
-        let role: "shopper" | "seller" | "admin" = "shopper";
-        try {
-          const { fetchProfileRole } = await import(
-            "@/lib/commerce/supabase-sync"
-          );
-          const dbRole = await fetchProfileRole(u.id);
-          if (dbRole) role = dbRole;
-        } catch {
-          /* profile may lag trigger; default shopper */
+
+      const attempts =
+        mode === "email"
+          ? ([
+              { email: pendingContact, token, type: "email" as const },
+              { email: pendingContact, token, type: "signup" as const },
+              { email: pendingContact, token, type: "magiclink" as const },
+            ] as const)
+          : ([{ phone: pendingContact, token, type: "sms" as const }] as const);
+
+      let user = null as Awaited<
+        ReturnType<typeof supabase.auth.verifyOtp>
+      >["data"]["user"];
+      let lastError: string | null = null;
+
+      for (const payload of attempts) {
+        const { data, error: err } = await supabase.auth.verifyOtp(payload);
+        if (!err && data.user) {
+          user = data.user;
+          break;
         }
-        setUserFromSupabase({
-          id: u.id,
-          fullName:
-            pendingName ||
-            (u.user_metadata?.full_name as string) ||
-            u.email ||
-            u.phone ||
-            "Shopper",
-          email: u.email,
-          phone: u.phone,
-          role,
-          isDemo: false,
-        });
-        // Hydrate cart/wishlist from Supabase in the background
-        void import("@/stores/commerce-store").then(({ useCommerceStore }) => {
-          useCommerceStore.getState().hydrateFromSupabase();
-        });
+        lastError = err?.message ?? lastError;
       }
+
+      if (!user) {
+        setError(
+          lastError?.toLowerCase().includes("expired")
+            ? "That code expired. Request a new one."
+            : lastError?.toLowerCase().includes("token") ||
+                lastError?.toLowerCase().includes("otp")
+              ? "That code didn’t work. Check the digits and try again."
+              : lastError || "Couldn’t verify the code.",
+        );
+        return;
+      }
+
+      const fullName =
+        pendingName ||
+        (user.user_metadata?.full_name as string | undefined) ||
+        user.email?.split("@")[0] ||
+        user.phone ||
+        "Shopper";
+
+      await ensureProfile(user.id, fullName, user.email, user.phone);
+
+      let role: "shopper" | "seller" | "admin" = "shopper";
+      try {
+        const { fetchProfileRole } = await import(
+          "@/lib/commerce/supabase-sync"
+        );
+        const dbRole = await fetchProfileRole(user.id);
+        if (dbRole) role = dbRole;
+      } catch {
+        /* default shopper */
+      }
+
+      setUserFromSupabase({
+        id: user.id,
+        fullName,
+        email: user.email,
+        phone: user.phone,
+        role,
+        isDemo: false,
+      });
+      void useCommerceStore.getState().hydrateFromSupabase();
       setMessage("You're signed in.");
       onSuccess?.();
     });
@@ -181,10 +280,12 @@ export function AuthForm({
   return (
     <GlassCard className={cn("space-y-5", compact ? "p-5" : "p-6 sm:p-8")}>
       <div className="space-y-1">
-        <h2 className="text-xl font-semibold tracking-tight">Sign in to copr</h2>
+        <h2 className="text-xl font-semibold tracking-tight">
+          {supabaseReady ? "Create account or sign in" : "Sign in to copr"}
+        </h2>
         <p className="text-sm text-muted-foreground">
           {supabaseReady
-            ? "We’ll email you a 6-digit code — no password needed."
+            ? "Enter your name and email — we’ll send a one-time code. New shoppers are created automatically."
             : "Try the shop with a quick demo sign-in on this device."}
         </p>
       </div>
@@ -226,6 +327,7 @@ export function AuthForm({
                 <input
                   className="field"
                   placeholder="Thandi Phiri"
+                  autoComplete="name"
                   {...emailForm.register("fullName")}
                 />
               </Field>
@@ -237,11 +339,16 @@ export function AuthForm({
                   className="field"
                   type="email"
                   placeholder="you@example.com"
+                  autoComplete="email"
                   {...emailForm.register("email")}
                 />
               </Field>
               <Button type="submit" className="w-full" disabled={pending}>
-                {supabaseReady ? "Email me a code" : "Continue on this device"}
+                {supabaseReady
+                  ? pending
+                    ? "Sending…"
+                    : "Email me a code"
+                  : "Continue on this device"}
               </Button>
             </form>
           ) : (
@@ -256,6 +363,7 @@ export function AuthForm({
                 <input
                   className="field"
                   placeholder="Thandi Phiri"
+                  autoComplete="name"
                   {...phoneForm.register("fullName")}
                 />
               </Field>
@@ -267,6 +375,7 @@ export function AuthForm({
                   className="field"
                   placeholder="+260 97 123 4567"
                   inputMode="tel"
+                  autoComplete="tel"
                   {...phoneForm.register("phone")}
                 />
               </Field>
@@ -281,30 +390,47 @@ export function AuthForm({
       {step === "otp" && (
         <form className="space-y-3" onSubmit={otpForm.handleSubmit(verifyOtp)}>
           <p className="text-sm text-muted-foreground">
-            Code sent to <span className="text-foreground">{pendingContact}</span>
+            Code sent to{" "}
+            <span className="text-foreground">{pendingContact}</span>
           </p>
-          <Field label="One-time code" error={otpForm.formState.errors.token?.message}>
+          <Field
+            label="One-time code"
+            error={otpForm.formState.errors.token?.message}
+          >
             <input
               className="field tracking-[0.3em]"
               inputMode="numeric"
-              placeholder="••••••"
+              autoComplete="one-time-code"
+              placeholder="123456"
               {...otpForm.register("token")}
             />
           </Field>
           <Button type="submit" className="w-full" disabled={pending}>
-            Verify & sign in
+            {pending ? "Verifying…" : "Verify & continue"}
           </Button>
-          <Button
-            type="button"
-            variant="ghost"
-            className="w-full"
-            onClick={() => {
-              setStep("identify");
-              setMessage(null);
-            }}
-          >
-            Back
-          </Button>
+          <div className="flex flex-col gap-1 sm:flex-row">
+            <Button
+              type="button"
+              variant="ghost"
+              className="w-full"
+              disabled={pending}
+              onClick={resendCode}
+            >
+              Resend code
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              className="w-full"
+              onClick={() => {
+                setStep("identify");
+                setMessage(null);
+                setError(null);
+              }}
+            >
+              Use a different email
+            </Button>
+          </div>
         </form>
       )}
 

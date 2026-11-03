@@ -5,7 +5,8 @@ import Link from "next/link";
 import { Heart } from "lucide-react";
 import { motion } from "framer-motion";
 import type { Product } from "@/types";
-import { getBrandById, getMinPrice } from "@/data";
+import { getMinPrice } from "@/data";
+import { resolveBrand } from "@/lib/catalogue";
 import { cn } from "@/lib/utils";
 import { fadeInView, usePrefersReducedMotion } from "@/lib/motion";
 import { PriceTag } from "./price-tag";
@@ -19,7 +20,9 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product, className, priority }: ProductCardProps) {
-  const brand = getBrandById(product.brandId);
+  const sellerBrand = useCommerceStore((s) => s.sellerBrand);
+  const platformBrands = useCommerceStore((s) => s.platformBrands);
+  const brand = resolveBrand(product.brandId, sellerBrand, platformBrands);
   const price = getMinPrice(product);
   const reduced = usePrefersReducedMotion();
   const toggleWishlist = useCommerceStore((s) => s.toggleWishlist);

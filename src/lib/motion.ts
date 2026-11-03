@@ -20,8 +20,8 @@ export function usePrefersReducedMotion() {
 export function fadeUp(reduced: boolean) {
   if (reduced) {
     return {
-      initial: false as const,
-      animate: { opacity: 1 },
+      initial: { opacity: 1, y: 0 },
+      animate: { opacity: 1, y: 0 },
       transition: { duration: 0 },
     };
   }
@@ -35,8 +35,8 @@ export function fadeUp(reduced: boolean) {
 export function fadeInView(reduced: boolean) {
   if (reduced) {
     return {
-      initial: false as const,
-      whileInView: { opacity: 1 },
+      initial: { opacity: 1, y: 0 },
+      whileInView: { opacity: 1, y: 0 },
       viewport: { once: true },
       transition: { duration: 0 },
     };
@@ -44,7 +44,16 @@ export function fadeInView(reduced: boolean) {
   return {
     initial: { opacity: 0, y: 12 },
     whileInView: { opacity: 1, y: 0 },
-    viewport: { once: true, margin: "-40px" },
+    viewport: { once: true, margin: "-10% 0px", amount: 0.15 },
     transition: { duration: 0.28, ease: [0.22, 1, 0.36, 1] as const },
   };
+}
+
+/** Shared exit props so AnimatePresence still unmounts cleanly with reduced motion. */
+export function presenceExit<T extends Record<string, string | number>>(
+  reduced: boolean,
+  props: T,
+): T | { opacity: number } {
+  if (reduced) return { opacity: 1 };
+  return props;
 }

@@ -8,19 +8,17 @@ import { AnimatePresence, motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { Button } from "./button";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
-import { usePrefersReducedMotion } from "@/lib/motion";
+import { presenceExit, usePrefersReducedMotion } from "@/lib/motion";
 import {
   useCartCount,
   useCommerceStore,
   useWishlistCount,
 } from "@/stores/commerce-store";
 
-const links = [
+const baseLinks = [
   { href: "/shop", label: "Shop" },
   { href: "/brands", label: "Brands" },
   { href: "/sell", label: "Sell on copr" },
-  { href: "/seller", label: "Seller" },
-  { href: "/admin", label: "Admin" },
 ];
 
 export function GlassNav() {
@@ -46,6 +44,17 @@ export function GlassNav() {
   React.useEffect(() => {
     setOpen(false);
   }, [pathname]);
+
+  const links = React.useMemo(() => {
+    const next = [...baseLinks];
+    if (user?.role === "seller" || user?.role === "admin") {
+      next.push({ href: "/seller", label: "Seller" });
+    }
+    if (user?.role === "admin") {
+      next.push({ href: "/admin", label: "Admin" });
+    }
+    return next;
+  }, [user?.role]);
 
   return (
     <header className="sticky top-0 z-50 px-3 pt-3 sm:px-4 sm:pt-4">
@@ -149,9 +158,9 @@ export function GlassNav() {
       <AnimatePresence>
         {open && (
           <motion.div
-            initial={reduced ? false : { opacity: 0, y: -8 }}
+            initial={reduced ? { opacity: 1, y: 0 } : { opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={reduced ? undefined : { opacity: 0, y: -8 }}
+            exit={presenceExit(reduced, { opacity: 0, y: -8 })}
             transition={{
               duration: reduced ? 0 : 0.22,
               ease: [0.22, 1, 0.36, 1],

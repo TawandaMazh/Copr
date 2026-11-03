@@ -72,8 +72,11 @@ export function resolveProductBySlug(
 export function resolveBrand(
   brandId: string,
   sellerBrand: SellerBrand | null,
+  platformBrands: SellerBrand[] = [],
 ): Brand | undefined {
   if (sellerBrand?.id === brandId) return sellerBrand;
+  const fromPlatform = platformBrands.find((b) => b.id === brandId);
+  if (fromPlatform) return fromPlatform;
   return getSeedBrandById(brandId);
 }
 

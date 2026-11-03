@@ -5,10 +5,11 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import type { Brand } from "@/types";
 import { GlassCard } from "@/components/ui/glass-card";
-import { usePrefersReducedMotion } from "@/lib/motion";
+import { fadeInView, usePrefersReducedMotion } from "@/lib/motion";
 
 export function FeaturedBrands({ brands }: { brands: Brand[] }) {
   const reduced = usePrefersReducedMotion();
+  const inView = fadeInView(reduced);
 
   return (
     <section className="mb-20">
@@ -33,13 +34,10 @@ export function FeaturedBrands({ brands }: { brands: Brand[] }) {
         {brands.slice(0, 6).map((brand, i) => (
           <motion.div
             key={brand.id}
-            initial={reduced ? false : { opacity: 0, y: 12 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-40px" }}
+            {...inView}
             transition={{
-              duration: reduced ? 0 : 0.28,
-              delay: reduced ? 0 : i * 0.04,
-              ease: [0.22, 1, 0.36, 1],
+              ...inView.transition,
+              delay: reduced ? 0 : Math.min(i, 5) * 0.04,
             }}
           >
             <Link href={`/brands/${brand.slug}`} className="block focus-ring rounded-3xl">

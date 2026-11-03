@@ -236,12 +236,11 @@ textarea.field {
     background: color-mix(in srgb, var(--sky) 18%, transparent);
   }
 
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
+  /* Don't zero out every transition — that breaks theme toggles and focus rings.
+     Framer Motion already respects prefers-reduced-motion via usePrefersReducedMotion. */
+  .atmosphere,
+  .skeleton {
+    animation: none !important;
   }
 }
 

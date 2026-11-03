@@ -6,13 +6,12 @@ import Link from "next/link";
 import { Minus, Plus, ShoppingBag, Trash2, X } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useCommerceStore } from "@/stores/commerce-store";
-import { getBrandById } from "@/data";
-import { resolveProduct } from "@/lib/catalogue";
+import { resolveBrand, resolveProduct } from "@/lib/catalogue";
 import { PriceTag } from "@/components/ui/price-tag";
 import { Button } from "@/components/ui/button";
 import { DELIVERY_FEE_KWACHA } from "@/lib/commerce/constants";
 import { resolveCartTotals } from "@/lib/commerce/checkout";
-import { usePrefersReducedMotion } from "@/lib/motion";
+import { presenceExit, usePrefersReducedMotion } from "@/lib/motion";
 
 export function CartDrawer() {
   const open = useCommerceStore((s) => s.cartOpen);
@@ -20,6 +19,7 @@ export function CartDrawer() {
   const cart = useCommerceStore((s) => s.cart);
   const sellerProducts = useCommerceStore((s) => s.sellerProducts);
   const sellerBrand = useCommerceStore((s) => s.sellerBrand);
+  const platformBrands = useCommerceStore((s) => s.platformBrands);
   const updateCartQuantity = useCommerceStore((s) => s.updateCartQuantity);
   const removeFromCart = useCommerceStore((s) => s.removeFromCart);
   const reduced = usePrefersReducedMotion();
@@ -29,7 +29,7 @@ export function CartDrawer() {
     cart,
     "delivery",
     (id) => resolveProduct(id, sellerProducts),
-    (id) => (sellerBrand?.id === id ? sellerBrand : getBrandById(id)),
+    (id) => resolveBrand(id, sellerBrand, platformBrands),
   );
 
   React.useEffect(() => {
@@ -55,9 +55,9 @@ export function CartDrawer() {
             type="button"
             aria-label="Close bag"
             className="fixed inset-0 z-[60] bg-navy/40 backdrop-blur-sm"
-            initial={reduced ? false : { opacity: 0 }}
+            initial={reduced ? { opacity: 1 } : { opacity: 0 }}
             animate={{ opacity: 1 }}
-            exit={reduced ? undefined : { opacity: 0 }}
+            exit={presenceExit(reduced, { opacity: 0 })}
             transition={{ duration: reduced ? 0 : 0.2 }}
             onClick={() => setCartOpen(false)}
           />
@@ -65,9 +65,9 @@ export function CartDrawer() {
             role="dialog"
             aria-modal="true"
             aria-label="Shopping bag"
-            initial={reduced ? false : { x: "100%" }}
+            initial={reduced ? { x: 0 } : { x: "100%" }}
             animate={{ x: 0 }}
-            exit={reduced ? undefined : { x: "100%" }}
+            exit={presenceExit(reduced, { x: "100%" })}
             transition={{
               duration: reduced ? 0 : 0.28,
               ease: [0.22, 1, 0.36, 1],

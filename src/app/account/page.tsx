@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { PageContainer } from "@/components/layout/page-container";
 import { AuthForm } from "@/components/auth/auth-form";
@@ -15,6 +16,16 @@ export default function AccountPage() {
   const wishlist = useCommerceStore((s) => s.wishlist);
   const addresses = useCommerceStore((s) => s.addresses);
   const signOutLocal = useCommerceStore((s) => s.signOut);
+  const [authError, setAuthError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("error") === "auth_callback") {
+      setAuthError(
+        "That sign-in link expired or was already used. Request a new code below.",
+      );
+    }
+  }, []);
 
   const signOut = async () => {
     if (isSupabaseConfigured()) {
@@ -41,7 +52,14 @@ export default function AccountPage() {
       </div>
 
       {!user ? (
-        <AuthForm />
+        <>
+          {authError && (
+            <p className="text-sm text-destructive" role="alert">
+              {authError}
+            </p>
+          )}
+          <AuthForm />
+        </>
       ) : (
         <>
           <GlassCard className="space-y-3 p-6">

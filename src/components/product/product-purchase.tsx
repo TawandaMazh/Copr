@@ -4,11 +4,8 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import { Heart, ShoppingBag } from "lucide-react";
 import type { Product } from "@/types";
-import {
-  getAvailableColours,
-  getAvailableSizes,
-  getBrandById,
-} from "@/data";
+import { getAvailableColours, getAvailableSizes } from "@/data";
+import { resolveBrand } from "@/lib/catalogue";
 import { PriceTag } from "@/components/ui/price-tag";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -16,7 +13,9 @@ import { cn } from "@/lib/utils";
 import { useCommerceStore } from "@/stores/commerce-store";
 
 export function ProductPurchase({ product }: { product: Product }) {
-  const brand = getBrandById(product.brandId);
+  const sellerBrand = useCommerceStore((s) => s.sellerBrand);
+  const platformBrands = useCommerceStore((s) => s.platformBrands);
+  const brand = resolveBrand(product.brandId, sellerBrand, platformBrands);
   const colours = getAvailableColours(product);
   const sizes = getAvailableSizes(product);
   const addToCart = useCommerceStore((s) => s.addToCart);

@@ -35,8 +35,13 @@ export const otpSchema = z.object({
   token: z
     .string()
     .trim()
-    .min(6, "Enter the 6-digit code")
-    .max(8, "Code looks too long"),
+    .transform((value) => value.replace(/\D/g, ""))
+    .pipe(
+      z
+        .string()
+        .min(6, "Enter the 6-digit code")
+        .max(8, "Code looks too long"),
+    ),
 });
 
 export type EmailAuthValues = z.infer<typeof emailAuthSchema>;

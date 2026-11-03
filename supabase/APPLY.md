@@ -32,8 +32,10 @@ cart/wishlist/orders for authenticated users. Local seed remains the offline fal
 1. **Site URL:** `https://copr-phi.vercel.app`
 2. **Redirect URLs:**
    - `https://copr-phi.vercel.app/**`
+   - `https://copr-phi.vercel.app/auth/callback`
    - `http://localhost:3000/**`
-3. **Email Templates → Magic Link:** include `{{ .Token }}` in the body (the app verifies a 6-digit code via `verifyOtp`).
+   - `http://localhost:3000/auth/callback`
+3. **Email Templates → Magic Link:** include `{{ .Token }}` in the body (the app verifies a 6-digit code via `verifyOtp`). Email links redirect to `/auth/callback`.
 
 Phone OTP is optional: Auth → Providers → Phone + SMS provider credentials for +260.
 

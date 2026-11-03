@@ -14,8 +14,7 @@ import {
   PICKUP_POINTS,
 } from "@/lib/commerce/constants";
 import { resolveCartTotals } from "@/lib/commerce/checkout";
-import { resolveProduct } from "@/lib/catalogue";
-import { getBrandById } from "@/data";
+import { resolveBrand, resolveProduct } from "@/lib/catalogue";
 import { useCommerceStore } from "@/stores/commerce-store";
 import { Button } from "@/components/ui/button";
 import { GlassCard } from "@/components/ui/glass-card";
@@ -30,6 +29,7 @@ export function CheckoutForm() {
   const addresses = useCommerceStore((s) => s.addresses);
   const sellerProducts = useCommerceStore((s) => s.sellerProducts);
   const sellerBrand = useCommerceStore((s) => s.sellerBrand);
+  const platformBrands = useCommerceStore((s) => s.platformBrands);
   const checkout = useCommerceStore((s) => s.checkout);
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
@@ -57,9 +57,9 @@ export function CheckoutForm() {
         cart,
         method,
         (id) => resolveProduct(id, sellerProducts),
-        (id) => (sellerBrand?.id === id ? sellerBrand : getBrandById(id)),
+        (id) => resolveBrand(id, sellerBrand, platformBrands),
       ),
-    [cart, method, sellerProducts, sellerBrand],
+    [cart, method, sellerProducts, sellerBrand, platformBrands],
   );
 
   if (cart.length === 0) {

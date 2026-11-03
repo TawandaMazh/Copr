@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import type { Category } from "@/types";
-import { usePrefersReducedMotion } from "@/lib/motion";
+import { fadeInView, usePrefersReducedMotion } from "@/lib/motion";
 
 export function TrendingCategories({
   categories,
@@ -12,6 +12,7 @@ export function TrendingCategories({
   categories: (Category & { productCount: number })[];
 }) {
   const reduced = usePrefersReducedMotion();
+  const inView = fadeInView(reduced);
 
   return (
     <section className="mb-8">
@@ -27,13 +28,10 @@ export function TrendingCategories({
         {categories.slice(0, 8).map((category, i) => (
           <motion.div
             key={category.id}
-            initial={reduced ? false : { opacity: 0, y: 12 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-40px" }}
+            {...inView}
             transition={{
-              duration: reduced ? 0 : 0.28,
-              delay: reduced ? 0 : i * 0.03,
-              ease: [0.22, 1, 0.36, 1],
+              ...inView.transition,
+              delay: reduced ? 0 : Math.min(i, 7) * 0.03,
             }}
           >
             <Link
