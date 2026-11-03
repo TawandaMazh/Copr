@@ -47,10 +47,14 @@ export function CheckoutForm() {
       landmark: defaultAddress?.landmark ?? "",
       pickupPointId: PICKUP_POINTS[0].id,
       notes: "",
+      paymentMethod: "mtn_momo",
+      mobileMoneyPhone: user?.phone ?? "",
+      whatsappUpdates: true,
     },
   });
 
   const method = form.watch("deliveryMethod");
+  const paymentMethod = form.watch("paymentMethod");
   const totals = useMemo(
     () =>
       resolveCartTotals(
@@ -220,6 +224,73 @@ export function CheckoutForm() {
               placeholder="Gate code, preferred time…"
               {...form.register("notes")}
             />
+          </label>
+        </GlassCard>
+
+        <GlassCard className="space-y-4 p-6">
+          <h2 className="text-lg font-semibold tracking-tight">Payment</h2>
+          <p className="text-sm text-muted-foreground">
+            Secure payment — the brand is paid only after your order is
+            delivered. Mobile money is mocked for now and ready for a live
+            provider later.
+          </p>
+          <div className="grid gap-2">
+            {(
+              [
+                { id: "mtn_momo", label: "MTN MoMo" },
+                { id: "airtel_money", label: "Airtel Money" },
+                { id: "card", label: "Card" },
+              ] as const
+            ).map((option) => (
+              <label
+                key={option.id}
+                className={cn(
+                  "flex cursor-pointer items-center gap-3 rounded-2xl border border-border-subtle px-4 py-3 transition-colors",
+                  paymentMethod === option.id &&
+                    "border-primary/40 bg-primary/5",
+                )}
+              >
+                <input
+                  type="radio"
+                  value={option.id}
+                  className="accent-primary"
+                  {...form.register("paymentMethod")}
+                />
+                <span className="text-sm font-medium">{option.label}</span>
+              </label>
+            ))}
+          </div>
+          {(paymentMethod === "mtn_momo" ||
+            paymentMethod === "airtel_money") && (
+            <label className="block space-y-1.5">
+              <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                Mobile money number (+260)
+              </span>
+              <input
+                className="field"
+                inputMode="tel"
+                placeholder="+260 97 123 4567"
+                {...form.register("mobileMoneyPhone")}
+              />
+              {form.formState.errors.mobileMoneyPhone && (
+                <span className="text-xs text-destructive">
+                  {form.formState.errors.mobileMoneyPhone.message}
+                </span>
+              )}
+            </label>
+          )}
+          <label className="flex cursor-pointer items-start gap-3 rounded-2xl border border-border-subtle px-4 py-3">
+            <input
+              type="checkbox"
+              className="mt-1 accent-primary"
+              {...form.register("whatsappUpdates")}
+            />
+            <span className="text-sm leading-relaxed">
+              Get order updates on WhatsApp
+              <span className="mt-0.5 block text-xs text-muted-foreground">
+                We’ll message the contact phone above when your parcel ships.
+              </span>
+            </span>
           </label>
         </GlassCard>
       </div>

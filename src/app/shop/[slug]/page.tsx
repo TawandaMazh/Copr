@@ -14,6 +14,7 @@ import { ProductReviews } from "@/components/product/product-reviews";
 import { ProductCard } from "@/components/ui/product-card";
 import { PageContainer } from "@/components/layout/page-container";
 import { JsonLd, productJsonLd } from "@/components/seo/json-ld";
+import { getPublishedReviewSummary } from "@/lib/commerce/review-summary";
 import { getSiteUrl } from "@/lib/site";
 
 interface ProductPageProps {
@@ -63,6 +64,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
     .filter((p) => p.id !== product.id)
     .slice(0, 4);
   const inStock = product.variants.some((v) => v.stock > 0);
+  const reviewSummary = await getPublishedReviewSummary(product.id);
 
   return (
     <PageContainer className="space-y-16">
@@ -95,8 +97,13 @@ export default async function ProductPage({ params }: ProductPageProps) {
       </nav>
 
       <div className="grid gap-10 lg:grid-cols-2 lg:gap-14">
-        <ProductGallery images={product.images} name={product.name} />
-        <ProductPurchase product={product} />
+        <ProductGallery
+          images={product.images}
+          name={product.name}
+          brandName={brand?.name}
+          colour={product.variants[0]?.colour}
+        />
+        <ProductPurchase product={product} reviewSummary={reviewSummary} />
       </div>
 
       <ProductReviews productId={product.id} productName={product.name} />

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import { notFound } from "next/navigation";
+import { BadgeCheck } from "lucide-react";
 import {
   getBrandBySlugService,
   listBrandSlugs,
@@ -9,6 +10,7 @@ import {
 import { ProductCard } from "@/components/ui/product-card";
 import { GlassCard } from "@/components/ui/glass-card";
 import { PageContainer } from "@/components/layout/page-container";
+import { brandIsVerified } from "@/lib/product-display";
 
 interface BrandPageProps {
   params: Promise<{ slug: string }>;
@@ -30,7 +32,7 @@ export async function generateMetadata({
     description: brand.story,
     openGraph: {
       title: `${brand.name} · copr`,
-      description: brand.tagline,
+      description: brand.tagline || brand.story.slice(0, 140),
       images: [brand.banner],
     },
     alternates: {
@@ -72,8 +74,14 @@ export default async function BrandPage({ params }: BrandPageProps) {
               />
             </div>
             <div className="text-white">
-              <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
+              <h1 className="flex flex-wrap items-center gap-2 text-3xl font-semibold tracking-tight sm:text-4xl">
                 {brand.name}
+                {brandIsVerified(brand) && (
+                  <span className="inline-flex items-center gap-1 rounded-full bg-white/15 px-2.5 py-1 text-xs font-medium tracking-normal">
+                    <BadgeCheck className="h-3.5 w-3.5" strokeWidth={1.75} />
+                    Verified
+                  </span>
+                )}
               </h1>
               <p className="text-sm text-white/75 sm:text-base">
                 {brand.tagline}

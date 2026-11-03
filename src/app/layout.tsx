@@ -59,12 +59,21 @@ export const metadata: Metadata = {
     type: "website",
     url: siteUrl,
     siteName: SITE_NAME,
+    images: [
+      {
+        url: "/opengraph-image",
+        width: 1200,
+        height: 630,
+        alt: "copr — Zambian fashion marketplace",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: `${SITE_NAME} — ${SITE_TAGLINE}`,
     description:
       "Local brands. Local shoppers. Fashion priced in Kwacha, delivered in Lusaka.",
+    images: ["/opengraph-image"],
   },
   robots: {
     index: true,

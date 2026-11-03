@@ -3,8 +3,8 @@ import { ProductCardSkeleton, Skeleton } from "@/components/ui/skeleton";
 
 export default function RootLoading() {
   return (
-    <PageContainer className="space-y-8 py-6" aria-busy="true" aria-live="polite">
-      <span className="sr-only">Loading page</span>
+    <PageContainer className="space-y-8 py-6" aria-busy="true">
+      <span className="sr-only">Loading</span>
       <Skeleton className="h-[42vh] w-full rounded-[2rem]" />
       <div className="space-y-3">
         <Skeleton className="h-8 w-48" />

@@ -2,11 +2,16 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { Heart } from "lucide-react";
+import { BadgeCheck, Heart } from "lucide-react";
 import { motion } from "framer-motion";
 import type { Product } from "@/types";
 import { getMinPrice } from "@/data";
 import { resolveBrand } from "@/lib/catalogue";
+import {
+  brandIsVerified,
+  isProductNew,
+  productImageAlt,
+} from "@/lib/product-display";
 import { cn } from "@/lib/utils";
 import { fadeInView, usePrefersReducedMotion } from "@/lib/motion";
 import { PriceTag } from "./price-tag";
@@ -29,6 +34,9 @@ export function ProductCard({ product, className, priority }: ProductCardProps) 
   const wishlisted = useCommerceStore((s) =>
     s.wishlist.includes(product.id),
   );
+  const showNew = isProductNew(product);
+  const verified = brandIsVerified(brand);
+  const colour = product.variants[0]?.colour;
 
   return (
     <motion.article
@@ -39,24 +47,32 @@ export function ProductCard({ product, className, priority }: ProductCardProps) 
         <div className="relative aspect-[3/4] overflow-hidden rounded-3xl bg-ice dark:bg-navy/40">
           <Image
             src={product.images[0]}
-            alt={product.name}
+            alt={productImageAlt(product, brand?.name, colour)}
             fill
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
             className="object-cover transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.04]"
             priority={priority}
+            loading={priority ? "eager" : "lazy"}
           />
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-navy/25 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
           <div className="absolute left-3 top-3 flex flex-wrap gap-1.5">
-            {product.isNew && <Badge variant="new">New</Badge>}
-            {product.trending && !product.isNew && (
+            {showNew && <Badge variant="new">New</Badge>}
+            {product.trending && !showNew && (
               <Badge variant="secondary">Trending</Badge>
             )}
           </div>
         </div>
 
         <div className="mt-3 space-y-1 px-0.5">
-          <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-            {brand?.name}
+          <p className="flex items-center gap-1 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+            <span className="truncate">{brand?.name}</span>
+            {verified && (
+              <BadgeCheck
+                className="h-3 w-3 shrink-0 text-primary"
+                strokeWidth={1.75}
+                aria-label="Verified brand"
+              />
+            )}
           </p>
           <h3 className="line-clamp-2 text-sm font-medium leading-snug text-foreground transition-colors group-hover:text-primary">
             {product.name}

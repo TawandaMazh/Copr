@@ -4,7 +4,8 @@ import { CheckoutForm } from "@/components/checkout/checkout-form";
 
 export const metadata: Metadata = {
   title: "Checkout",
-  description: "Pay with mock escrow and place your Lusaka order.",
+  description: "Secure checkout for Lusaka delivery and pickup on copr.",
+  alternates: { canonical: "/checkout" },
 };
 
 export default function CheckoutPage() {

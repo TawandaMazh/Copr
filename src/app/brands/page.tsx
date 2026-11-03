@@ -1,16 +1,25 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import { BadgeCheck } from "lucide-react";
 import {
   listBrands,
   listProductsByBrand,
 } from "@/lib/catalogue/service";
 import { GlassCard } from "@/components/ui/glass-card";
 import { PageContainer } from "@/components/layout/page-container";
+import { brandIsVerified } from "@/lib/product-display";
 
 export const metadata: Metadata = {
   title: "Brands",
-  description: "Discover independent Zambian fashion brands on copr.",
+  description:
+    "Discover independent Zambian fashion brands stocking on copr — each holds their own inventory.",
+  alternates: { canonical: "/brands" },
+  openGraph: {
+    title: "Zambian fashion brands · copr",
+    description:
+      "Local labels from Lusaka, Ndola, Kitwe and beyond — shop each brand’s story and stock.",
+  },
 };
 
 export default async function BrandsPage() {
@@ -60,8 +69,15 @@ export default async function BrandsPage() {
                       />
                     </div>
                     <div className="min-w-0 space-y-1">
-                      <p className="text-lg font-semibold tracking-tight">
-                        {brand.name}
+                      <p className="flex items-center gap-1.5 text-lg font-semibold tracking-tight">
+                        <span className="truncate">{brand.name}</span>
+                        {brandIsVerified(brand) && (
+                          <BadgeCheck
+                            className="h-4 w-4 shrink-0 text-primary"
+                            strokeWidth={1.75}
+                            aria-label="Verified brand"
+                          />
+                        )}
                       </p>
                       <p className="text-sm text-muted-foreground">
                         {brand.tagline}

@@ -4,7 +4,7 @@ import { ProductCardSkeleton, Skeleton } from "@/components/ui/skeleton";
 export default function ShopLoading() {
   return (
     <PageContainer className="space-y-6" aria-busy="true">
-      <span className="sr-only">Loading shop</span>
+      <span className="sr-only">Loading</span>
       <div className="space-y-2">
         <Skeleton className="h-10 w-40" />
         <Skeleton className="h-4 w-56" />

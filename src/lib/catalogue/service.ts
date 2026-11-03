@@ -59,11 +59,20 @@ export async function listProducts(): Promise<Product[]> {
 }
 
 export async function listNewProducts(limit = 8): Promise<Product[]> {
-  if (!isSupabaseConfigured()) return getSeedNewProducts().slice(0, limit);
+  const { isProductNew } = await import("@/lib/product-display");
+  if (!isSupabaseConfigured()) {
+    return getSeedNewProducts()
+      .filter((p) => isProductNew(p))
+      .slice(0, limit);
+  }
   const products = await fetchAllProducts();
-  if (!products) return getSeedNewProducts().slice(0, limit);
+  if (!products) {
+    return getSeedNewProducts()
+      .filter((p) => isProductNew(p))
+      .slice(0, limit);
+  }
   return products
-    .filter((p) => p.isNew)
+    .filter((p) => isProductNew(p))
     .sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt))
     .slice(0, limit);
 }

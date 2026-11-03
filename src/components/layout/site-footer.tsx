@@ -14,15 +14,14 @@ const columns = [
     links: [
       { href: "/sell", label: "Sell on copr" },
       { href: "/seller/apply", label: "Apply to join" },
-      { href: "/seller", label: "Seller dashboard" },
     ],
   },
   {
     title: "Help",
     links: [
       { href: "/account", label: "Your account" },
-      { href: "/shop", label: "Delivery (Lusaka)" },
-      { href: "/admin", label: "Admin dashboard" },
+      { href: "/delivery", label: "Delivery (Lusaka)" },
+      { href: "/returns", label: "Returns" },
     ],
   },
 ];
@@ -45,7 +44,7 @@ export function SiteFooter() {
             </p>
             <ul className="space-y-2">
               {col.links.map((link) => (
-                <li key={link.href}>
+                <li key={`${col.title}-${link.href}-${link.label}`}>
                   <Link
                     href={link.href}
                     className="text-sm text-muted-foreground transition-colors hover:text-primary"
@@ -61,7 +60,7 @@ export function SiteFooter() {
       <div className="border-t border-border-subtle">
         <div className="mx-auto flex max-w-6xl flex-col gap-2 px-4 py-6 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
           <p>© {new Date().getFullYear()} copr. Prices in Zambian Kwacha (K).</p>
-          <p>Phase 5 · Performance, SEO &amp; a11y</p>
+          <p>Made for Lusaka shoppers</p>
         </div>
       </div>
     </footer>

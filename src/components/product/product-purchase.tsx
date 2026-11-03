@@ -2,17 +2,26 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { Heart, ShoppingBag } from "lucide-react";
+import { BadgeCheck, Heart, ShoppingBag } from "lucide-react";
 import type { Product } from "@/types";
 import { getAvailableColours, getAvailableSizes } from "@/data";
 import { resolveBrand } from "@/lib/catalogue";
+import { isProductNew, brandIsVerified } from "@/lib/product-display";
 import { PriceTag } from "@/components/ui/price-tag";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { SizeGuideDialog } from "@/components/product/size-guide-dialog";
 import { cn } from "@/lib/utils";
 import { useCommerceStore } from "@/stores/commerce-store";
 
-export function ProductPurchase({ product }: { product: Product }) {
+export function ProductPurchase({
+  product,
+  reviewSummary,
+}: {
+  product: Product;
+  /** Real published reviews only — hide rating when null/empty. */
+  reviewSummary?: { rating: number; count: number } | null;
+}) {
   const sellerBrand = useCommerceStore((s) => s.sellerBrand);
   const platformBrands = useCommerceStore((s) => s.platformBrands);
   const brand = resolveBrand(product.brandId, sellerBrand, platformBrands);
@@ -26,6 +35,9 @@ export function ProductPurchase({ product }: { product: Product }) {
 
   const [colour, setColour] = useState(colours[0]);
   const [size, setSize] = useState(sizes[0]);
+  const [sizeGuideOpen, setSizeGuideOpen] = useState(false);
+  const showNew = isProductNew(product);
+  const verified = brandIsVerified(brand);
 
   const variant = useMemo(
     () =>
@@ -41,10 +53,17 @@ export function ProductPurchase({ product }: { product: Product }) {
         const match = product.variants.find(
           (v) => v.colour === colour && v.size === s,
         );
-        return { size: s, inStock: (match?.stock ?? 0) > 0 };
+        return {
+          size: s,
+          inStock: (match?.stock ?? 0) > 0,
+          stock: match?.stock ?? 0,
+        };
       }),
     [sizes, product.variants, colour],
   );
+
+  const reviewCount = reviewSummary?.count ?? 0;
+  const reviewRating = reviewSummary?.rating;
 
   return (
     <div className="space-y-8">
@@ -52,9 +71,15 @@ export function ProductPurchase({ product }: { product: Product }) {
         {brand && (
           <Link
             href={`/brands/${brand.slug}`}
-            className="text-xs font-semibold uppercase tracking-wider text-primary hover:underline"
+            className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-primary hover:underline"
           >
             {brand.name}
+            {verified && (
+              <span className="inline-flex items-center gap-0.5 normal-case tracking-normal text-primary">
+                <BadgeCheck className="h-3.5 w-3.5" strokeWidth={1.75} />
+                <span className="sr-only">Verified brand</span>
+              </span>
+            )}
           </Link>
         )}
         <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
@@ -62,10 +87,13 @@ export function ProductPurchase({ product }: { product: Product }) {
         </h1>
         <div className="flex flex-wrap items-center gap-3">
           <PriceTag amount={variant.price} size="lg" />
-          {product.isNew && <Badge variant="new">New</Badge>}
-          <span className="text-sm text-muted-foreground">
-            {product.rating.toFixed(1)} · {product.reviewCount} reviews
-          </span>
+          {showNew && <Badge variant="new">New</Badge>}
+          {reviewCount > 0 && reviewRating != null && (
+            <span className="text-sm text-muted-foreground">
+              {reviewRating.toFixed(1)} · {reviewCount} review
+              {reviewCount === 1 ? "" : "s"}
+            </span>
+          )}
         </div>
         <p className="max-w-prose text-base leading-relaxed text-muted-foreground">
           {product.description}
@@ -96,7 +124,24 @@ export function ProductPurchase({ product }: { product: Product }) {
       </div>
 
       <div className="space-y-3">
-        <p className="text-sm font-medium">Size</p>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <p className="text-sm font-medium">Size</p>
+          <div className="flex flex-wrap gap-3 text-xs">
+            <button
+              type="button"
+              className="font-medium text-primary hover:underline focus-ring rounded"
+              onClick={() => setSizeGuideOpen(true)}
+            >
+              Size guide
+            </button>
+            <Link
+              href="/returns"
+              className="font-medium text-muted-foreground hover:text-primary hover:underline focus-ring rounded"
+            >
+              Returns
+            </Link>
+          </div>
+        </div>
         <div className="flex flex-wrap gap-2">
           {sizeOptions.map(({ size: s, inStock }) => (
             <button
@@ -116,9 +161,18 @@ export function ProductPurchase({ product }: { product: Product }) {
           ))}
         </div>
         <p className="text-xs text-muted-foreground">
-          {variant.stock > 0
-            ? `${variant.stock} in stock · Fulfilled by ${brand?.name}`
-            : "Out of stock for this variant"}
+          {variant.stock > 0 ? (
+            <>
+              {variant.stock <= 3 && (
+                <span className="font-medium text-primary">
+                  Only {variant.stock} left ·{" "}
+                </span>
+              )}
+              {variant.stock} in stock · Fulfilled by {brand?.name}
+            </>
+          ) : (
+            "Out of stock for this variant"
+          )}
         </p>
       </div>
 
@@ -148,9 +202,11 @@ export function ProductPurchase({ product }: { product: Product }) {
       </div>
 
       <p className="text-xs leading-relaxed text-muted-foreground">
-        Delivery across Lusaka · Pickup points at checkout · Paid via mock escrow
-        (HELD until delivery).
+        Delivery across Lusaka · Pickup points at checkout · Secure payment —
+        the brand is paid only after your order is delivered.
       </p>
+
+      <SizeGuideDialog open={sizeGuideOpen} onOpenChange={setSizeGuideOpen} />
     </div>
   );
 }

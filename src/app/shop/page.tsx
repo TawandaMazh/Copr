@@ -10,7 +10,14 @@ import { PageContainer } from "@/components/layout/page-container";
 
 export const metadata: Metadata = {
   title: "Shop",
-  description: "Browse fashion from Zambian brands on copr.",
+  description:
+    "Browse dresses, chitenge, and city staples from Zambian brands — priced in Kwacha.",
+  alternates: { canonical: "/shop" },
+  openGraph: {
+    title: "Shop Zambian fashion · copr",
+    description:
+      "Multi-brand catalogue with Lusaka delivery. Filter by category, brand, size, and colour.",
+  },
 };
 
 interface ShopPageProps {

@@ -1,6 +1,15 @@
 import { z } from "zod";
 import { LUSAKA_AREAS } from "@/lib/commerce/constants";
 
+const phoneRefine = (value: string) => {
+  const digits = value.replace(/\D/g, "");
+  return (
+    digits.length === 9 ||
+    digits.length === 10 ||
+    (digits.startsWith("260") && digits.length >= 12)
+  );
+};
+
 export const addressSchema = z.object({
   label: z.string().max(40).optional(),
   area: z.enum(LUSAKA_AREAS as unknown as [string, ...string[]], {
@@ -11,10 +20,7 @@ export const addressSchema = z.object({
   phone: z
     .string()
     .min(9, "Delivery phone required")
-    .refine((value) => {
-      const digits = value.replace(/\D/g, "");
-      return digits.length >= 9;
-    }, "Use +260 format"),
+    .refine(phoneRefine, "Use +260 format"),
   isDefault: z.boolean().optional(),
 });
 
@@ -28,6 +34,9 @@ export const checkoutSchema = z
     phone: z.string().min(9, "Phone required"),
     notes: z.string().max(240).optional(),
     fullName: z.string().min(2, "Name required"),
+    paymentMethod: z.enum(["mtn_momo", "airtel_money", "card"]),
+    mobileMoneyPhone: z.string().optional(),
+    whatsappUpdates: z.boolean().optional(),
   })
   .superRefine((data, ctx) => {
     if (data.deliveryMethod === "delivery") {
@@ -59,6 +68,19 @@ export const checkoutSchema = z
         path: ["pickupPointId"],
         message: "Choose a pickup point",
       });
+    }
+    if (
+      data.paymentMethod === "mtn_momo" ||
+      data.paymentMethod === "airtel_money"
+    ) {
+      const phone = data.mobileMoneyPhone?.trim() ?? "";
+      if (!phone || !phoneRefine(phone)) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["mobileMoneyPhone"],
+          message: "Enter a valid +260 mobile money number",
+        });
+      }
     }
   });
 

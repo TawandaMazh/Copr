@@ -3,28 +3,22 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { GlassCard } from "@/components/ui/glass-card";
 import { PageContainer } from "@/components/layout/page-container";
+import { SELLER_PROGRAM } from "@/lib/commerce/seller-program";
 
 export const metadata: Metadata = {
   title: "Sell on copr",
   description: "Join Zambia’s multi-vendor fashion marketplace as a brand.",
+  alternates: { canonical: "/sell" },
+  openGraph: {
+    title: "Sell on copr",
+    description:
+      "Keep your stock, tell your story, and sell to Lusaka shoppers.",
+  },
 };
 
-const steps = [
-  {
-    title: "Apply",
-    body: "Tell us about your brand, where you make, and what you sell.",
-  },
-  {
-    title: "List",
-    body: "Upload products with sizes, colours, stock, and images. You keep the inventory.",
-  },
-  {
-    title: "Fulfil",
-    body: "When an order lands, you pack and ship across Lusaka. copr takes a fair commission.",
-  },
-];
-
 export default function SellPage() {
+  const { commissionPercent, payoutTiming, holdNote, steps } = SELLER_PROGRAM;
+
   return (
     <PageContainer className="mx-auto max-w-3xl space-y-12 py-6">
       <div className="space-y-5 text-center">
@@ -33,8 +27,8 @@ export default function SellPage() {
           Sell fashion to Zambian shoppers — keep your stock, tell your story.
         </h1>
         <p className="mx-auto max-w-xl text-base leading-relaxed text-muted-foreground">
-          You fulfil orders; we handle discovery, checkout, and escrow. Default
-          commission 15%. Open the seller dashboard to manage products, orders,
+          You fulfil orders; we handle discovery and checkout. Commission{" "}
+          {commissionPercent}%. Open the seller hub to manage products, orders,
           and earnings.
         </p>
         <div className="flex flex-wrap justify-center gap-3 pt-2">
@@ -46,6 +40,27 @@ export default function SellPage() {
           </Button>
         </div>
       </div>
+
+      <section className="grid gap-4 sm:grid-cols-2" aria-label="Programme terms">
+        <GlassCard className="p-5 text-left">
+          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            Commission
+          </p>
+          <p className="mt-2 text-3xl font-semibold tracking-tight text-primary">
+            {commissionPercent}%
+          </p>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Taken on item subtotal when a sale completes.
+          </p>
+        </GlassCard>
+        <GlassCard className="p-5 text-left">
+          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            Payout timing
+          </p>
+          <p className="mt-2 text-lg font-semibold tracking-tight">{payoutTiming}</p>
+          <p className="mt-2 text-sm text-muted-foreground">{holdNote}</p>
+        </GlassCard>
+      </section>
 
       <div id="how-it-works" className="grid gap-4 sm:grid-cols-3">
         {steps.map((step, i) => (

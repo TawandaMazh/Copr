@@ -2,10 +2,12 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { BadgeCheck } from "lucide-react";
 import { motion } from "framer-motion";
 import type { Brand } from "@/types";
 import { GlassCard } from "@/components/ui/glass-card";
 import { fadeInView, usePrefersReducedMotion } from "@/lib/motion";
+import { brandIsVerified } from "@/lib/product-display";
 
 export function FeaturedBrands({ brands }: { brands: Brand[] }) {
   const reduced = usePrefersReducedMotion();
@@ -63,8 +65,15 @@ export function FeaturedBrands({ brands }: { brands: Brand[] }) {
                     />
                   </div>
                   <div className="min-w-0">
-                    <p className="truncate font-semibold tracking-tight">
-                      {brand.name}
+                    <p className="flex items-center gap-1 truncate font-semibold tracking-tight">
+                      <span className="truncate">{brand.name}</span>
+                      {brandIsVerified(brand) && (
+                        <BadgeCheck
+                          className="h-3.5 w-3.5 shrink-0 text-primary"
+                          strokeWidth={1.75}
+                          aria-label="Verified brand"
+                        />
+                      )}
                     </p>
                     <p className="truncate text-sm text-muted-foreground">
                       {brand.tagline}

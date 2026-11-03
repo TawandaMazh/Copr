@@ -21,7 +21,7 @@ export class MockProvider implements PaymentProvider {
       providerRef,
       status: "held",
       amount: input.amount,
-      message: "Mock payment authorised and held in escrow.",
+      message: "Payment secured — brand paid after delivery.",
       raw: { simulated: true, input },
     };
   }
@@ -36,7 +36,7 @@ export class MockProvider implements PaymentProvider {
       providerRef: input.providerRef,
       status: "held",
       amount: 0,
-      message: "Funds held in mock escrow.",
+      message: "Payment secured — brand paid after delivery.",
     };
   }
 
@@ -47,7 +47,7 @@ export class MockProvider implements PaymentProvider {
       providerRef: input.providerRef,
       status: "released",
       amount: input.amount,
-      message: "Mock escrow released to seller (minus commission).",
+      message: "Payment released to brand (minus commission).",
     };
   }
 
