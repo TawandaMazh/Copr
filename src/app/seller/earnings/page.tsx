@@ -25,16 +25,16 @@ export default function SellerEarningsPage() {
       <div>
         <h1 className="text-3xl font-semibold tracking-tight">Earnings</h1>
         <p className="text-muted-foreground">
-          Commission default {DEFAULT_COMMISSION_PERCENT}% · payouts after
-          delivery confirmation
+          Default commission {DEFAULT_COMMISSION_PERCENT}% · payouts after
+          shoppers confirm delivery
         </p>
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <Metric label="Available" amount={earnings.available} />
-        <Metric label="In escrow" amount={earnings.pending} />
+        <Metric label="Ready for payout" amount={earnings.available} />
+        <Metric label="Awaiting delivery" amount={earnings.pending} />
         <Metric label="Paid out" amount={earnings.paidOut} />
-        <Metric label="Lifetime gross" amount={earnings.lifetimeGross} />
+        <Metric label="Lifetime sales" amount={earnings.lifetimeGross} />
       </div>
 
       <GlassCard className="space-y-2 p-5">
@@ -54,8 +54,8 @@ export default function SellerEarningsPage() {
         <h2 className="text-lg font-semibold tracking-tight">Payout records</h2>
         {payouts.length === 0 ? (
           <GlassCard className="p-6 text-sm text-muted-foreground">
-            Payout rows appear when a shopper confirms delivery (or auto-confirm
-            after 3 days in production). Admin payout runs land in Phase 4.
+            Payouts appear here when a shopper confirms delivery. Admins mark
+            them paid once money is sent to your brand.
           </GlassCard>
         ) : (
           <ul className="space-y-2">

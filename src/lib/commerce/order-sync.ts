@@ -24,6 +24,7 @@ type DbOrderItem = {
   variant_id: string;
   brand_id: string;
   product_name: string;
+  product_image: string | null;
   variant_size: string;
   variant_colour: string;
   unit_price: number;
@@ -89,7 +90,7 @@ function mapSubOrder(row: DbSubOrder): SubOrderRecord {
     variantId: appIdFromUuid(item.variant_id),
     brandId: appIdFromUuid(item.brand_id),
     productName: item.product_name,
-    productImage: "",
+    productImage: item.product_image ?? "",
     brandName: brandName(row),
     size: item.variant_size as SubOrderRecord["items"][number]["size"],
     colour: item.variant_colour as SubOrderRecord["items"][number]["colour"],
@@ -161,8 +162,8 @@ const ORDER_SELECT = `
     seller_amount, tracking_note, shipped_at, delivered_at, completed_at,
     brands ( name ),
     order_items (
-      id, product_id, variant_id, brand_id, product_name, variant_size,
-      variant_colour, unit_price, quantity, line_total, sub_order_id
+      id, product_id, variant_id, brand_id, product_name, product_image,
+      variant_size, variant_colour, unit_price, quantity, line_total, sub_order_id
     )
   )
 `;

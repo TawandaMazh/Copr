@@ -6,6 +6,7 @@ import { GlassCard } from "@/components/ui/glass-card";
 import { Button } from "@/components/ui/button";
 import { PriceTag } from "@/components/ui/price-tag";
 import { Badge } from "@/components/ui/badge";
+import { orderStatusLabel } from "@/lib/commerce/status-labels";
 
 export default function SellerOverviewPage() {
   const brand = useCommerceStore((s) => s.sellerBrand);
@@ -39,14 +40,21 @@ export default function SellerOverviewPage() {
         <Stat label="Published products" value={String(published)} />
         <Stat label="Open orders" value={String(openOrders.length)} />
         <Stat
-          label="Pending escrow"
+          label="Awaiting delivery"
           value={<PriceTag amount={earnings.pending} size="sm" />}
         />
         <Stat
-          label="Available to payout"
+          label="Ready for payout"
           value={<PriceTag amount={earnings.available} size="sm" />}
         />
       </div>
+
+      {brand.status === "pending" && (
+        <GlassCard className="border-primary/20 bg-primary/5 p-5 text-sm text-muted-foreground">
+          Your brand is pending admin approval. You can keep editing products —
+          they go live on the shop once you’re approved.
+        </GlassCard>
+      )}
 
       <GlassCard className="space-y-3 p-5">
         <div className="flex items-center justify-between">
@@ -57,7 +65,8 @@ export default function SellerOverviewPage() {
         </div>
         {orders.length === 0 ? (
           <p className="text-sm text-muted-foreground">
-            No orders for your brand yet. Share your public page to get sales.
+            No orders for your brand yet. Share your public brand page once
+            you’re approved to get sales.
           </p>
         ) : (
           <ul className="divide-y divide-border-subtle">
@@ -68,8 +77,9 @@ export default function SellerOverviewPage() {
               >
                 <div>
                   <p className="text-sm font-medium">
-                    {order.id.slice(0, 14)}… · {subOrder.items.length} item
-                    {subOrder.items.length === 1 ? "" : "s"}
+                    {subOrder.items.length} item
+                    {subOrder.items.length === 1 ? "" : "s"} ·{" "}
+                    {order.deliveryArea}
                   </p>
                   <p className="text-xs text-muted-foreground">
                     {new Date(order.createdAt).toLocaleString("en-ZM", {
@@ -79,8 +89,8 @@ export default function SellerOverviewPage() {
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Badge variant="outline" className="capitalize">
-                    {subOrder.status.replaceAll("_", " ")}
+                  <Badge variant="outline">
+                    {orderStatusLabel(subOrder.status)}
                   </Badge>
                   <PriceTag amount={subOrder.sellerAmount} size="sm" />
                 </div>

@@ -225,11 +225,11 @@ export function CheckoutForm() {
       </div>
 
       <GlassCard strong className="h-fit space-y-4 p-6 lg:sticky lg:top-24">
-        <h2 className="text-lg font-semibold tracking-tight">Pay with mock escrow</h2>
+        <h2 className="text-lg font-semibold tracking-tight">Secure checkout</h2>
         <p className="text-sm leading-relaxed text-muted-foreground">
-          MockProvider authorises payment and marks funds <strong>HELD</strong>.
-          After delivery confirmation (or auto after 3 days), funds are{" "}
-          <strong>RELEASED</strong> to sellers minus commission.
+          Your payment is secured at checkout. Each brand ships separately —
+          confirm delivery when a parcel arrives (or we auto-confirm after a few
+          days) so that brand gets paid.
         </p>
         <div className="space-y-2 border-t border-border-subtle pt-3 text-sm">
           <div className="flex justify-between">

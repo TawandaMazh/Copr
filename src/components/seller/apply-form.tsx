@@ -52,13 +52,15 @@ export function ApplyForm() {
       <div className="space-y-2 text-center">
         <h1 className="text-3xl font-semibold tracking-tight">Apply to sell</h1>
         <p className="text-muted-foreground">
-          New brands stay pending until an admin approves them. Claim a demo
-          brand to edit live catalogue inventory right away.
+          Tell us about your brand. Applications stay pending until an admin
+          approves them — then your products can appear on the shop.
         </p>
       </div>
 
       <GlassCard className="space-y-3 p-5">
-        <p className="text-sm font-medium">Quick start — claim a demo brand</p>
+        <p className="text-sm font-medium">
+          Trying the dashboard? Claim a sample brand
+        </p>
         <div className="flex flex-wrap gap-2">
           {brands.slice(0, 4).map((b) => (
             <Button

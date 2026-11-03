@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { PriceTag } from "@/components/ui/price-tag";
 import type { OrderStatus } from "@/types";
+import { orderStatusLabel } from "@/lib/commerce/status-labels";
 
 const NEXT: Partial<Record<OrderStatus, OrderStatus>> = {
   paid: "processing",
@@ -29,13 +30,14 @@ export default function SellerOrdersPage() {
       <div>
         <h1 className="text-3xl font-semibold tracking-tight">Orders</h1>
         <p className="text-muted-foreground">
-          Update fulfilment status. Shoppers confirm delivery to release escrow.
+          Pack and ship your items. You’re paid after the shopper confirms
+          delivery (or auto-confirm after a few days).
         </p>
       </div>
 
       {rows.length === 0 ? (
         <GlassCard className="p-8 text-center text-sm text-muted-foreground">
-          No orders for {brand.name} yet.
+          No orders for {brand.name} yet. New sales will show up here to pack.
         </GlassCard>
       ) : (
         <ul className="space-y-4">
@@ -51,7 +53,8 @@ export default function SellerOrdersPage() {
                           href={`/orders/${order.id}`}
                           className="hover:text-primary"
                         >
-                          {order.id.slice(0, 16)}…
+                          {order.deliveryNeighbourhood || order.deliveryArea}{" "}
+                          order
                         </Link>
                       </p>
                       <p className="text-xs text-muted-foreground">
@@ -59,11 +62,15 @@ export default function SellerOrdersPage() {
                           dateStyle: "medium",
                           timeStyle: "short",
                         })}{" "}
-                        · {order.deliveryMethod} · {order.deliveryArea}
+                        ·{" "}
+                        {order.deliveryMethod === "pickup"
+                          ? "Pickup"
+                          : "Delivery"}{" "}
+                        · {order.deliveryArea}
                       </p>
                     </div>
-                    <Badge variant="secondary" className="capitalize">
-                      {subOrder.status.replaceAll("_", " ")}
+                    <Badge variant="secondary">
+                      {orderStatusLabel(subOrder.status)}
                     </Badge>
                   </div>
 
@@ -99,13 +106,14 @@ export default function SellerOrdersPage() {
 
                   <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border-subtle pt-3">
                     <p className="text-sm text-muted-foreground">
-                      You receive{" "}
+                      You earn{" "}
                       <PriceTag
                         amount={subOrder.sellerAmount}
                         size="sm"
                         className="inline"
                       />{" "}
-                      after release (−{subOrder.commissionPercent}%)
+                      after delivery is confirmed (copr keeps{" "}
+                      {subOrder.commissionPercent}%)
                     </p>
                     <div className="flex flex-wrap gap-2">
                       {subOrder.status === "paid" && (

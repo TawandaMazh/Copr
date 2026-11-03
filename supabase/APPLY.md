@@ -13,6 +13,7 @@ The app talks to project `koyosnsrparlhljvybok` (eu-west-1).
 | Brand claim policy (`brands_claim_unowned`) | Applied |
 | Reviews status + rating rollup trigger | Applied |
 | Fulfilment RPCs (ship / confirm delivery + payout) | Applied |
+| Order item `product_image` column | Applied |
 | Auth → Email provider | On |
 | Auth → Phone / SMS | Off until Twilio (or another SMS provider) is configured |
 | Auth URL Configuration | Set Site URL + redirects (see below) |
@@ -49,6 +50,9 @@ Phone OTP is optional: Auth → Providers → Phone + SMS provider credentials f
    - (optional) `migrations/20260322000003_seed.sql` — large seed for DB catalogue
    - `migrations/20260322000004_storage.sql` — buckets + storage RLS
    - `migrations/20260322000005_claim_brand.sql` — claim unowned brands
+   - `migrations/20260322000006_reviews_status.sql` — review moderation + rating rollups
+   - `migrations/20260322000007_fulfillment_rpc.sql` — ship / confirm delivery RPCs
+   - `migrations/20260322000008_order_item_image.sql` — order line thumbnails
 3. Confirm Auth → Providers → **Email** is on. Enable **Phone** only if you want +260 SMS.
 
 ### Option B — CLI (needs DB password or access token)

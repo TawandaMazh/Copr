@@ -210,6 +210,7 @@ export async function persistOrderToSupabase(order: OrderRecord) {
       variant_id: dbIdFromAppId(item.variantId),
       brand_id: dbIdFromAppId(item.brandId),
       product_name: item.productName,
+      product_image: item.productImage || null,
       variant_size: item.size,
       variant_colour: item.colour,
       unit_price: item.unitPrice,

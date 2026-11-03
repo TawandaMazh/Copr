@@ -39,14 +39,15 @@ export function SellerShell({ children }: { children: React.ReactNode }) {
         <GlassCard className="space-y-4 p-8">
           <p className="text-xl font-semibold tracking-tight">Seller dashboard</p>
           <p className="text-sm text-muted-foreground">
-            Apply to sell on copr or claim a demo brand to explore the dashboard.
+            Apply with your brand to sell on copr. New applications stay pending
+            until an admin approves them.
           </p>
           <div className="flex flex-wrap justify-center gap-2">
             <Button asChild>
               <Link href="/seller/apply">Apply to join</Link>
             </Button>
             <Button variant="secondary" asChild>
-              <Link href="/sell">Back to Sell on copr</Link>
+              <Link href="/sell">Why sell on copr</Link>
             </Button>
           </div>
           {user && (
