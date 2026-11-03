@@ -110,30 +110,62 @@ export function AuthForm({
         finishDemo(values.fullName || values.email.split("@")[0], values.email);
         return;
       }
-      const supabase = createClient();
-      if (!supabase) return;
-      const { error: err } = await supabase.auth.signInWithOtp({
-        email: values.email.trim(),
-        options: {
-          data: { full_name: values.fullName.trim() },
-          shouldCreateUser: true,
-          // Keep redirect allow-listed for template links; primary UX is the 6-digit code.
-          emailRedirectTo: `${getSiteUrl()}/auth/callback?next=/account`,
-        },
-      });
-      if (err) {
-        setError(
-          err.message.includes("rate")
-            ? "Too many codes sent. Wait a minute and try again."
-            : err.message,
-        );
-        return;
+
+      const email = values.email.trim();
+      const fullName = values.fullName.trim();
+
+      // Prefer app-sent 6–8 digit codes when Resend is configured (free-tier
+      // Supabase cannot edit the Magic Link template without custom SMTP).
+      let sentCodeEmail = false;
+      try {
+        const res = await fetch("/api/auth/email-otp", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, fullName }),
+        });
+        if (res.ok) {
+          sentCodeEmail = true;
+        } else if (res.status !== 503) {
+          const payload = (await res.json().catch(() => null)) as {
+            error?: string;
+          } | null;
+          if (payload?.error && payload.error !== "otp_email_unavailable") {
+            setError(payload.error);
+            return;
+          }
+        }
+      } catch {
+        /* fall through to Supabase magic link */
       }
-      setPendingContact(values.email.trim());
-      setPendingName(values.fullName.trim());
+
+      if (!sentCodeEmail) {
+        const supabase = createClient();
+        if (!supabase) return;
+        const { error: err } = await supabase.auth.signInWithOtp({
+          email,
+          options: {
+            data: { full_name: fullName },
+            shouldCreateUser: true,
+            emailRedirectTo: `${getSiteUrl()}/auth/callback?next=/account`,
+          },
+        });
+        if (err) {
+          setError(
+            err.message.includes("rate")
+              ? "Too many codes sent. Wait a minute and try again."
+              : err.message,
+          );
+          return;
+        }
+      }
+
+      setPendingContact(email);
+      setPendingName(fullName);
       setStep("otp");
       setMessage(
-        "Check your email for a 6-digit code (and spam). Ignore any “Sign in” link — enter the digits here.",
+        sentCodeEmail
+          ? "Check your email for a sign-in code (and spam). Codes expire quickly."
+          : "Check your email (and spam). Open the Sign in link on this phone — it opens copr, not localhost.",
       );
       otpForm.reset({ token: "" });
     });
@@ -391,8 +423,7 @@ export function AuthForm({
       {step === "otp" && (
         <form className="space-y-3" onSubmit={otpForm.handleSubmit(verifyOtp)}>
           <p className="text-sm text-muted-foreground">
-            Code sent to{" "}
-            <span className="text-foreground">{pendingContact}</span>
+            Sent to <span className="text-foreground">{pendingContact}</span>
           </p>
           <Field
             label="One-time code"
@@ -409,6 +440,10 @@ export function AuthForm({
           <Button type="submit" className="w-full" disabled={pending}>
             {pending ? "Verifying…" : "Verify & continue"}
           </Button>
+          <p className="text-xs text-muted-foreground">
+            Got a “Sign in” link instead of digits? Open it on this phone — that
+            finishes sign-in too.
+          </p>
           <div className="flex flex-col gap-1 sm:flex-row">
             <Button
               type="button"
