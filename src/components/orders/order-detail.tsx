@@ -18,6 +18,7 @@ import {
   orderStatusLabel,
   paymentStatusLabel,
 } from "@/lib/commerce/status-labels";
+import { Slogan } from "@/components/brand/slogan";
 
 export function OrderDetail({ orderId }: { orderId: string }) {
   const searchParams = useSearchParams();
@@ -71,6 +72,7 @@ export function OrderDetail({ orderId }: { orderId: string }) {
               Thanks{order.contactName ? `, ${order.contactName.split(" ")[0]}` : ""}
               — we’ve got your order
             </h2>
+            <Slogan id="happyWithCopd" variant="quote" className="mt-2" />
             <p className="text-sm text-muted-foreground">
               Payment secured. We’ll update you as each brand packs and ships.
             </p>

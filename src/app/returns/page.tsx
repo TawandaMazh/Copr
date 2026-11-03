@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { PageContainer } from "@/components/layout/page-container";
 import { GlassCard } from "@/components/ui/glass-card";
+import { Slogan } from "@/components/brand/slogan";
 import { SITE_NAME } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -38,6 +39,7 @@ export default function ReturnsPage() {
   return (
     <PageContainer className="mx-auto max-w-3xl space-y-10 py-6">
       <div className="space-y-3">
+        <Slogan id="returnsSoft" variant="eyebrow" />
         <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
           Returns
         </h1>

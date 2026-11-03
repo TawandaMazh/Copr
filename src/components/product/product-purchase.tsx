@@ -11,6 +11,7 @@ import { PriceTag } from "@/components/ui/price-tag";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { SizeGuideDialog } from "@/components/product/size-guide-dialog";
+import { Slogan } from "@/components/brand/slogan";
 import { cn } from "@/lib/utils";
 import { useCommerceStore } from "@/stores/commerce-store";
 
@@ -201,6 +202,7 @@ export function ProductPurchase({
         </Button>
       </div>
 
+      <Slogan id="productNudge" variant="quote" className="text-sm not-italic" />
       <p className="text-xs leading-relaxed text-muted-foreground">
         Delivery across Lusaka · Pickup points at checkout · Secure payment —
         the brand is paid only after your order is delivered.
