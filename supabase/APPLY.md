@@ -15,11 +15,12 @@ The app talks to project `koyosnsrparlhljvybok` (eu-west-1).
 | Fulfilment RPCs (ship / confirm delivery + payout) | Applied |
 | Order item `product_image` column | Applied |
 | Auto-confirm due shipments RPC | Applied (`20260322000008_auto_confirm.sql`; cron `/api/cron/auto-confirm`) |
-| Brand `is_verified` column | Pending — review `20260322000009_brand_verified.sql` before apply |
+| Brand `is_verified` column | Applied (`20260322000009_brand_verified.sql`) |
 | Auth → Email provider | On |
 | Auth → Phone / SMS | Off until Twilio (or another SMS provider) is configured |
-| Auth URL Configuration | Set Site URL + redirects (see below) |
-| Email Magic Link template | Include `{{ .Token }}` so the in-app 6-digit OTP works |
+| Auth URL Configuration | Site URL must be `https://copr-phi.vercel.app` (not localhost) |
+| Email Magic Link template | Must include `{{ .Token }}` (6-digit OTP). Run `node scripts/configure-supabase-auth-otp.mjs` with `SUPABASE_ACCESS_TOKEN`, or edit in the dashboard |
+
 | Vercel env vars | Set on project `copr` (`NEXT_PUBLIC_APP_URL`, Supabase URL/keys, payment defaults) |
 
 The Next app reads the catalogue from Supabase when env keys are set, and syncs
@@ -37,7 +38,20 @@ cart/wishlist/orders for authenticated users. Local seed remains the offline fal
    - `https://copr-phi.vercel.app/auth/callback`
    - `http://localhost:3000/**`
    - `http://localhost:3000/auth/callback`
-3. **Email Templates → Magic Link:** include `{{ .Token }}` in the body (the app verifies a 6-digit code via `verifyOtp`). Email links redirect to `/auth/callback`.
+3. **Email Templates → Magic Link:** use an OTP-first body with `{{ .Token }}` (no reliance on the Sign-in link). Example:
+
+   ```html
+   <h2>Your copr sign-in code</h2>
+   <p>Enter this 6-digit code on the copr sign-in screen:</p>
+   <p><strong>{{ .Token }}</strong></p>
+   ```
+
+   Or apply both Site URL + template via Management API:
+
+   ```bash
+   export SUPABASE_ACCESS_TOKEN=sbp_…   # https://supabase.com/dashboard/account/tokens
+   node scripts/configure-supabase-auth-otp.mjs
+   ```
 
 Phone OTP is optional: Auth → Providers → Phone + SMS provider credentials for +260.
 

@@ -117,6 +117,7 @@ export function AuthForm({
         options: {
           data: { full_name: values.fullName.trim() },
           shouldCreateUser: true,
+          // Keep redirect allow-listed for template links; primary UX is the 6-digit code.
           emailRedirectTo: `${getSiteUrl()}/auth/callback?next=/account`,
         },
       });
@@ -132,7 +133,7 @@ export function AuthForm({
       setPendingName(values.fullName.trim());
       setStep("otp");
       setMessage(
-        "Check your email for a 6-digit code (and spam folder). Codes expire quickly.",
+        "Check your email for a 6-digit code (and spam). Ignore any “Sign in” link — enter the digits here.",
       );
       otpForm.reset({ token: "" });
     });

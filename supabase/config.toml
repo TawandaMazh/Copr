@@ -24,6 +24,13 @@ enable_signup = true
 enable_signup = true
 enable_confirmations = false
 
+[auth.email.template.magic_link]
+subject = "Your copr sign-in code"
+content = """<h2>Your copr sign-in code</h2>
+<p>Enter this 6-digit code on the copr sign-in screen:</p>
+<p style="font-size:28px;letter-spacing:0.25em;font-weight:700">{{ .Token }}</p>
+<p style="color:#666;font-size:14px">This code expires shortly. If you didn’t request it, you can ignore this email.</p>"""
+
 [auth.sms]
 enable_signup = true
 enable_confirmations = true
