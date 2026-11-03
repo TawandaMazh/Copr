@@ -92,15 +92,16 @@ export function GlassNav() {
 
   return (
     <header className="sticky top-0 z-50 px-3 pt-3 sm:px-4 sm:pt-4">
-      <nav
-        className={cn(
-          "mx-auto flex max-w-6xl items-center justify-between gap-2 rounded-full px-3 py-2 transition-all duration-250 sm:gap-3 sm:px-4",
-          scrolled || open || mobileSearch
-            ? "glass-strong shadow-glass-lg"
-            : "glass",
-        )}
-        aria-label="Primary"
-      >
+      <div className="relative mx-auto max-w-6xl">
+        <nav
+          className={cn(
+            "relative z-[60] flex items-center justify-between gap-2 rounded-full px-3 py-2 transition-all duration-250 sm:gap-3 sm:px-4",
+            scrolled || open || mobileSearch
+              ? "glass-strong shadow-glass-lg"
+              : "glass",
+          )}
+          aria-label="Primary"
+        >
         <div className="flex items-center gap-1.5 sm:gap-2">
           <Button
             variant="ghost"
@@ -109,7 +110,10 @@ export function GlassNav() {
             aria-label={open ? "Close menu" : "Open menu"}
             aria-expanded={open}
             aria-controls="mobile-nav"
-            onClick={() => setOpen((v) => !v)}
+            onClick={() => {
+              setOpen((v) => !v);
+              setMobileSearch(false);
+            }}
           >
             {open ? (
               <X className="h-5 w-5" strokeWidth={1.5} />
@@ -177,6 +181,7 @@ export function GlassNav() {
             aria-expanded={mobileSearch}
             onClick={() => {
               setMobileSearch((v) => !v);
+              setOpen(false);
               setSearchOpen(true);
             }}
           >
@@ -224,13 +229,31 @@ export function GlassNav() {
       </nav>
 
       <AnimatePresence>
+        {(open || mobileSearch) && (
+          <motion.button
+            type="button"
+            aria-label="Close menu"
+            initial={reduced ? { opacity: 1 } : { opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={presenceExit(reduced, { opacity: 0 })}
+            transition={{ duration: reduced ? 0 : 0.18 }}
+            className="fixed inset-0 z-[55] bg-navy/25 backdrop-blur-[2px] lg:hidden"
+            onClick={() => {
+              setOpen(false);
+              setMobileSearch(false);
+            }}
+          />
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
         {mobileSearch && (
           <motion.form
             initial={reduced ? { opacity: 1, y: 0 } : { opacity: 0, y: -6 }}
             animate={{ opacity: 1, y: 0 }}
             exit={presenceExit(reduced, { opacity: 0, y: -6 })}
             transition={{ duration: reduced ? 0 : 0.2 }}
-            className="glass-strong mx-auto mt-2 flex max-w-6xl items-center gap-2 rounded-full px-3 py-2 md:hidden"
+            className="glass-strong absolute inset-x-0 top-[calc(100%+0.5rem)] z-[60] flex items-center gap-2 rounded-full px-3 py-2 shadow-glass-lg md:hidden"
             onSubmit={(e) => {
               e.preventDefault();
               submitSearch(query);
@@ -271,7 +294,7 @@ export function GlassNav() {
               duration: reduced ? 0 : 0.22,
               ease: [0.22, 1, 0.36, 1],
             }}
-            className="glass-strong mx-auto mt-2 max-w-6xl overflow-hidden rounded-3xl p-4 lg:hidden"
+            className="glass-strong absolute inset-x-0 top-[calc(100%+0.5rem)] z-[60] overflow-hidden rounded-3xl p-4 shadow-glass-lg lg:hidden"
             id="mobile-nav"
           >
             <ul className="flex flex-col gap-1">
@@ -323,6 +346,7 @@ export function GlassNav() {
           </motion.div>
         )}
       </AnimatePresence>
+      </div>
 
       <SearchDialog open={searchOpen} onOpenChange={setSearchOpen} />
     </header>
