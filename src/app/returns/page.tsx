@@ -3,7 +3,7 @@ import Link from "next/link";
 import { PageContainer } from "@/components/layout/page-container";
 import { GlassCard } from "@/components/ui/glass-card";
 import { Slogan } from "@/components/brand/slogan";
-import { SITE_NAME } from "@/lib/site";
+import { getSupportEmail, SITE_NAME } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Returns",
@@ -76,7 +76,14 @@ export default function ReturnsPage() {
       </GlassCard>
 
       <p className="text-sm text-muted-foreground">
-        See also{" "}
+        Need help? Email{" "}
+        <a
+          href={`mailto:${getSupportEmail()}?subject=${encodeURIComponent("copr returns help")}`}
+          className="text-primary hover:underline"
+        >
+          {getSupportEmail()}
+        </a>
+        {" · "}
         <Link href="/delivery" className="text-primary hover:underline">
           Delivery in Lusaka
         </Link>
