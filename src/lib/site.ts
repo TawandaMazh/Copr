@@ -10,3 +10,11 @@ export const SITE_NAME = "copr";
 export const SITE_TAGLINE = "Cop local. Wear Zambian.";
 export const SITE_DESCRIPTION =
   "Shop dresses, chitenge, and city staples from local Zambian brands. Multi-vendor marketplace with Lusaka delivery — hope you’re happy with what you cop’d.";
+
+/** Public support inbox for mailto links (mirrors ORDER_NOTIFY_EMAIL when set). */
+export function getSupportEmail() {
+  return (
+    process.env.NEXT_PUBLIC_SUPPORT_EMAIL?.trim() ||
+    "mazhandut@icloud.com"
+  );
+}

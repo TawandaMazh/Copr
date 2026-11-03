@@ -1,13 +1,16 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+import { Check, Copy } from "lucide-react";
 import { useCommerceStore } from "@/stores/commerce-store";
 import { GlassCard } from "@/components/ui/glass-card";
 import { PriceTag } from "@/components/ui/price-tag";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { ReportProblemForm } from "@/components/orders/report-problem-form";
 import { AUTO_CONFIRM_DAYS } from "@/lib/commerce/constants";
 import {
   expectedDeliveryWindow,
@@ -26,8 +29,14 @@ export function OrderDetail({ orderId }: { orderId: string }) {
   const order = useCommerceStore((s) => s.orders.find((o) => o.id === orderId));
   const confirmDelivery = useCommerceStore((s) => s.confirmDelivery);
   const markShipped = useCommerceStore((s) => s.markShipped);
-  const openDispute = useCommerceStore((s) => s.openDispute);
   const user = useCommerceStore((s) => s.user);
+  const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    if (justPlaced) {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  }, [justPlaced]);
 
   const canManageFulfilment =
     user?.role === "seller" || user?.role === "admin";
@@ -129,6 +138,35 @@ export function OrderDetail({ orderId }: { orderId: string }) {
               timeStyle: "short",
             })}
           </p>
+          <div className="flex flex-wrap items-center gap-2 pt-1">
+            <p className="font-mono text-xs text-muted-foreground">
+              Ref {order.id.slice(-8).toUpperCase()}
+            </p>
+            <Button
+              type="button"
+              size="sm"
+              variant="ghost"
+              className="h-8 px-2"
+              onClick={async () => {
+                try {
+                  await navigator.clipboard.writeText(
+                    order.id.slice(-8).toUpperCase(),
+                  );
+                  setCopied(true);
+                  window.setTimeout(() => setCopied(false), 1600);
+                } catch {
+                  /* ignore */
+                }
+              }}
+            >
+              {copied ? (
+                <Check className="h-3.5 w-3.5" strokeWidth={1.5} />
+              ) : (
+                <Copy className="h-3.5 w-3.5" strokeWidth={1.5} />
+              )}
+              {copied ? "Copied" : "Copy ref"}
+            </Button>
+          </div>
           {hint && (
             <p className="max-w-xl text-sm text-muted-foreground">{hint}</p>
           )}
@@ -257,30 +295,16 @@ export function OrderDetail({ orderId }: { orderId: string }) {
                 </p>
               )}
               {user &&
-                user.role === "shopper" &&
+                (user.role === "shopper" || user.role === "admin") &&
                 sub.status !== "disputed" &&
                 sub.status !== "refunded" &&
-                sub.status !== "cancelled" &&
-                sub.status !== "completed" && (
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() =>
-                      openDispute({
-                        orderId: order.id,
-                        subOrderId: sub.id,
-                        reason: "Issue with this brand shipment",
-                        notes: "Opened from order tracking",
-                      })
-                    }
-                  >
-                    Report a problem
-                  </Button>
+                sub.status !== "cancelled" && (
+                  <ReportProblemForm order={order} sub={sub} />
                 )}
               {sub.status === "disputed" && (
                 <p className="text-sm text-muted-foreground">
-                  We’ve flagged this shipment for review. Our team will follow
-                  up.
+                  We’ve flagged this shipment for review and emailed support.
+                  Our team will follow up.
                 </p>
               )}
             </div>

@@ -46,7 +46,7 @@ export function orderStatusHint(status: string) {
     case "completed":
       return "All set. Thanks for shopping on copr.";
     case "disputed":
-      return "Our team is reviewing this order. We’ll follow up by email.";
+      return "Support has been emailed about this order. We’ll follow up soon.";
     default:
       return null;
   }
