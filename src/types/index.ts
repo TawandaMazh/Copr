@@ -28,6 +28,8 @@ export interface Brand {
   banner: string;
   featured: boolean;
   foundedYear: number;
+  /** Verified seller badge — default true for seed brands. */
+  isVerified?: boolean;
 }
 
 export type ProductColour =

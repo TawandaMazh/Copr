@@ -2,7 +2,7 @@ import { Suspense } from "react";
 import type { Metadata } from "next";
 import { FilterPanel } from "@/components/shop/filter-panel";
 import { ProductGrid } from "@/components/shop/product-grid";
-import { filterProducts } from "@/data";
+import { filterCatalogue } from "@/lib/catalogue/service";
 import type { CategorySlug, ProductColour, ProductSize } from "@/types";
 import { GlassCard } from "@/components/ui/glass-card";
 import { ShopToolbar } from "@/components/shop/shop-toolbar";
@@ -10,7 +10,14 @@ import { PageContainer } from "@/components/layout/page-container";
 
 export const metadata: Metadata = {
   title: "Shop",
-  description: "Browse fashion from Zambian brands on copr.",
+  description:
+    "Browse dresses, chitenge, and city staples from Zambian brands — priced in Kwacha.",
+  alternates: { canonical: "/shop" },
+  openGraph: {
+    title: "Shop Zambian fashion · copr",
+    description:
+      "Multi-brand catalogue with Lusaka delivery. Filter by category, brand, size, and colour.",
+  },
 };
 
 interface ShopPageProps {
@@ -38,7 +45,7 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
     | "popular"
     | undefined) ?? "newest";
 
-  const products = filterProducts({
+  const products = await filterCatalogue({
     q,
     category,
     brand,

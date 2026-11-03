@@ -4,8 +4,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
+import { fadeUp, usePrefersReducedMotion } from "@/lib/motion";
 
 export function Hero() {
+  const reduced = usePrefersReducedMotion();
+  const motionProps = fadeUp(reduced);
+
   return (
     <section className="relative mb-16 w-full overflow-hidden">
       <div className="relative min-h-[85vh] w-full sm:min-h-[78vh] lg:min-h-[85vh]">
@@ -22,9 +26,7 @@ export function Hero() {
         <div className="absolute inset-0 flex items-end">
           <div className="mx-auto w-full max-w-6xl px-4 pb-14 pt-28 sm:pb-20">
             <motion.div
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+              {...motionProps}
               className="max-w-xl space-y-5 text-white"
             >
               <p className="text-4xl font-semibold tracking-tight sm:text-5xl lg:text-6xl">
@@ -34,8 +36,8 @@ export function Hero() {
                 Zambian fashion, from local brands to your door.
               </h1>
               <p className="max-w-md text-base leading-relaxed text-white/75 sm:text-lg">
-                Discover dresses, chitenge, and city staples from makers across
-                Lusaka and beyond — priced in Kwacha, delivered in Lusaka.
+                A multi-brand marketplace for Zambian labels — shop dresses,
+                chitenge, and city staples in Kwacha, with Lusaka delivery.
               </p>
               <div className="flex flex-wrap gap-3 pt-1">
                 <Button asChild size="lg" className="bg-white text-navy hover:bg-ice">

@@ -1,0 +1,32 @@
+# Minimal Supabase CLI config for local / linked projects.
+# Docs: https://supabase.com/docs/guides/cli/config
+
+project_id = "copr"
+
+[api]
+enabled = true
+port = 54321
+
+[db]
+port = 54322
+major_version = 15
+
+[auth]
+enabled = true
+site_url = "https://copr-phi.vercel.app"
+additional_redirect_urls = [
+  "https://copr-phi.vercel.app/**",
+  "http://localhost:3000/**",
+]
+enable_signup = true
+
+[auth.email]
+enable_signup = true
+enable_confirmations = false
+
+[auth.sms]
+enable_signup = true
+enable_confirmations = true
+
+[storage]
+enabled = true

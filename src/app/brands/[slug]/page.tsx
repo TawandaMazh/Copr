@@ -1,38 +1,52 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import { notFound } from "next/navigation";
-import { brands, getBrandBySlug } from "@/data/brands";
-import { getProductsByBrand } from "@/data/products";
+import { BadgeCheck } from "lucide-react";
+import {
+  getBrandBySlugService,
+  listBrandSlugs,
+  listProductsByBrand,
+} from "@/lib/catalogue/service";
 import { ProductCard } from "@/components/ui/product-card";
 import { GlassCard } from "@/components/ui/glass-card";
 import { PageContainer } from "@/components/layout/page-container";
+import { brandIsVerified } from "@/lib/product-display";
 
 interface BrandPageProps {
   params: Promise<{ slug: string }>;
 }
 
 export async function generateStaticParams() {
-  return brands.map((brand) => ({ slug: brand.slug }));
+  const slugs = await listBrandSlugs();
+  return slugs.map((slug) => ({ slug }));
 }
 
 export async function generateMetadata({
   params,
 }: BrandPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const brand = getBrandBySlug(slug);
+  const brand = await getBrandBySlugService(slug);
   if (!brand) return { title: "Brand not found" };
   return {
     title: brand.name,
     description: brand.story,
+    openGraph: {
+      title: `${brand.name} · copr`,
+      description: brand.tagline || brand.story.slice(0, 140),
+      images: [brand.banner],
+    },
+    alternates: {
+      canonical: `/brands/${brand.slug}`,
+    },
   };
 }
 
 export default async function BrandPage({ params }: BrandPageProps) {
   const { slug } = await params;
-  const brand = getBrandBySlug(slug);
+  const brand = await getBrandBySlugService(slug);
   if (!brand) notFound();
 
-  const products = getProductsByBrand(brand.id);
+  const products = await listProductsByBrand(brand.id);
 
   return (
     <>
@@ -40,7 +54,7 @@ export default async function BrandPage({ params }: BrandPageProps) {
         <div className="relative h-56 w-full sm:h-80">
           <Image
             src={brand.banner}
-            alt=""
+            alt={`${brand.name} banner`}
             fill
             priority
             sizes="100vw"
@@ -53,15 +67,21 @@ export default async function BrandPage({ params }: BrandPageProps) {
             <div className="relative h-16 w-16 overflow-hidden rounded-2xl ring-2 ring-white/40 sm:h-20 sm:w-20">
               <Image
                 src={brand.logo}
-                alt=""
+                alt={`${brand.name} logo`}
                 fill
                 sizes="80px"
                 className="object-cover"
               />
             </div>
             <div className="text-white">
-              <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
+              <h1 className="flex flex-wrap items-center gap-2 text-3xl font-semibold tracking-tight sm:text-4xl">
                 {brand.name}
+                {brandIsVerified(brand) && (
+                  <span className="inline-flex items-center gap-1 rounded-full bg-white/15 px-2.5 py-1 text-xs font-medium tracking-normal">
+                    <BadgeCheck className="h-3.5 w-3.5" strokeWidth={1.75} />
+                    Verified
+                  </span>
+                )}
               </h1>
               <p className="text-sm text-white/75 sm:text-base">
                 {brand.tagline}

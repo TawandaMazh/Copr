@@ -1,11 +1,15 @@
 import { GlassNav } from "@/components/ui/glass-nav";
+import { SkipLink } from "./skip-link";
 import { SiteFooter } from "./site-footer";
 
 export function SiteShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="atmosphere min-h-dvh">
+      <SkipLink />
       <GlassNav />
-      <main className="w-full pb-16">{children}</main>
+      <main id="main-content" tabIndex={-1} className="w-full pb-16 outline-none">
+        {children}
+      </main>
       <SiteFooter />
     </div>
   );

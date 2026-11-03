@@ -1,25 +1,24 @@
 # copr
 
-Multi-vendor fashion marketplace for **Zambian brands** and shoppers — think ASOS, built for Lusaka. Brands hold their own stock and fulfil orders; copr takes a commission (default **15%**).
+Multi-vendor fashion marketplace for **Zambian brands** and shoppers — think ASOS, built for Lusaka. Brands hold their own stock and fulfil orders; copr takes a commission (default **15%**, configurable in admin).
 
-**Phase 1 (this PR):** project setup, design system, layout, home, shop listing, product & brand pages, seed catalogue (10 brands · 60 products).
+**Current: Phase 5** — Performance, SEO, accessibility, empty/error states, dark-mode polish.
 
 ---
 
 ## Stack
 
 - **Next.js 15** (App Router) + TypeScript
-- **Tailwind CSS v4** + design tokens in `tailwind.config.ts` + `src/app/globals.css`
-- **shadcn-style** primitives (CVA + Radix Slot) — `Button`, `GlassCard`, `GlassNav`, `ProductCard`, `PriceTag`
-- **Framer Motion** for subtle fade/slide motion
-- **next/image** + Unsplash placeholders (swap for Supabase Storage in Phase 2)
+- **Tailwind CSS v4** + tokens in `tailwind.config.ts` + `src/app/globals.css`
+- **Supabase** — Postgres, Auth, Storage-ready, RLS on every table (`supabase/migrations/`)
+- **Zod** + **React Hook Form** for auth, checkout, seller forms
+- **PaymentProvider** + **MockProvider** escrow
+- Framer Motion (respects `prefers-reduced-motion`), lucide-react, next-themes, zustand (`copr-commerce-v3`)
 - Deploy target: **Vercel**
-
-Phases 2–5 add Supabase (Auth, Postgres, RLS, Storage), cart/checkout with `MockProvider`, seller & admin dashboards, polish.
 
 ---
 
-## Quick start
+## Quick start (no Supabase required)
 
 ```bash
 npm install
@@ -30,80 +29,67 @@ npm run dev
 Open [http://localhost:3000](http://localhost:3000).
 
 ```bash
-npm run build      # production build
-npm run lint       # ESLint
-npm run typecheck  # tsc --noEmit
+npm run build && npm run typecheck
 ```
+
+---
+
+## Phase 5 polish
+
+- **SEO** — `sitemap.xml`, `robots.txt`, web manifest, richer Open Graph / Twitter metadata, Organization + WebSite + Product JSON-LD
+- **Performance** — route `loading.tsx` skeletons, AVIF/WebP image sizes, font `display: swap`, reduced-motion for Framer Motion + CSS
+- **Accessibility** — skip-to-content, `sr-only`, breadcrumb/`aria-*` fixes, cart Escape + body scroll lock, meaningful image alts
+- **Empty / error** — shared `EmptyState`, polished `not-found`, `error.tsx` + `global-error.tsx`
+- **Dark mode** — improved muted text contrast on navy glass
+
+---
+
+## Admin (Phase 4)
+
+Open [/admin](http://localhost:3000/admin) → **Continue as demo admin**. Moderate brands, products, orders, payouts, disputes, reviews, and commission settings.
+
+---
+
+## Seller (Phase 3)
+
+[/sell](http://localhost:3000/sell) → apply or claim a demo brand. New applications stay **pending** until admin approval.
+
+---
+
+## Connect Supabase
+
+Live project: `koyosnsrparlhljvybok` · production: [copr-phi.vercel.app](https://copr-phi.vercel.app)
+
+1. Copy `.env.example` → `.env.local` (URL + keys are documented in [`supabase/APPLY.md`](supabase/APPLY.md))
+2. Schema, RLS, seed, and storage buckets are applied; finish Auth URLs + storage RLS via the checklist in `APPLY.md`
+3. Auth → Email OTP (Phone optional for +260 SMS)
+
+With keys set, the app loads **brands/products/categories from Supabase** (falls back to local seed if the API is unreachable). Signed-in shoppers sync **cart, wishlist, addresses, and orders** to Supabase; guests stay on local zustand.
 
 ---
 
 ## Environment variables
 
-Copy `.env.example` → `.env.local`. Phase 1 runs without Supabase keys.
-
-| Variable | Phase | Notes |
-|---|---|---|
-| `NEXT_PUBLIC_APP_URL` | 1+ | App origin (local or Vercel URL) |
-| `NEXT_PUBLIC_SUPABASE_URL` | 2+ | Supabase project URL |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | 2+ | Public anon key |
-| `SUPABASE_SERVICE_ROLE_KEY` | 2+ | Server-only; never expose to client |
-| `PAYMENT_PROVIDER` | 2+ | `mock` for now |
-| `NEXT_PUBLIC_DEFAULT_COMMISSION_PERCENT` | 4 | Default `15` |
-| `NEXT_PUBLIC_DELIVERY_FEE_KWACHA` | 2+ | Flat Lusaka fee |
-| `NEXT_PUBLIC_DELIVERY_CITY` | 2+ | `Lusaka` for MVP |
-
----
-
-## Design system — “Apple meets glass, in blue”
-
-| Token | Value |
+| Variable | Notes |
 |---|---|
-| Navy | `#0A1A3F` |
-| Primary | `#1E5EFF` |
-| Sky | `#7FB2FF` |
-| Ice | `#F5F8FF` |
-
-- Glass panels: translucent fill, `backdrop-blur`, 1px light border, soft shadow
-- Light + dark mode via `next-themes` (toggle in nav)
-- Currency: Zambian Kwacha as **`K 450.00`** (`formatKwacha`)
-- Phones: **`+260`** format (`formatPhoneZM`)
-
-Reusable components live under `src/components/ui/` and `src/components/layout/`.
-
----
-
-## Folder structure
-
-```
-src/
-  app/                 # routes — home, shop, product, brands, sell, account
-  components/
-    ui/                # Button, GlassCard, GlassNav, ProductCard, PriceTag…
-    home/ shop/ product/ layout/
-  data/                # seed brands, categories, products (Phase 1)
-  lib/                 # cn, format helpers
-  types/               # shared domain types
-tailwind.config.ts     # design tokens
-.env.example
-```
-
----
-
-## Seed data (Phase 1)
-
-- **10 brands** — e.g. Chitenge House, Mwape Studio, Copper & Cloth, Zambezi Atelier…
-- **60 products** with variants (size × colour), stock, prices in Kwacha
-- Regenerate products: `node scripts/generate-products.mjs`
+| `NEXT_PUBLIC_APP_URL` | Canonical origin (sitemap / OG / JSON-LD) |
+| `NEXT_PUBLIC_SUPABASE_URL` / `ANON_KEY` | Optional until wired |
+| `SUPABASE_SERVICE_ROLE_KEY` | Server-only |
+| `PAYMENT_PROVIDER` | `mock` |
+| `NEXT_PUBLIC_DEFAULT_COMMISSION_PERCENT` | Default `15` |
+| `NEXT_PUBLIC_DELIVERY_FEE_KWACHA` | Default `50` |
+| `NEXT_PUBLIC_DELIVERY_CITY` | `Lusaka` |
 
 ---
 
 ## Roadmap
 
-1. **Phase 1** — Design system + catalogue UI ← *you are here*
-2. **Phase 2** — Supabase schema + RLS, auth, cart, wishlist, checkout + MockProvider
-3. **Phase 3** — Seller dashboard (products, orders, earnings)
-4. **Phase 4** — Admin (commission, payouts, moderation, analytics, reviews)
-5. **Phase 5** — Performance, SEO, a11y, empty/error states, dark-mode QA
+1. ~~Phase 1 — Design system + catalogue~~
+2. ~~Phase 2 — Schema/RLS, auth, cart, wishlist, MockProvider checkout~~
+3. ~~Phase 3 — Seller dashboard~~
+4. ~~Phase 4 — Admin (commission, payouts, moderation, analytics, reviews)~~
+5. ~~Phase 5 — Performance, SEO, a11y, empty/error states, dark-mode QA~~
+6. Theme system preset + auth/session fixes · global search · delivery auto-confirm ← *you are here*
 
 ---
 
