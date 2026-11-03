@@ -31,6 +31,8 @@ export function GlassNav() {
   const [query, setQuery] = React.useState("");
   const [scrolled, setScrolled] = React.useState(false);
   const [mounted, setMounted] = React.useState(false);
+  const [panelTop, setPanelTop] = React.useState(72);
+  const navRef = React.useRef<HTMLElement>(null);
   const setCartOpen = useCommerceStore((s) => s.setCartOpen);
   const user = useCommerceStore((s) => s.user);
   const cartCount = useCartCount();
@@ -68,6 +70,36 @@ export function GlassNav() {
     if (mobileSearch) mobileSearchRef.current?.focus();
   }, [mobileSearch]);
 
+  const measurePanelTop = React.useCallback(() => {
+    const el = navRef.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    setPanelTop(Math.round(rect.bottom + 8));
+  }, []);
+
+  React.useEffect(() => {
+    measurePanelTop();
+    window.addEventListener("resize", measurePanelTop);
+    window.addEventListener("scroll", measurePanelTop, { passive: true });
+    return () => {
+      window.removeEventListener("resize", measurePanelTop);
+      window.removeEventListener("scroll", measurePanelTop);
+    };
+  }, [measurePanelTop]);
+
+  React.useEffect(() => {
+    if (open || mobileSearch) measurePanelTop();
+  }, [open, mobileSearch, measurePanelTop]);
+
+  React.useEffect(() => {
+    if (!(open || mobileSearch)) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [open, mobileSearch]);
+
   const links = React.useMemo(() => {
     const next = [...baseLinks];
     if (user?.role === "seller" || user?.role === "admin") {
@@ -92,16 +124,16 @@ export function GlassNav() {
 
   return (
     <header className="sticky top-0 z-50 px-3 pt-3 sm:px-4 sm:pt-4">
-      <div className="relative mx-auto max-w-6xl">
-        <nav
-          className={cn(
-            "relative z-[60] flex items-center justify-between gap-2 rounded-full px-3 py-2 transition-all duration-250 sm:gap-3 sm:px-4",
-            scrolled || open || mobileSearch
-              ? "glass-strong shadow-glass-lg"
-              : "glass",
-          )}
-          aria-label="Primary"
-        >
+      <nav
+        ref={navRef}
+        className={cn(
+          "relative z-[70] mx-auto flex max-w-6xl items-center justify-between gap-2 rounded-full px-3 py-2 transition-all duration-250 sm:gap-3 sm:px-4",
+          scrolled || open || mobileSearch
+            ? "glass-strong shadow-glass-lg"
+            : "glass",
+        )}
+        aria-label="Primary"
+      >
         <div className="flex items-center gap-1.5 sm:gap-2">
           <Button
             variant="ghost"
@@ -237,7 +269,7 @@ export function GlassNav() {
             animate={{ opacity: 1 }}
             exit={presenceExit(reduced, { opacity: 0 })}
             transition={{ duration: reduced ? 0 : 0.18 }}
-            className="fixed inset-0 z-[55] bg-navy/25 backdrop-blur-[2px] lg:hidden"
+            className="fixed inset-0 z-[60] bg-navy/35 backdrop-blur-[3px] lg:hidden"
             onClick={() => {
               setOpen(false);
               setMobileSearch(false);
@@ -253,7 +285,8 @@ export function GlassNav() {
             animate={{ opacity: 1, y: 0 }}
             exit={presenceExit(reduced, { opacity: 0, y: -6 })}
             transition={{ duration: reduced ? 0 : 0.2 }}
-            className="glass-strong absolute inset-x-0 top-[calc(100%+0.5rem)] z-[60] flex items-center gap-2 rounded-full px-3 py-2 shadow-glass-lg md:hidden"
+            style={{ top: panelTop }}
+            className="glass-strong fixed inset-x-3 z-[70] mx-auto flex max-w-6xl items-center gap-2 rounded-full px-3 py-2 shadow-glass-lg md:hidden sm:inset-x-4"
             onSubmit={(e) => {
               e.preventDefault();
               submitSearch(query);
@@ -294,7 +327,8 @@ export function GlassNav() {
               duration: reduced ? 0 : 0.22,
               ease: [0.22, 1, 0.36, 1],
             }}
-            className="glass-strong absolute inset-x-0 top-[calc(100%+0.5rem)] z-[60] overflow-hidden rounded-3xl p-4 shadow-glass-lg lg:hidden"
+            style={{ top: panelTop }}
+            className="glass-strong fixed inset-x-3 z-[70] mx-auto max-w-6xl overflow-hidden rounded-3xl p-4 shadow-glass-lg lg:hidden sm:inset-x-4"
             id="mobile-nav"
           >
             <ul className="flex flex-col gap-1">
@@ -346,7 +380,6 @@ export function GlassNav() {
           </motion.div>
         )}
       </AnimatePresence>
-      </div>
 
       <SearchDialog open={searchOpen} onOpenChange={setSearchOpen} />
     </header>
