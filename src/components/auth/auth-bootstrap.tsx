@@ -62,8 +62,10 @@ export function AuthBootstrap() {
     const sync = async (sessionUser: User | null) => {
       const store = useCommerceStore.getState();
       if (!sessionUser) {
+        // Real sessions ending (sign-out / expired) must clear personal data.
+        // Demo shoppers stay local until they explicitly sign out.
         if (store.user && !store.user.isDemo) {
-          store.setUserFromSupabase(null);
+          store.signOut();
         }
         return;
       }

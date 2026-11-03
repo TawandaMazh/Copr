@@ -227,10 +227,30 @@ export const useCommerceStore = create<CommerceState>()(
       signOut: () =>
         set({
           user: null,
-          // Keep brand/products so reclaiming is easy; clear on explicit reset only
+          cart: [],
+          wishlist: [],
+          addresses: [],
+          orders: [],
+          cartOpen: false,
+          // Keep seller/admin catalogue caches so reclaiming a brand is easy
         }),
 
-      setUserFromSupabase: (user) => set({ user }),
+      setUserFromSupabase: (user) => {
+        if (!user) {
+          // Signing out / session loss — drop personal shopper state so the
+          // next visitor (or guest) does not inherit wishlist/cart/orders.
+          set({
+            user: null,
+            cart: [],
+            wishlist: [],
+            addresses: [],
+            orders: [],
+            cartOpen: false,
+          });
+          return;
+        }
+        set({ user });
+      },
 
       addToCart: (productId, variantId, quantity = 1) => {
         set((state) => {
