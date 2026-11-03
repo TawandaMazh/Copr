@@ -55,6 +55,7 @@ export type DbBrand = {
   featured: boolean;
   founded_year: number | null;
   status: string;
+  is_verified?: boolean | null;
 };
 
 export type DbCategory = {
@@ -104,7 +105,7 @@ export function mapBrand(row: DbBrand): Brand {
     banner: row.banner_url ?? "",
     featured: row.featured,
     foundedYear: row.founded_year ?? 2020,
-    isVerified: true,
+    isVerified: row.is_verified !== false,
   };
 }
 

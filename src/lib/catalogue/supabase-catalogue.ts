@@ -25,7 +25,7 @@ export async function fetchAllBrands(): Promise<Brand[] | null> {
   const { data, error } = await sb
     .from("brands")
     .select(
-      "id, name, slug, tagline, story, location, logo_url, banner_url, featured, founded_year, status",
+      "id, name, slug, tagline, story, location, logo_url, banner_url, featured, founded_year, status, is_verified",
     )
     .eq("status", "approved")
     .order("name");
@@ -44,7 +44,7 @@ export async function fetchBrandBySlug(
   const { data, error } = await sb
     .from("brands")
     .select(
-      "id, name, slug, tagline, story, location, logo_url, banner_url, featured, founded_year, status",
+      "id, name, slug, tagline, story, location, logo_url, banner_url, featured, founded_year, status, is_verified",
     )
     .eq("slug", slug)
     .eq("status", "approved")

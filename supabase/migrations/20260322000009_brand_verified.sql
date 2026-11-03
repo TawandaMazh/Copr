@@ -1,5 +1,5 @@
--- Optional: verified brand badge for marketplace trust signals.
--- Review this migration before applying to production.
+-- Verified brand badge for marketplace trust signals.
+-- Applied on live Supabase (ybkhrkhiemnbaviyhtio) 2026-11-03.
 
 alter table public.brands
   add column if not exists is_verified boolean not null default true;
