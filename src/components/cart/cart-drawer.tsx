@@ -9,6 +9,8 @@ import { useCommerceStore } from "@/stores/commerce-store";
 import { resolveBrand, resolveProduct } from "@/lib/catalogue";
 import { PriceTag } from "@/components/ui/price-tag";
 import { Button } from "@/components/ui/button";
+import { Slogan } from "@/components/brand/slogan";
+import { SLOGANS } from "@/data/slogans";
 import { DELIVERY_FEE_KWACHA } from "@/lib/commerce/constants";
 import { resolveCartTotals } from "@/lib/commerce/checkout";
 import { presenceExit, usePrefersReducedMotion } from "@/lib/motion";
@@ -98,7 +100,7 @@ export function CartDrawer() {
                 <div className="flex h-full flex-col items-center justify-center gap-3 text-center">
                   <p className="font-medium">Your bag is empty</p>
                   <p className="text-sm text-muted-foreground">
-                    Browse Zambian brands and add something you love.
+                    {SLOGANS.emptyBag}
                   </p>
                   <Button
                     onClick={() => setCartOpen(false)}
@@ -204,6 +206,10 @@ export function CartDrawer() {
                   <span>Total</span>
                   <PriceTag amount={total || subtotal + DELIVERY_FEE_KWACHA} />
                 </div>
+                <Slogan
+                  id="cartCheckout"
+                  className="text-center text-xs text-muted-foreground"
+                />
                 <Button asChild size="lg" className="w-full">
                   <Link href="/checkout" onClick={() => setCartOpen(false)}>
                     Checkout

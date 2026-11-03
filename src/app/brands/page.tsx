@@ -8,6 +8,7 @@ import {
 } from "@/lib/catalogue/service";
 import { GlassCard } from "@/components/ui/glass-card";
 import { PageContainer } from "@/components/layout/page-container";
+import { Slogan } from "@/components/brand/slogan";
 import { brandIsVerified } from "@/lib/product-display";
 
 export const metadata: Metadata = {
@@ -28,6 +29,7 @@ export default async function BrandsPage() {
   return (
     <PageContainer className="space-y-8">
       <div className="space-y-2">
+        <Slogan id="brandsDiscover" variant="eyebrow" />
         <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
           Brands
         </h1>

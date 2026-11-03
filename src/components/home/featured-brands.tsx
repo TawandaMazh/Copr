@@ -5,6 +5,7 @@ import Link from "next/link";
 import { BadgeCheck } from "lucide-react";
 import { motion } from "framer-motion";
 import type { Brand } from "@/types";
+import { Slogan } from "@/components/brand/slogan";
 import { GlassCard } from "@/components/ui/glass-card";
 import { fadeInView, usePrefersReducedMotion } from "@/lib/motion";
 import { brandIsVerified } from "@/lib/product-display";
@@ -17,6 +18,7 @@ export function FeaturedBrands({ brands }: { brands: Brand[] }) {
     <section className="mb-20">
       <div className="mb-8 flex items-end justify-between gap-4">
         <div>
+          <Slogan id="brandsDiscover" variant="eyebrow" className="mb-2" />
           <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">
             Featured brands
           </h2>

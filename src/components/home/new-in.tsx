@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { Product } from "@/types";
+import { Slogan } from "@/components/brand/slogan";
 import { ProductCard } from "@/components/ui/product-card";
 
 export function NewIn({ products }: { products: Product[] }) {
@@ -7,6 +8,7 @@ export function NewIn({ products }: { products: Product[] }) {
     <section className="mb-20">
       <div className="mb-8 flex items-end justify-between gap-4">
         <div>
+          <Slogan id="freshDrops" variant="eyebrow" className="mb-2" />
           <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">
             New in
           </h2>

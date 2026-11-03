@@ -7,6 +7,7 @@ import type { CategorySlug, ProductColour, ProductSize } from "@/types";
 import { GlassCard } from "@/components/ui/glass-card";
 import { ShopToolbar } from "@/components/shop/shop-toolbar";
 import { PageContainer } from "@/components/layout/page-container";
+import { Slogan } from "@/components/brand/slogan";
 
 export const metadata: Metadata = {
   title: "Shop",
@@ -59,6 +60,7 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
   return (
     <PageContainer className="space-y-6">
       <div className="space-y-2">
+        <Slogan id="shopBrowse" variant="eyebrow" />
         <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
           Shop
         </h1>

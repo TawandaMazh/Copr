@@ -16,6 +16,7 @@ import {
 import { useCommerceStore } from "@/stores/commerce-store";
 import { Button } from "@/components/ui/button";
 import { GlassCard } from "@/components/ui/glass-card";
+import { Slogan } from "@/components/brand/slogan";
 import { formatPhoneZM } from "@/lib/format";
 import { getSiteUrl } from "@/lib/site";
 import { cn } from "@/lib/utils";
@@ -313,6 +314,7 @@ export function AuthForm({
   return (
     <GlassCard className={cn("space-y-5", compact ? "p-5" : "p-6 sm:p-8")}>
       <div className="space-y-1">
+        <Slogan id="authSignIn" variant="eyebrow" />
         <h2 className="text-xl font-semibold tracking-tight">
           {supabaseReady ? "Create account or sign in" : "Sign in to copr"}
         </h2>
