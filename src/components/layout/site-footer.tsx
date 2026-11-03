@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Slogan } from "@/components/brand/slogan";
 
 const columns = [
   {
@@ -32,6 +33,7 @@ export function SiteFooter() {
       <div className="mx-auto grid max-w-6xl gap-10 px-4 py-14 sm:grid-cols-2 lg:grid-cols-4 lg:px-4">
         <div className="space-y-3">
           <p className="text-2xl font-semibold tracking-tight">copr</p>
+          <Slogan id="footerTag" variant="quote" className="max-w-xs not-italic" />
           <p className="max-w-xs text-sm leading-relaxed text-muted-foreground">
             Zambia’s multi-vendor fashion marketplace. Local brands. Local
             shoppers. Delivered across Lusaka.
@@ -60,7 +62,7 @@ export function SiteFooter() {
       <div className="border-t border-border-subtle">
         <div className="mx-auto flex max-w-6xl flex-col gap-2 px-4 py-6 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
           <p>© {new Date().getFullYear()} copr. Prices in Zambian Kwacha (K).</p>
-          <p>Made for Lusaka shoppers</p>
+          <Slogan id="happyWithCopd" as="p" className="text-xs text-muted-foreground" />
         </div>
       </div>
     </footer>

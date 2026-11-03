@@ -1,13 +1,14 @@
 import type { Product } from "@/types";
 import { ProductCard } from "@/components/ui/product-card";
 import { EmptyState } from "@/components/ui/empty-state";
+import { SLOGANS } from "@/data/slogans";
 
 export function ProductGrid({ products }: { products: Product[] }) {
   if (products.length === 0) {
     return (
       <EmptyState
         title="No pieces found"
-        description="Try clearing filters or browsing the full catalogue."
+        description={`${SLOGANS.goOnAndCop} Try clearing filters or browsing the full catalogue.`}
         actionHref="/shop"
         actionLabel="Clear filters"
       />
