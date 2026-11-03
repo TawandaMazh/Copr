@@ -1,0 +1,186 @@
+@import "tailwindcss";
+@config "../../tailwind.config.ts";
+
+/* ─── Design tokens (light) ─── */
+:root {
+  --navy: #0a1a3f;
+  --primary: #1e5eff;
+  --sky: #7fb2ff;
+  --ice: #f5f8ff;
+
+  --background: #f5f8ff;
+  --foreground: #0a1a3f;
+  --muted: #5a6b8a;
+  --muted-foreground: #6b7c9c;
+  --card: rgba(255, 255, 255, 0.6);
+  --card-solid: #ffffff;
+  --border: rgba(255, 255, 255, 0.2);
+  --border-subtle: rgba(10, 26, 63, 0.08);
+  --ring: #1e5eff;
+  --accent: #7fb2ff;
+  --destructive: #e11d48;
+
+  --glass-bg: rgba(255, 255, 255, 0.6);
+  --glass-bg-strong: rgba(255, 255, 255, 0.78);
+  --glass-border: rgba(255, 255, 255, 0.35);
+  --glass-shadow: 0 4px 24px -4px rgba(10, 26, 63, 0.08),
+    0 1px 2px rgba(10, 26, 63, 0.04);
+
+  --orb-1: rgba(30, 94, 255, 0.18);
+  --orb-2: rgba(127, 178, 255, 0.28);
+  --orb-3: rgba(10, 26, 63, 0.06);
+
+  --radius: 1rem;
+  --radius-lg: 1.5rem;
+}
+
+/* ─── Design tokens (dark) ─── */
+.dark {
+  --background: #050a14;
+  --foreground: #f5f8ff;
+  --muted: #8fa6d4;
+  --muted-foreground: #8fa6d4;
+  --card: rgba(10, 26, 63, 0.55);
+  --card-solid: #0a1a3f;
+  --border: rgba(127, 178, 255, 0.15);
+  --border-subtle: rgba(127, 178, 255, 0.12);
+  --ring: #7fb2ff;
+  --accent: #7fb2ff;
+  --destructive: #fb7185;
+
+  --glass-bg: rgba(10, 26, 63, 0.55);
+  --glass-bg-strong: rgba(10, 26, 63, 0.78);
+  --glass-border: rgba(127, 178, 255, 0.18);
+  --glass-shadow: 0 4px 24px -4px rgba(0, 0, 0, 0.45),
+    0 1px 2px rgba(0, 0, 0, 0.25);
+
+  --orb-1: rgba(30, 94, 255, 0.22);
+  --orb-2: rgba(127, 178, 255, 0.12);
+  --orb-3: rgba(30, 94, 255, 0.08);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-card: var(--card-solid);
+  --color-border: var(--border-subtle);
+  --color-border-subtle: var(--border-subtle);
+  --color-ring: var(--ring);
+  --color-accent: var(--accent);
+  --color-destructive: var(--destructive);
+  --color-navy: var(--navy);
+  --color-primary: var(--primary);
+  --color-primary-600: #0047e6;
+  --color-sky: var(--sky);
+  --color-ice: var(--ice);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --shadow-glass: var(--glass-shadow);
+  --shadow-glass-lg: 0 12px 40px -8px rgba(10, 26, 63, 0.12),
+    0 4px 12px rgba(10, 26, 63, 0.06);
+  --shadow-lift: 0 16px 40px -12px rgba(30, 94, 255, 0.2);
+  --radius-3xl: 1.5rem;
+}
+
+/* ─── Base ─── */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  min-height: 100dvh;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--primary) 28%, transparent);
+  color: var(--foreground);
+}
+
+/* Atmosphere: soft blue gradient + colour orbs */
+.atmosphere {
+  position: relative;
+  isolation: isolate;
+  background:
+    radial-gradient(ellipse 80% 50% at 10% -10%, var(--orb-1), transparent 55%),
+    radial-gradient(ellipse 60% 40% at 90% 10%, var(--orb-2), transparent 50%),
+    radial-gradient(ellipse 50% 30% at 50% 100%, var(--orb-3), transparent 55%),
+    linear-gradient(180deg, var(--ice) 0%, var(--background) 40%, var(--background) 100%);
+}
+
+.dark .atmosphere {
+  background:
+    radial-gradient(ellipse 80% 50% at 10% -10%, var(--orb-1), transparent 55%),
+    radial-gradient(ellipse 60% 40% at 90% 10%, var(--orb-2), transparent 50%),
+    radial-gradient(ellipse 50% 30% at 40% 80%, var(--orb-3), transparent 55%),
+    linear-gradient(180deg, #050a14 0%, #070f1f 50%, #050a14 100%);
+}
+
+/* Glass utility */
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+}
+
+.glass-strong {
+  background: var(--glass-bg-strong);
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+}
+
+/* Focus ring */
+.focus-ring {
+  outline: none;
+}
+
+.focus-ring:focus-visible {
+  box-shadow: 0 0 0 2px var(--background), 0 0 0 4px var(--ring);
+}
+
+/* Skeleton shimmer */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--sky) 12%, transparent) 0%,
+    color-mix(in srgb, var(--sky) 28%, transparent) 50%,
+    color-mix(in srgb, var(--sky) 12%, transparent) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+  border-radius: 0.75rem;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* Scrollbar — subtle */
+@media (pointer: fine) {
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: color-mix(in srgb, var(--navy) 18%, transparent);
+    border-radius: 999px;
+  }
+  .dark ::-webkit-scrollbar-thumb {
+    background: color-mix(in srgb, var(--sky) 25%, transparent);
+  }
+}
