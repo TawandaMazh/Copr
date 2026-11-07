@@ -60,21 +60,26 @@ export async function listProducts(): Promise<Product[]> {
 
 export async function listNewProducts(limit = 8): Promise<Product[]> {
   const { isProductNew } = await import("@/lib/product-display");
+  const newestFirst = (list: Product[]) =>
+    [...list].sort(
+      (a, b) => +new Date(b.createdAt) - +new Date(a.createdAt),
+    );
+
+  /** Prefer truly-new (14-day) pieces; if the catalogue is older, still show newest. */
+  const pickNewOrNewest = (list: Product[]) => {
+    const fresh = newestFirst(list.filter((p) => isProductNew(p)));
+    if (fresh.length > 0) return fresh.slice(0, limit);
+    return newestFirst(list).slice(0, limit);
+  };
+
   if (!isSupabaseConfigured()) {
-    return getSeedNewProducts()
-      .filter((p) => isProductNew(p))
-      .slice(0, limit);
+    return pickNewOrNewest(getSeedNewProducts());
   }
   const products = await fetchAllProducts();
   if (!products) {
-    return getSeedNewProducts()
-      .filter((p) => isProductNew(p))
-      .slice(0, limit);
+    return pickNewOrNewest(getSeedNewProducts());
   }
-  return products
-    .filter((p) => isProductNew(p))
-    .sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt))
-    .slice(0, limit);
+  return pickNewOrNewest(products);
 }
 
 export async function getProductBySlugService(

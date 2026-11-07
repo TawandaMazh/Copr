@@ -89,6 +89,8 @@ export const viewport: Viewport = {
   ],
   width: "device-width",
   initialScale: 1,
+  /** Enables env(safe-area-inset-*) on notched iPhones */
+  viewportFit: "cover",
 };
 
 export default function RootLayout({

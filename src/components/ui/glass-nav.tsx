@@ -123,7 +123,7 @@ export function GlassNav() {
   };
 
   return (
-    <header className="sticky top-0 z-50 px-3 pt-3 sm:px-4 sm:pt-4">
+    <header className="sticky top-0 z-50 px-3 pt-[max(0.75rem,env(safe-area-inset-top))] sm:px-4 sm:pt-[max(1rem,env(safe-area-inset-top))]">
       <nav
         ref={navRef}
         className={cn(
@@ -200,7 +200,7 @@ export function GlassNav() {
             onFocus={() => setSearchOpen(true)}
             placeholder="Search brands & styles"
             aria-label="Search products"
-            className="h-10 w-full rounded-full border border-border-subtle bg-white/50 pl-9 pr-3 text-sm outline-none focus:ring-2 focus:ring-primary/40 dark:bg-navy/40"
+            className="h-11 w-full rounded-full border border-border-subtle bg-white/50 pl-9 pr-3 text-base outline-none focus:ring-2 focus:ring-primary/40 dark:bg-navy/40"
           />
         </form>
 

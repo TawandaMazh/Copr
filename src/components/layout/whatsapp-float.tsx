@@ -20,7 +20,7 @@ export function WhatsAppFloat() {
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Chat on WhatsApp"
-      className="glass-strong fixed bottom-5 right-5 z-40 inline-flex items-center gap-2 rounded-full px-4 py-3 text-sm font-medium text-foreground shadow-glass-lg transition-transform hover:scale-[1.02] focus-ring"
+      className="glass-strong fixed bottom-[max(1.25rem,env(safe-area-inset-bottom))] right-[max(1.25rem,env(safe-area-inset-right))] z-40 inline-flex items-center gap-2 rounded-full px-4 py-3 text-sm font-medium text-foreground shadow-glass-lg transition-transform hover:scale-[1.02] focus-ring"
     >
       <MessageCircle className="h-4 w-4 text-primary" strokeWidth={1.5} />
       Chat on WhatsApp

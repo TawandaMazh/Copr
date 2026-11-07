@@ -139,7 +139,7 @@ body {
   box-shadow: var(--glass-shadow);
 }
 
-/* Form fields */
+/* Form fields — 16px minimum avoids iOS Safari auto-zoom on focus */
 .field {
   display: block;
   width: 100%;
@@ -148,10 +148,12 @@ body {
   border: 1px solid var(--border-subtle);
   background: color-mix(in srgb, white 55%, transparent);
   padding: 0 0.9rem;
-  font-size: 0.925rem;
+  font-size: 16px;
   color: var(--foreground);
   outline: none;
   transition: box-shadow 0.2s ease, border-color 0.2s ease;
+  -webkit-appearance: none;
+  appearance: none;
 }
 
 .dark .field {
