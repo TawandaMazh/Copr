@@ -210,7 +210,7 @@ export function FilterPanel({ className }: { className?: string }) {
             placeholder="Min"
             defaultValue={minPrice}
             onBlur={(e) => update("minPrice", e.target.value)}
-            className="w-full rounded-xl border border-border-subtle bg-white/50 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary/40 dark:bg-navy/40"
+            className="w-full rounded-xl border border-border-subtle bg-white/50 px-3 py-2 text-base outline-none focus:ring-2 focus:ring-primary/40 dark:bg-navy/40"
           />
           <span className="text-muted-foreground">–</span>
           <input
@@ -219,7 +219,7 @@ export function FilterPanel({ className }: { className?: string }) {
             placeholder="Max"
             defaultValue={maxPrice}
             onBlur={(e) => update("maxPrice", e.target.value)}
-            className="w-full rounded-xl border border-border-subtle bg-white/50 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary/40 dark:bg-navy/40"
+            className="w-full rounded-xl border border-border-subtle bg-white/50 px-3 py-2 text-base outline-none focus:ring-2 focus:ring-primary/40 dark:bg-navy/40"
           />
         </div>
       </FilterGroup>

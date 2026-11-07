@@ -59,7 +59,7 @@ export default function AdminSettingsPage() {
             step={0.5}
             value={commissionPercent}
             onChange={(e) => setCommissionPercent(Number(e.target.value))}
-            className="w-full rounded-2xl border border-border-subtle bg-white/50 px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/30 dark:bg-navy/40"
+            className="w-full rounded-2xl border border-border-subtle bg-white/50 px-3 py-2.5 text-base outline-none focus:ring-2 focus:ring-primary/30 dark:bg-navy/40"
           />
         </Field>
 
@@ -73,7 +73,7 @@ export default function AdminSettingsPage() {
             step={1}
             value={deliveryFeeKwacha}
             onChange={(e) => setDeliveryFeeKwacha(Number(e.target.value))}
-            className="w-full rounded-2xl border border-border-subtle bg-white/50 px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/30 dark:bg-navy/40"
+            className="w-full rounded-2xl border border-border-subtle bg-white/50 px-3 py-2.5 text-base outline-none focus:ring-2 focus:ring-primary/30 dark:bg-navy/40"
           />
         </Field>
 
@@ -82,7 +82,7 @@ export default function AdminSettingsPage() {
             type="text"
             value={deliveryCity}
             onChange={(e) => setDeliveryCity(e.target.value)}
-            className="w-full rounded-2xl border border-border-subtle bg-white/50 px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/30 dark:bg-navy/40"
+            className="w-full rounded-2xl border border-border-subtle bg-white/50 px-3 py-2.5 text-base outline-none focus:ring-2 focus:ring-primary/30 dark:bg-navy/40"
           />
         </Field>
 
@@ -96,7 +96,7 @@ export default function AdminSettingsPage() {
             max={30}
             value={autoConfirmDays}
             onChange={(e) => setAutoConfirmDays(Number(e.target.value))}
-            className="w-full rounded-2xl border border-border-subtle bg-white/50 px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/30 dark:bg-navy/40"
+            className="w-full rounded-2xl border border-border-subtle bg-white/50 px-3 py-2.5 text-base outline-none focus:ring-2 focus:ring-primary/30 dark:bg-navy/40"
           />
         </Field>
 

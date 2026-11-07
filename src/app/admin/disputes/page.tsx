@@ -135,7 +135,7 @@ function DisputeCard({
             onChange={(e) => setNote(e.target.value)}
             placeholder="Resolution note"
             rows={2}
-            className="w-full rounded-2xl border border-border-subtle bg-white/50 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary/30 dark:bg-navy/40"
+            className="w-full rounded-2xl border border-border-subtle bg-white/50 px-3 py-2 text-base outline-none focus:ring-2 focus:ring-primary/30 dark:bg-navy/40"
           />
           <div className="flex flex-wrap gap-2">
             {dispute.status === "open" && (

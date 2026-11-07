@@ -432,6 +432,11 @@ export const useCommerceStore = create<CommerceState>()(
           },
         );
 
+        void import("@/lib/commerce/notify-order-email").then(
+          ({ notifyOrderPlacedEmail }) =>
+            notifyOrderPlacedEmail(order, form.email || user.email || ""),
+        );
+
         return order;
       },
 

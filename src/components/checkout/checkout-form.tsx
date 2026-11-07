@@ -43,6 +43,7 @@ export function CheckoutForm() {
     defaultValues: {
       deliveryMethod: "delivery",
       fullName: user?.fullName ?? "",
+      email: user?.email ?? "",
       phone: user?.phone ?? defaultAddress?.phone ?? "",
       savedAddressId: defaultAddress?.id,
       area: defaultAddress?.area ?? LUSAKA_AREAS[0],
@@ -130,6 +131,27 @@ export function CheckoutForm() {
             {form.formState.errors.fullName && (
               <span className="text-xs text-destructive">
                 {form.formState.errors.fullName.message}
+              </span>
+            )}
+          </label>
+          <label className="block space-y-1.5">
+            <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              Email
+            </span>
+            <input
+              className="field"
+              type="email"
+              autoComplete="email"
+              placeholder="you@email.com"
+              {...form.register("email")}
+            />
+            {form.formState.errors.email ? (
+              <span className="text-xs text-destructive">
+                {form.formState.errors.email.message}
+              </span>
+            ) : (
+              <span className="text-xs text-muted-foreground">
+                We’ll send your order confirmation here.
               </span>
             )}
           </label>
@@ -387,7 +409,7 @@ export function CheckoutForm() {
         </GlassCard>
       </div>
 
-      <GlassCard strong className="h-fit space-y-4 p-6 lg:sticky lg:top-24">
+      <GlassCard strong className="h-fit space-y-4 p-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] lg:sticky lg:top-24 lg:pb-6">
         <h2 className="text-lg font-semibold tracking-tight">Order summary</h2>
         <p className="text-sm leading-relaxed text-muted-foreground">
           You’ll get an order confirmation next, with your expected delivery

@@ -201,6 +201,7 @@ export async function placeOrder(input: {
     total,
     notes: input.form.notes,
     contactName: input.form.fullName,
+    contactEmail: input.form.email.trim(),
     paidAt: now,
     createdAt: now,
     updatedAt: now,

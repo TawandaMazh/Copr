@@ -43,7 +43,7 @@ export function ShopToolbar({ resultCount }: { resultCount: number }) {
           name="q"
           defaultValue={q}
           placeholder="Search brands, styles…"
-          className="h-11 w-full rounded-full border border-transparent bg-white/50 pl-10 pr-4 text-sm outline-none focus:ring-2 focus:ring-primary/40 dark:bg-navy/40"
+          className="h-11 w-full rounded-full border border-transparent bg-white/50 pl-10 pr-4 text-base outline-none focus:ring-2 focus:ring-primary/40 dark:bg-navy/40"
         />
       </form>
 
@@ -59,7 +59,7 @@ export function ShopToolbar({ resultCount }: { resultCount: number }) {
               p.set("sort", e.target.value);
             })
           }
-          className="h-11 rounded-full border border-border-subtle bg-white/50 px-4 text-sm outline-none focus:ring-2 focus:ring-primary/40 dark:bg-navy/40"
+          className="h-11 rounded-full border border-border-subtle bg-white/50 px-4 text-base outline-none focus:ring-2 focus:ring-primary/40 dark:bg-navy/40"
         >
           <option value="newest">Newest</option>
           <option value="popular">Popular</option>

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getSiteUrl } from "@/lib/site";
+import { sendResendEmail, resendConfigured } from "@/lib/email/resend";
 import { z } from "zod";
 
 const bodySchema = z.object({
@@ -29,8 +30,7 @@ export async function POST(request: Request) {
   }
 
   const { email, fullName } = parsed.data;
-  const resendKey = process.env.RESEND_API_KEY;
-  if (!resendKey) {
+  if (!resendConfigured()) {
     return NextResponse.json(
       { error: "otp_email_unavailable", fallback: "magiclink" },
       { status: 503 },
@@ -60,29 +60,16 @@ export async function POST(request: Request) {
   }
 
   const otp = data.properties.email_otp;
-  const from =
-    process.env.RESEND_FROM_EMAIL?.trim() || "copr <onboarding@resend.dev>";
-
-  const sendRes = await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${resendKey}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      from,
-      to: [email],
-      subject: `${otp} is your copr sign-in code`,
-      html: `<h2>Your copr sign-in code</h2>
+  const sent = await sendResendEmail({
+    to: email,
+    subject: `${otp} is your copr sign-in code`,
+    html: `<h2>Your copr sign-in code</h2>
 <p>Enter this code on the sign-in screen:</p>
 <p style="font-size:28px;letter-spacing:0.25em;font-weight:700">${otp}</p>
 <p style="color:#666;font-size:14px">This code expires shortly. If you didn’t request it, ignore this email.</p>`,
-    }),
   });
 
-  if (!sendRes.ok) {
-    const detail = await sendRes.text();
-    console.error("resend email-otp failed", sendRes.status, detail);
+  if (!sent.ok) {
     return NextResponse.json(
       { error: "Could not send the email code. Try again in a minute." },
       { status: 502 },

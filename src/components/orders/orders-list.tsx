@@ -6,6 +6,7 @@ import { GlassCard } from "@/components/ui/glass-card";
 import { PriceTag } from "@/components/ui/price-tag";
 import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/empty-state";
+import { SLOGANS } from "@/data/slogans";
 import { orderStatusLabel } from "@/lib/commerce/status-labels";
 
 export function OrdersList() {
@@ -15,7 +16,7 @@ export function OrdersList() {
     return (
       <EmptyState
         title="No orders yet"
-        description="After checkout, you’ll track each brand’s shipment here and confirm delivery when parcels arrive."
+        description={SLOGANS.emptyOrders}
         actionHref="/shop"
         actionLabel="Start shopping"
       />

@@ -30,6 +30,7 @@ console.log("drawer shows checkout?", drawer);
 
 await page.goto("http://localhost:3000/checkout", { waitUntil: "networkidle0" });
 await page.type('input[name="fullName"]', "Thandi Phiri");
+await page.type('input[name="email"]', "thandi@example.com");
 await page.type('input[name="phone"]', "+260971234567");
 await page.select('select[name="area"]', "Kabulonga");
 await page.type('input[name="neighbourhood"]', "Twin Palm Road");

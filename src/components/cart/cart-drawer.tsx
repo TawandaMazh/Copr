@@ -9,6 +9,8 @@ import { useCommerceStore } from "@/stores/commerce-store";
 import { resolveBrand, resolveProduct } from "@/lib/catalogue";
 import { PriceTag } from "@/components/ui/price-tag";
 import { Button } from "@/components/ui/button";
+import { Slogan } from "@/components/brand/slogan";
+import { SLOGANS } from "@/data/slogans";
 import { DELIVERY_FEE_KWACHA } from "@/lib/commerce/constants";
 import { resolveCartTotals } from "@/lib/commerce/checkout";
 import { presenceExit, usePrefersReducedMotion } from "@/lib/motion";
@@ -72,7 +74,7 @@ export function CartDrawer() {
               duration: reduced ? 0 : 0.28,
               ease: [0.22, 1, 0.36, 1],
             }}
-            className="glass-strong fixed inset-y-0 right-0 z-[70] flex w-full max-w-md flex-col shadow-glass-lg"
+            className="glass-strong fixed inset-y-0 right-0 z-[70] flex w-full max-w-md flex-col pb-[env(safe-area-inset-bottom)] pt-[env(safe-area-inset-top)] shadow-glass-lg"
           >
             <div className="flex items-center justify-between border-b border-border-subtle px-5 py-4">
               <div className="flex items-center gap-2">
@@ -98,7 +100,7 @@ export function CartDrawer() {
                 <div className="flex h-full flex-col items-center justify-center gap-3 text-center">
                   <p className="font-medium">Your bag is empty</p>
                   <p className="text-sm text-muted-foreground">
-                    Browse Zambian brands and add something you love.
+                    {SLOGANS.emptyBag}
                   </p>
                   <Button
                     onClick={() => setCartOpen(false)}
@@ -204,6 +206,10 @@ export function CartDrawer() {
                   <span>Total</span>
                   <PriceTag amount={total || subtotal + DELIVERY_FEE_KWACHA} />
                 </div>
+                <Slogan
+                  id="cartCheckout"
+                  className="text-center text-xs text-muted-foreground"
+                />
                 <Button asChild size="lg" className="w-full">
                   <Link href="/checkout" onClick={() => setCartOpen(false)}>
                     Checkout

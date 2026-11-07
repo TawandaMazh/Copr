@@ -3,7 +3,8 @@
 import * as React from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Heart, Menu, Search, ShoppingBag, X } from "lucide-react";
+import { Heart, Menu, Search, ShoppingBag, User, X } from "lucide-react";
+import { Slogan } from "@/components/brand/slogan";
 import { AnimatePresence, motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { Button } from "./button";
@@ -123,7 +124,7 @@ export function GlassNav() {
   };
 
   return (
-    <header className="sticky top-0 z-50 px-3 pt-3 sm:px-4 sm:pt-4">
+    <header className="sticky top-0 z-50 px-3 pt-[max(0.75rem,env(safe-area-inset-top))] sm:px-4 sm:pt-[max(1rem,env(safe-area-inset-top))]">
       <nav
         ref={navRef}
         className={cn(
@@ -200,7 +201,7 @@ export function GlassNav() {
             onFocus={() => setSearchOpen(true)}
             placeholder="Search brands & styles"
             aria-label="Search products"
-            className="h-10 w-full rounded-full border border-border-subtle bg-white/50 pl-9 pr-3 text-sm outline-none focus:ring-2 focus:ring-primary/40 dark:bg-navy/40"
+            className="h-11 w-full rounded-full border border-border-subtle bg-white/50 pl-9 pr-3 text-base outline-none focus:ring-2 focus:ring-primary/40 dark:bg-navy/40"
           />
         </form>
 
@@ -247,6 +248,13 @@ export function GlassNav() {
               </span>
             )}
           </button>
+          <Link
+            href="/account"
+            aria-label="Account"
+            className="relative ml-0.5 inline-flex h-11 w-11 items-center justify-center rounded-full text-foreground transition-all focus-ring hover:bg-white/50 dark:hover:bg-navy/40 sm:hidden"
+          >
+            <User className="h-4 w-4" strokeWidth={1.5} aria-hidden />
+          </Link>
           <Button
             variant="secondary"
             size="sm"
@@ -302,7 +310,7 @@ export function GlassNav() {
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search brands & styles"
               aria-label="Search products"
-              className="h-10 flex-1 bg-transparent text-sm outline-none"
+              className="h-11 flex-1 bg-transparent text-base outline-none"
             />
             <Button
               type="button"
@@ -377,6 +385,10 @@ export function GlassNav() {
                 </Link>
               </li>
             </ul>
+            <Slogan
+              id="copLocal"
+              className="mt-3 px-4 pb-1 text-center text-xs text-muted-foreground"
+            />
           </motion.div>
         )}
       </AnimatePresence>

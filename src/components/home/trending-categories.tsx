@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import type { Category } from "@/types";
+import { Slogan } from "@/components/brand/slogan";
 import { fadeInView, usePrefersReducedMotion } from "@/lib/motion";
 
 export function TrendingCategories({
@@ -17,6 +18,7 @@ export function TrendingCategories({
   return (
     <section className="mb-8">
       <div className="mb-8">
+        <Slogan id="categoriesPlay" variant="eyebrow" className="mb-2" />
         <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">
           Trending categories
         </h2>

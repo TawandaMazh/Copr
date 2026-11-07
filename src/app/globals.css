@@ -96,6 +96,8 @@ body {
   min-height: 100dvh;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+  -webkit-tap-highlight-color: transparent;
 }
 
 ::selection {
@@ -139,7 +141,7 @@ body {
   box-shadow: var(--glass-shadow);
 }
 
-/* Form fields */
+/* Form fields — 16px minimum avoids iOS Safari auto-zoom on focus */
 .field {
   display: block;
   width: 100%;
@@ -148,10 +150,12 @@ body {
   border: 1px solid var(--border-subtle);
   background: color-mix(in srgb, white 55%, transparent);
   padding: 0 0.9rem;
-  font-size: 0.925rem;
+  font-size: 16px;
   color: var(--foreground);
   outline: none;
   transition: box-shadow 0.2s ease, border-color 0.2s ease;
+  -webkit-appearance: none;
+  appearance: none;
 }
 
 .dark .field {
@@ -226,6 +230,20 @@ textarea.field {
   }
 }
 
+/* Brand slogan marquee */
+.slogan-rail-track {
+  animation: slogan-marquee 48s linear infinite;
+}
+
+@keyframes slogan-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
@@ -241,6 +259,10 @@ textarea.field {
   .atmosphere,
   .skeleton {
     animation: none !important;
+  }
+
+  .slogan-rail-track {
+    animation: none;
   }
 }
 

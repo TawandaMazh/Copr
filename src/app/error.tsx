@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { GlassCard } from "@/components/ui/glass-card";
 import { PageContainer } from "@/components/layout/page-container";
+import { Slogan } from "@/components/brand/slogan";
 
 export default function Error({
   error,
@@ -26,6 +27,7 @@ export default function Error({
         <h1 className="text-2xl font-semibold tracking-tight">
           We couldn’t load this page
         </h1>
+        <Slogan id="errorSoft" variant="quote" className="text-base" />
         <p className="text-sm text-muted-foreground">
           Try again, or head back to the shop. If it keeps happening, refresh
           and clear demo session data.

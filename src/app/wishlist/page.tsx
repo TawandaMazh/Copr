@@ -1,10 +1,12 @@
 "use client";
 
 import { PageContainer } from "@/components/layout/page-container";
+import { Slogan } from "@/components/brand/slogan";
 import { ProductCard } from "@/components/ui/product-card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { useCommerceStore } from "@/stores/commerce-store";
 import { resolveProduct } from "@/lib/catalogue";
+import { SLOGANS } from "@/data/slogans";
 
 export default function WishlistPage() {
   const wishlist = useCommerceStore((s) => s.wishlist);
@@ -16,6 +18,7 @@ export default function WishlistPage() {
   return (
     <PageContainer className="space-y-6">
       <div className="space-y-2">
+        <Slogan id="savedLooks" variant="eyebrow" />
         <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
           Wishlist
         </h1>
@@ -27,7 +30,7 @@ export default function WishlistPage() {
       {products.length === 0 ? (
         <EmptyState
           title="Nothing saved yet"
-          description="Tap the heart on any product to save it here."
+          description={SLOGANS.emptyWishlist}
           actionHref="/shop"
           actionLabel="Browse shop"
         />
