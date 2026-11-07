@@ -108,7 +108,7 @@ export function SearchDialog({
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Search brands, styles, chitenge…"
-                className="h-11 flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
+                className="h-11 flex-1 bg-transparent text-base outline-none placeholder:text-muted-foreground"
                 autoComplete="off"
                 spellCheck={false}
                 onKeyDown={(e) => {

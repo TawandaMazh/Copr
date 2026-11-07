@@ -117,14 +117,14 @@ export function ProductReviews({
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Headline"
-              className="w-full rounded-2xl border border-border-subtle bg-white/50 px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/30 dark:bg-navy/40"
+              className="w-full rounded-2xl border border-border-subtle bg-white/50 px-3 py-2.5 text-base outline-none focus:ring-2 focus:ring-primary/30 dark:bg-navy/40"
             />
             <textarea
               value={body}
               onChange={(e) => setBody(e.target.value)}
               placeholder="How was the quality, fit, and delivery?"
               rows={3}
-              className="w-full rounded-2xl border border-border-subtle bg-white/50 px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/30 dark:bg-navy/40"
+              className="w-full rounded-2xl border border-border-subtle bg-white/50 px-3 py-2.5 text-base outline-none focus:ring-2 focus:ring-primary/30 dark:bg-navy/40"
             />
             {error && <p className="text-sm text-red-600">{error}</p>}
             <Button size="sm" onClick={submit} disabled={pending}>

@@ -302,7 +302,7 @@ export function GlassNav() {
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search brands & styles"
               aria-label="Search products"
-              className="h-10 flex-1 bg-transparent text-sm outline-none"
+              className="h-11 flex-1 bg-transparent text-base outline-none"
             />
             <Button
               type="button"
