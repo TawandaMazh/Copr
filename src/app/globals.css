@@ -228,6 +228,20 @@ textarea.field {
   }
 }
 
+/* Brand slogan marquee */
+.slogan-rail-track {
+  animation: slogan-marquee 48s linear infinite;
+}
+
+@keyframes slogan-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
@@ -243,6 +257,10 @@ textarea.field {
   .atmosphere,
   .skeleton {
     animation: none !important;
+  }
+
+  .slogan-rail-track {
+    animation: none;
   }
 }
 

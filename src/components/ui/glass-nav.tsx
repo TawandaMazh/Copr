@@ -4,6 +4,7 @@ import * as React from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { Heart, Menu, Search, ShoppingBag, X } from "lucide-react";
+import { Slogan } from "@/components/brand/slogan";
 import { AnimatePresence, motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { Button } from "./button";
@@ -377,6 +378,10 @@ export function GlassNav() {
                 </Link>
               </li>
             </ul>
+            <Slogan
+              id="copLocal"
+              className="mt-3 px-4 pb-1 text-center text-xs text-muted-foreground"
+            />
           </motion.div>
         )}
       </AnimatePresence>

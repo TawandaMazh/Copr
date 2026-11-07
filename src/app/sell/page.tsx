@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { GlassCard } from "@/components/ui/glass-card";
 import { PageContainer } from "@/components/layout/page-container";
+import { Slogan } from "@/components/brand/slogan";
 import { SELLER_PROGRAM } from "@/lib/commerce/seller-program";
 
 export const metadata: Metadata = {
@@ -23,6 +24,7 @@ export default function SellPage() {
     <PageContainer className="mx-auto max-w-3xl space-y-12 py-6">
       <div className="space-y-5 text-center">
         <p className="text-4xl font-semibold tracking-tight sm:text-5xl">copr</p>
+        <Slogan id="sellStory" variant="quote" className="mx-auto max-w-md" />
         <h1 className="text-balance text-2xl font-medium tracking-tight sm:text-3xl">
           Sell fashion to Zambian shoppers — keep your stock, tell your story.
         </h1>

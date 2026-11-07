@@ -6,7 +6,9 @@ function whatsappHref() {
   const raw = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? "";
   const digits = raw.replace(/\D/g, "");
   if (!digits) return null;
-  const text = encodeURIComponent("Hi copr — I have a question about an order.");
+  const text = encodeURIComponent(
+    "Hi copr — I hope you’re happy with what I cop’d. I have a question about an order.",
+  );
   return `https://wa.me/${digits}?text=${text}`;
 }
 

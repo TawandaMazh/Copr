@@ -10,6 +10,7 @@ import {
 import { ProductCard } from "@/components/ui/product-card";
 import { GlassCard } from "@/components/ui/glass-card";
 import { PageContainer } from "@/components/layout/page-container";
+import { Slogan } from "@/components/brand/slogan";
 import { brandIsVerified } from "@/lib/product-display";
 
 interface BrandPageProps {
@@ -102,6 +103,7 @@ export default async function BrandPage({ params }: BrandPageProps) {
         </GlassCard>
 
         <section>
+          <Slogan id="goOnAndCop" variant="eyebrow" className="mb-2" />
           <h2 className="mb-6 text-2xl font-semibold tracking-tight">
             Products ({products.length})
           </h2>

@@ -8,6 +8,7 @@ import {
   OUTSIDE_LUSAKA,
   PICKUP_POINTS_PUBLIC,
 } from "@/lib/commerce/delivery-config";
+import { Slogan } from "@/components/brand/slogan";
 import { SITE_NAME } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -26,6 +27,7 @@ export default function DeliveryPage() {
   return (
     <PageContainer className="mx-auto max-w-3xl space-y-10 py-6">
       <div className="space-y-3">
+        <Slogan id="deliveryPromise" variant="eyebrow" />
         <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
           Delivery in Lusaka
         </h1>

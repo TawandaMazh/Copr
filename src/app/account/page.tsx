@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { PageContainer } from "@/components/layout/page-container";
 import { AuthForm } from "@/components/auth/auth-form";
+import { Slogan } from "@/components/brand/slogan";
 import { GlassCard } from "@/components/ui/glass-card";
 import { Button } from "@/components/ui/button";
 import { useCommerceStore } from "@/stores/commerce-store";
@@ -45,6 +46,7 @@ export default function AccountPage() {
   return (
     <PageContainer className="mx-auto max-w-lg space-y-6 py-6">
       <div className="space-y-1">
+        <Slogan id="accountWelcome" variant="eyebrow" />
         <h1 className="text-3xl font-semibold tracking-tight">Account</h1>
         <p className="text-sm text-muted-foreground">
           Orders, wishlist, and delivery details for shopping in Lusaka.
