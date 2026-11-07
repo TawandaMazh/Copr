@@ -409,7 +409,7 @@ export function CheckoutForm() {
         </GlassCard>
       </div>
 
-      <GlassCard strong className="h-fit space-y-4 p-6 lg:sticky lg:top-24">
+      <GlassCard strong className="h-fit space-y-4 p-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] lg:sticky lg:top-24 lg:pb-6">
         <h2 className="text-lg font-semibold tracking-tight">Order summary</h2>
         <p className="text-sm leading-relaxed text-muted-foreground">
           You’ll get an order confirmation next, with your expected delivery

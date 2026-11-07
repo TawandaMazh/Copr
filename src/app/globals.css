@@ -96,6 +96,8 @@ body {
   min-height: 100dvh;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+  -webkit-tap-highlight-color: transparent;
 }
 
 ::selection {

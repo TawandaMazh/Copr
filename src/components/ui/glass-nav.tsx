@@ -3,7 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Heart, Menu, Search, ShoppingBag, X } from "lucide-react";
+import { Heart, Menu, Search, ShoppingBag, User, X } from "lucide-react";
 import { Slogan } from "@/components/brand/slogan";
 import { AnimatePresence, motion } from "framer-motion";
 import { cn } from "@/lib/utils";
@@ -248,6 +248,13 @@ export function GlassNav() {
               </span>
             )}
           </button>
+          <Link
+            href="/account"
+            aria-label="Account"
+            className="relative ml-0.5 inline-flex h-11 w-11 items-center justify-center rounded-full text-foreground transition-all focus-ring hover:bg-white/50 dark:hover:bg-navy/40 sm:hidden"
+          >
+            <User className="h-4 w-4" strokeWidth={1.5} aria-hidden />
+          </Link>
           <Button
             variant="secondary"
             size="sm"

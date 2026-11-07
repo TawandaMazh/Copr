@@ -12,7 +12,7 @@ export function Hero() {
 
   return (
     <section className="relative mb-16 w-full overflow-hidden">
-      <div className="relative min-h-[85vh] w-full sm:min-h-[78vh] lg:min-h-[85vh]">
+      <div className="relative min-h-[85dvh] w-full sm:min-h-[78dvh] lg:min-h-[85dvh]">
         <Image
           src="https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=1800&q=80"
           alt="Model wearing contemporary fashion"

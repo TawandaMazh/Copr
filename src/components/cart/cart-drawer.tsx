@@ -74,7 +74,7 @@ export function CartDrawer() {
               duration: reduced ? 0 : 0.28,
               ease: [0.22, 1, 0.36, 1],
             }}
-            className="glass-strong fixed inset-y-0 right-0 z-[70] flex w-full max-w-md flex-col shadow-glass-lg"
+            className="glass-strong fixed inset-y-0 right-0 z-[70] flex w-full max-w-md flex-col pb-[env(safe-area-inset-bottom)] pt-[env(safe-area-inset-top)] shadow-glass-lg"
           >
             <div className="flex items-center justify-between border-b border-border-subtle px-5 py-4">
               <div className="flex items-center gap-2">
