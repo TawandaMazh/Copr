@@ -59,22 +59,25 @@ export async function listProducts(): Promise<Product[]> {
 }
 
 export async function listNewProducts(limit = 8): Promise<Product[]> {
-  const { isProductNew } = await import("@/lib/product-display");
+  // Prefer newest listings overall (Depop-style feed). Do not require the
+  // 14-day “new” badge window — seed dates often fall outside it.
+  const sortNewest = (items: Product[]) =>
+    [...items].sort(
+      (a, b) => +new Date(b.createdAt) - +new Date(a.createdAt),
+    );
+
   if (!isSupabaseConfigured()) {
-    return getSeedNewProducts()
-      .filter((p) => isProductNew(p))
-      .slice(0, limit);
+    const flagged = getSeedNewProducts();
+    const pool = flagged.length ? flagged : filterSeedProducts({});
+    return sortNewest(pool).slice(0, limit);
   }
   const products = await fetchAllProducts();
   if (!products) {
-    return getSeedNewProducts()
-      .filter((p) => isProductNew(p))
-      .slice(0, limit);
+    const flagged = getSeedNewProducts();
+    const pool = flagged.length ? flagged : filterSeedProducts({});
+    return sortNewest(pool).slice(0, limit);
   }
-  return products
-    .filter((p) => isProductNew(p))
-    .sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt))
-    .slice(0, limit);
+  return sortNewest(products).slice(0, limit);
 }
 
 export async function getProductBySlugService(

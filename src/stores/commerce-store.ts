@@ -36,6 +36,7 @@ import {
   DELIVERY_FEE_KWACHA,
   AUTO_CONFIRM_DAYS,
 } from "@/lib/commerce/constants";
+import { withConditionTag } from "@/lib/commerce/conditions";
 
 export type SellerProduct = Product & { isPublished: boolean };
 
@@ -712,7 +713,8 @@ export const useCommerceStore = create<CommerceState>()(
           banner: values.banner || DEFAULT_BANNER,
           featured: false,
           foundedYear: values.foundedYear,
-          status: "pending",
+          // Open marketplace: anyone can list immediately (admin can still suspend).
+          status: "approved",
           contactEmail: values.contactEmail,
           contactPhone: formatPhoneZM(values.contactPhone),
           updatedAt: new Date().toISOString(),
@@ -839,6 +841,8 @@ export const useCommerceStore = create<CommerceState>()(
           sku: `COPR-S-${id.slice(-6).toUpperCase()}-${v.colour.slice(0, 3).toUpperCase()}-${v.size}`,
         }));
 
+        const tags = withConditionTag(input.tags, input.condition);
+
         const product: SellerProduct = {
           id,
           slug,
@@ -846,9 +850,10 @@ export const useCommerceStore = create<CommerceState>()(
           description: input.description,
           brandId: brand.id,
           categorySlug: input.categorySlug,
+          condition: input.condition,
           images: input.images,
           variants,
-          tags: input.tags,
+          tags,
           featured: input.featured,
           trending: false,
           isNew: true,

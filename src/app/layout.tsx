@@ -42,11 +42,12 @@ export const metadata: Metadata = {
   keywords: [
     "Zambia",
     "Lusaka",
-    "fashion",
     "marketplace",
-    "chitenge",
+    "buy and sell",
+    "second hand",
     "Kwacha",
-    "Zambian brands",
+    "Depop Zambia",
+    "peer to peer",
   ],
   alternates: {
     canonical: "/",
@@ -54,7 +55,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: `${SITE_NAME} — ${SITE_TAGLINE}`,
     description:
-      "Local brands. Local shoppers. Fashion priced in Kwacha, delivered in Lusaka.",
+      "List anything. Find unique pieces. Buy and sell with people across Zambia.",
     locale: "en_ZM",
     type: "website",
     url: siteUrl,
@@ -64,7 +65,7 @@ export const metadata: Metadata = {
         url: "/opengraph-image",
         width: 1200,
         height: 630,
-        alt: "copr — Zambian fashion marketplace",
+        alt: "copr — buy & sell anything",
       },
     ],
   },
@@ -72,7 +73,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: `${SITE_NAME} — ${SITE_TAGLINE}`,
     description:
-      "Local brands. Local shoppers. Fashion priced in Kwacha, delivered in Lusaka.",
+      "List anything. Find unique pieces. Buy and sell with people across Zambia.",
     images: ["/opengraph-image"],
   },
   robots: {

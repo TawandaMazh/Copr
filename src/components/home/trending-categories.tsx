@@ -18,10 +18,10 @@ export function TrendingCategories({
     <section className="mb-8">
       <div className="mb-8">
         <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">
-          Trending categories
+          Shop by category
         </h2>
         <p className="mt-2 max-w-md text-sm leading-relaxed text-muted-foreground sm:text-base">
-          Browse by what you wear — from chitenge to city denim.
+          From fashion and beauty to electronics, home, and everything else.
         </p>
       </div>
       <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-4">
@@ -49,7 +49,8 @@ export function TrendingCategories({
               <div className="absolute inset-x-0 bottom-0 p-4 text-white">
                 <p className="font-semibold tracking-tight">{category.name}</p>
                 <p className="text-xs text-white/70">
-                  {category.productCount} pieces
+                  {category.productCount} listing
+                  {category.productCount === 1 ? "" : "s"}
                 </p>
               </div>
             </Link>

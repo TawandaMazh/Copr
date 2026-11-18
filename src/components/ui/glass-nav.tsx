@@ -18,8 +18,8 @@ import {
 
 const baseLinks = [
   { href: "/shop", label: "Shop" },
-  { href: "/brands", label: "Brands" },
-  { href: "/sell", label: "Sell on copr" },
+  { href: "/brands", label: "Sellers" },
+  { href: "/sell", label: "Sell" },
 ];
 
 export function GlassNav() {
@@ -198,7 +198,7 @@ export function GlassNav() {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onFocus={() => setSearchOpen(true)}
-            placeholder="Search brands & styles"
+            placeholder="Search listings"
             aria-label="Search products"
             className="h-10 w-full rounded-full border border-border-subtle bg-white/50 pl-9 pr-3 text-sm outline-none focus:ring-2 focus:ring-primary/40 dark:bg-navy/40"
           />
@@ -300,7 +300,7 @@ export function GlassNav() {
               ref={mobileSearchRef}
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search brands & styles"
+              placeholder="Search listings"
               aria-label="Search products"
               className="h-10 flex-1 bg-transparent text-sm outline-none"
             />

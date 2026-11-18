@@ -1,6 +1,7 @@
 import type { Product } from "@/types";
+import { marketplaceListings } from "./marketplace-listings";
 
-export const products: Product[] = [
+const seedFashionProducts: Product[] = [
   {
     "id": "prod-001",
     "slug": "lusaka-market-wrap-dress",
@@ -7140,6 +7141,11 @@ export const products: Product[] = [
     "createdAt": "2025-10-06T10:00:00.000Z"
   }
 ] satisfies Product[];
+
+export const products: Product[] = [
+  ...seedFashionProducts,
+  ...marketplaceListings,
+];
 
 export function getProductBySlug(slug: string): Product | undefined {
   return products.find((p) => p.slug === slug);

@@ -6,20 +6,20 @@ export const SELLER_PROGRAM = {
   commissionPercent: Number(
     process.env.NEXT_PUBLIC_DEFAULT_COMMISSION_PERCENT ?? 15,
   ),
-  payoutTiming: "Within 3–5 business days after the shopper confirms delivery",
+  payoutTiming: "Within 3–5 business days after the buyer confirms delivery",
   holdNote: "Payments stay held until delivery is confirmed (or auto-confirmed).",
   steps: [
     {
-      title: "Apply",
-      body: "Tell us about your brand, where you make, and what you sell.",
+      title: "Open your shop",
+      body: "Create a seller profile in a minute — no brand approval wait.",
     },
     {
-      title: "List",
-      body: "Upload products with sizes, colours, stock, and images. You keep the inventory.",
+      title: "List anything",
+      body: "Upload photos, set a price and condition, and go live. Keep the item until it sells.",
     },
     {
-      title: "Fulfil & get paid",
-      body: "Pack Lusaka orders when they land. After delivery is confirmed, your payout is released minus commission.",
+      title: "Ship & get paid",
+      body: "Fulfil Lusaka orders when they land. After delivery is confirmed, your payout is released minus commission.",
     },
   ],
 } as const;

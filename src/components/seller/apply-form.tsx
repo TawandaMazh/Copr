@@ -31,8 +31,8 @@ export function ApplyForm() {
       contactEmail: user?.email ?? "",
       contactPhone: user?.phone ?? "",
       name: "",
-      tagline: "",
-      story: "",
+      tagline: "Buying & selling on copr",
+      story: "I list clothes, gadgets, and finds from around Lusaka.",
       location: "Lusaka",
       foundedYear: new Date().getFullYear(),
       logo: "",
@@ -43,23 +43,25 @@ export function ApplyForm() {
   const onSubmit = (values: BrandApplyValues) => {
     startTransition(() => {
       applyAsSeller(values);
-      router.push("/seller");
+      router.push("/seller/products/new");
     });
   };
 
   return (
     <div className="mx-auto max-w-2xl space-y-6">
       <div className="space-y-2 text-center">
-        <h1 className="text-3xl font-semibold tracking-tight">Apply to sell</h1>
+        <h1 className="text-3xl font-semibold tracking-tight">
+          Start selling
+        </h1>
         <p className="text-muted-foreground">
-          Tell us about your brand. Applications stay pending until an admin
-          approves them — then your products can appear on the shop.
+          Create your shop in a minute — list clothes, electronics, homeware,
+          or anything else. You go live straight away.
         </p>
       </div>
 
       <GlassCard className="space-y-3 p-5">
         <p className="text-sm font-medium">
-          Trying the dashboard? Claim a sample brand
+          Trying the dashboard? Claim a sample shop
         </p>
         <div className="flex flex-wrap gap-2">
           {brands.slice(0, 4).map((b) => (
@@ -106,38 +108,37 @@ export function ApplyForm() {
             <input className="field" {...form.register("location")} />
           </Field>
           <Field
-            label="Brand name"
+            label="Shop name"
             error={form.formState.errors.name?.message}
             className="sm:col-span-2"
           >
-            <input className="field" {...form.register("name")} />
+            <input
+              className="field"
+              placeholder="e.g. Thandiwe’s closet"
+              {...form.register("name")}
+            />
           </Field>
           <Field
-            label="Tagline"
+            label="Short bio"
             error={form.formState.errors.tagline?.message}
             className="sm:col-span-2"
           >
-            <input className="field" {...form.register("tagline")} />
+            <input
+              className="field"
+              placeholder="What do you usually sell?"
+              {...form.register("tagline")}
+            />
           </Field>
           <Field
-            label="Story"
+            label="About your shop"
             error={form.formState.errors.story?.message}
             className="sm:col-span-2"
           >
-            <textarea className="field" rows={4} {...form.register("story")} />
+            <textarea className="field" rows={3} {...form.register("story")} />
           </Field>
-          <Field
-            label="Founded year"
-            error={form.formState.errors.foundedYear?.message}
-          >
-            <input
-              className="field"
-              type="number"
-              {...form.register("foundedYear", { valueAsNumber: true })}
-            />
-          </Field>
+          <input type="hidden" {...form.register("foundedYear", { valueAsNumber: true })} />
           <ImageUploadField
-            label="Logo"
+            label="Profile photo (optional)"
             bucket={BRAND_ASSETS_BUCKET}
             pathPrefix="brands/applications/logo"
             value={form.watch("logo")}
@@ -151,7 +152,7 @@ export function ApplyForm() {
           />
           <ImageUploadField
             className="sm:col-span-2"
-            label="Banner"
+            label="Cover photo (optional)"
             bucket={BRAND_ASSETS_BUCKET}
             pathPrefix="brands/applications/banner"
             value={form.watch("banner")}
@@ -165,7 +166,7 @@ export function ApplyForm() {
           />
         </GlassCard>
         <Button type="submit" size="lg" className="w-full" disabled={pending}>
-          Submit application
+          Create shop & list an item
         </Button>
       </form>
     </div>

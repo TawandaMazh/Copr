@@ -4,7 +4,8 @@ import * as React from "react";
 
 /** Respect OS “Reduce motion” preference for Framer Motion and CSS. */
 export function usePrefersReducedMotion() {
-  const [reduced, setReduced] = React.useState(false);
+  // Default true so SSR / first paint stays visible (opacity 1) until we know.
+  const [reduced, setReduced] = React.useState(true);
 
   React.useEffect(() => {
     const mq = window.matchMedia("(prefers-reduced-motion: reduce)");

@@ -7,6 +7,6 @@ export function getSiteUrl() {
 }
 
 export const SITE_NAME = "copr";
-export const SITE_TAGLINE = "Zambian fashion marketplace";
+export const SITE_TAGLINE = "Buy & sell anything";
 export const SITE_DESCRIPTION =
-  "Shop dresses, chitenge, and city staples from local Zambian brands. Multi-vendor marketplace with Lusaka delivery.";
+  "List anything, discover unique finds, and buy or sell with people across Zambia. Priced in Kwacha, with Lusaka delivery.";

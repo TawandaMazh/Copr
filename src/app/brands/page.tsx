@@ -11,14 +11,14 @@ import { PageContainer } from "@/components/layout/page-container";
 import { brandIsVerified } from "@/lib/product-display";
 
 export const metadata: Metadata = {
-  title: "Brands",
+  title: "Sellers",
   description:
-    "Discover independent Zambian fashion brands stocking on copr — each holds their own inventory.",
+    "Discover people and shops selling on copr — fashion, electronics, home, and more.",
   alternates: { canonical: "/brands" },
   openGraph: {
-    title: "Zambian fashion brands · copr",
+    title: "Sellers on copr",
     description:
-      "Local labels from Lusaka, Ndola, Kitwe and beyond — shop each brand’s story and stock.",
+      "Independent sellers from Lusaka and beyond — browse each shop’s listings.",
   },
 };
 
@@ -29,10 +29,10 @@ export default async function BrandsPage() {
     <PageContainer className="space-y-8">
       <div className="space-y-2">
         <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
-          Brands
+          Sellers
         </h1>
         <p className="max-w-xl text-muted-foreground">
-          Local labels stocking on copr — each holds their own inventory and
+          People and shops listing on copr — each holds their own stock and
           fulfils orders directly.
         </p>
       </div>
@@ -51,7 +51,7 @@ export default async function BrandsPage() {
                   <div className="relative h-40 w-full">
                     <Image
                       src={brand.banner}
-                      alt={`${brand.name} banner`}
+                      alt={`${brand.name} cover`}
                       fill
                       sizes="(max-width: 640px) 100vw, 50vw"
                       className="object-cover"
@@ -62,7 +62,7 @@ export default async function BrandsPage() {
                     <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-2xl">
                       <Image
                         src={brand.logo}
-                        alt={`${brand.name} logo`}
+                        alt={`${brand.name} profile`}
                         fill
                         sizes="56px"
                         className="object-cover"
@@ -75,7 +75,7 @@ export default async function BrandsPage() {
                           <BadgeCheck
                             className="h-4 w-4 shrink-0 text-primary"
                             strokeWidth={1.75}
-                            aria-label="Verified brand"
+                            aria-label="Verified seller"
                           />
                         )}
                       </p>
@@ -83,8 +83,8 @@ export default async function BrandsPage() {
                         {brand.tagline}
                       </p>
                       <p className="text-xs text-muted-foreground">
-                        {brand.location} · Est. {brand.foundedYear} · {count}{" "}
-                        products
+                        {brand.location} · {count} listing
+                        {count === 1 ? "" : "s"}
                       </p>
                     </div>
                   </div>

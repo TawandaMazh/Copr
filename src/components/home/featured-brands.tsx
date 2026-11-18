@@ -18,10 +18,10 @@ export function FeaturedBrands({ brands }: { brands: Brand[] }) {
       <div className="mb-8 flex items-end justify-between gap-4">
         <div>
           <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">
-            Featured brands
+            Sellers to follow
           </h2>
           <p className="mt-2 max-w-md text-sm leading-relaxed text-muted-foreground sm:text-base">
-            Independent Zambian labels holding their own stock and story.
+            Independent shops and people listing unique finds on copr.
           </p>
         </div>
         <Link
@@ -47,7 +47,7 @@ export function FeaturedBrands({ brands }: { brands: Brand[] }) {
                 <div className="relative h-36 w-full sm:h-40">
                   <Image
                     src={brand.banner}
-                    alt={`${brand.name} banner`}
+                    alt={`${brand.name} cover`}
                     fill
                     sizes="(max-width: 640px) 100vw, 33vw"
                     className="object-cover"
@@ -58,7 +58,7 @@ export function FeaturedBrands({ brands }: { brands: Brand[] }) {
                   <div className="relative h-12 w-12 overflow-hidden rounded-2xl bg-ice dark:bg-navy">
                     <Image
                       src={brand.logo}
-                      alt={`${brand.name} logo`}
+                      alt={`${brand.name} profile`}
                       fill
                       sizes="48px"
                       className="object-cover"
@@ -71,7 +71,7 @@ export function FeaturedBrands({ brands }: { brands: Brand[] }) {
                         <BadgeCheck
                           className="h-3.5 w-3.5 shrink-0 text-primary"
                           strokeWidth={1.75}
-                          aria-label="Verified brand"
+                          aria-label="Verified seller"
                         />
                       )}
                     </p>

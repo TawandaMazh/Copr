@@ -12,6 +12,10 @@ import {
   isProductNew,
   productImageAlt,
 } from "@/lib/product-display";
+import {
+  conditionLabel,
+  productCondition,
+} from "@/lib/commerce/conditions";
 import { cn } from "@/lib/utils";
 import { fadeInView, usePrefersReducedMotion } from "@/lib/motion";
 import { PriceTag } from "./price-tag";
@@ -37,6 +41,8 @@ export function ProductCard({ product, className, priority }: ProductCardProps) 
   const showNew = isProductNew(product);
   const verified = brandIsVerified(brand);
   const colour = product.variants[0]?.colour;
+  const condition = productCondition(product);
+  const showCondition = condition !== "new";
 
   return (
     <motion.article
@@ -56,8 +62,11 @@ export function ProductCard({ product, className, priority }: ProductCardProps) 
           />
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-navy/25 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
           <div className="absolute left-3 top-3 flex flex-wrap gap-1.5">
-            {showNew && <Badge variant="new">New</Badge>}
-            {product.trending && !showNew && (
+            {showCondition && (
+              <Badge variant="secondary">{conditionLabel(condition)}</Badge>
+            )}
+            {showNew && !showCondition && <Badge variant="new">New</Badge>}
+            {product.trending && !showNew && !showCondition && (
               <Badge variant="secondary">Trending</Badge>
             )}
           </div>
@@ -65,19 +74,26 @@ export function ProductCard({ product, className, priority }: ProductCardProps) 
 
         <div className="mt-3 space-y-1 px-0.5">
           <p className="flex items-center gap-1 text-xs font-medium uppercase tracking-wider text-muted-foreground">
-            <span className="truncate">{brand?.name}</span>
+            <span className="truncate">{brand?.name ?? "Seller"}</span>
             {verified && (
               <BadgeCheck
                 className="h-3 w-3 shrink-0 text-primary"
                 strokeWidth={1.75}
-                aria-label="Verified brand"
+                aria-label="Verified seller"
               />
             )}
           </p>
           <h3 className="line-clamp-2 text-sm font-medium leading-snug text-foreground transition-colors group-hover:text-primary">
             {product.name}
           </h3>
-          <PriceTag amount={price} size="sm" />
+          <div className="flex flex-wrap items-baseline gap-2">
+            <PriceTag amount={price} size="sm" />
+            {showCondition && (
+              <span className="text-xs text-muted-foreground">
+                {conditionLabel(condition)}
+              </span>
+            )}
+          </div>
         </div>
       </Link>
 

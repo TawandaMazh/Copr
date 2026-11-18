@@ -6,7 +6,17 @@ export type CategorySlug =
   | "traditional"
   | "footwear"
   | "accessories"
-  | "activewear";
+  | "activewear"
+  | "electronics"
+  | "home"
+  | "beauty"
+  | "kids"
+  | "sports"
+  | "books"
+  | "other";
+
+/** Listing condition — Depop-style buy/sell. */
+export type ProductCondition = "new" | "like_new" | "good" | "fair";
 
 export interface Category {
   id: string;
@@ -68,6 +78,8 @@ export interface Product {
   images: string[];
   variants: ProductVariant[];
   tags: string[];
+  /** Item condition for second-hand / marketplace listings. Defaults to new. */
+  condition?: ProductCondition;
   featured: boolean;
   trending: boolean;
   isNew: boolean;
