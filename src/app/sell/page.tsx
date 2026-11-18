@@ -7,12 +7,13 @@ import { SELLER_PROGRAM } from "@/lib/commerce/seller-program";
 
 export const metadata: Metadata = {
   title: "Sell on copr",
-  description: "Join Zambia’s multi-vendor fashion marketplace as a brand.",
+  description:
+    "List anything and sell to shoppers across Zambia. Open your shop in minutes.",
   alternates: { canonical: "/sell" },
   openGraph: {
     title: "Sell on copr",
     description:
-      "Keep your stock, tell your story, and sell to Lusaka shoppers.",
+      "Clothes, gadgets, home finds, books — list what you have and get paid after delivery.",
   },
 };
 
@@ -24,16 +25,16 @@ export default function SellPage() {
       <div className="space-y-5 text-center">
         <p className="text-4xl font-semibold tracking-tight sm:text-5xl">copr</p>
         <h1 className="text-balance text-2xl font-medium tracking-tight sm:text-3xl">
-          Sell fashion to Zambian shoppers — keep your stock, tell your story.
+          Sell anything to people who want it.
         </h1>
         <p className="mx-auto max-w-xl text-base leading-relaxed text-muted-foreground">
-          You fulfil orders; we handle discovery and checkout. Commission{" "}
-          {commissionPercent}%. Open the seller hub to manage products, orders,
-          and earnings.
+          Clear your closet, move flat essentials, or run a side shop. You keep
+          the stock; we handle discovery and checkout. Commission{" "}
+          {commissionPercent}%.
         </p>
         <div className="flex flex-wrap justify-center gap-3 pt-2">
           <Button size="lg" asChild>
-            <Link href="/seller/apply">Apply to join</Link>
+            <Link href="/seller/apply">Start selling</Link>
           </Button>
           <Button size="lg" variant="secondary" asChild>
             <Link href="/seller">Seller dashboard</Link>

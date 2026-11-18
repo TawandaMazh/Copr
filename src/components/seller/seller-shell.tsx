@@ -20,7 +20,7 @@ const nav = [
   { href: "/seller/products", label: "Products", icon: Package },
   { href: "/seller/orders", label: "Orders", icon: ShoppingBag },
   { href: "/seller/earnings", label: "Earnings", icon: BadgeDollarSign },
-  { href: "/seller/brand", label: "Brand profile", icon: Store },
+  { href: "/seller/brand", label: "Shop profile", icon: Store },
 ];
 
 export function SellerShell({ children }: { children: React.ReactNode }) {
@@ -39,15 +39,15 @@ export function SellerShell({ children }: { children: React.ReactNode }) {
         <GlassCard className="space-y-4 p-8">
           <p className="text-xl font-semibold tracking-tight">Seller dashboard</p>
           <p className="text-sm text-muted-foreground">
-            Apply with your brand to sell on copr. New applications stay pending
-            until an admin approves them.
+            Open a shop and list anything — clothes, gadgets, home finds, and
+            more. You go live straight away.
           </p>
           <div className="flex flex-wrap justify-center gap-2">
             <Button asChild>
-              <Link href="/seller/apply">Apply to join</Link>
+              <Link href="/seller/apply">Start selling</Link>
             </Button>
             <Button variant="secondary" asChild>
-              <Link href="/sell">Why sell on copr</Link>
+              <Link href="/sell">How selling works</Link>
             </Button>
           </div>
           {user && (
@@ -122,12 +122,11 @@ export function SellerShell({ children }: { children: React.ReactNode }) {
         {isPending && (
           <GlassCard className="border-primary/20 bg-primary/5 p-4">
             <p className="font-semibold text-primary dark:text-sky">
-              Application pending
+              Shop under review
             </p>
             <p className="mt-1 text-sm text-muted-foreground">
-              An admin must approve {brand.name} before you go fully live.
-              You can draft products; publishing waits on approval. Demo admins
-              approve at{" "}
+              {brand.name} is waiting on a quick admin check. You can still draft
+              listings. Demo admins review at{" "}
               <Link href="/admin/brands" className="text-primary hover:underline">
                 /admin/brands
               </Link>
@@ -138,11 +137,10 @@ export function SellerShell({ children }: { children: React.ReactNode }) {
         {isBlocked && (
           <GlassCard className="border-red-500/20 bg-red-500/5 p-4">
             <p className="font-semibold capitalize text-red-700 dark:text-red-300">
-              Brand {brand.status}
+              Shop {brand.status}
             </p>
             <p className="mt-1 text-sm text-muted-foreground">
-              Contact copr support or wait for an admin to re-approve your
-              brand.
+              Contact copr support or wait for an admin to re-approve your shop.
             </p>
           </GlassCard>
         )}

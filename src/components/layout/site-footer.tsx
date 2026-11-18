@@ -4,16 +4,16 @@ const columns = [
   {
     title: "Shop",
     links: [
-      { href: "/shop", label: "All products" },
-      { href: "/shop?sort=newest", label: "New in" },
-      { href: "/brands", label: "Brands" },
+      { href: "/shop", label: "All listings" },
+      { href: "/shop?sort=newest", label: "Just listed" },
+      { href: "/brands", label: "Sellers" },
     ],
   },
   {
     title: "Sell",
     links: [
       { href: "/sell", label: "Sell on copr" },
-      { href: "/seller/apply", label: "Apply to join" },
+      { href: "/seller/apply", label: "Start selling" },
     ],
   },
   {
@@ -33,8 +33,8 @@ export function SiteFooter() {
         <div className="space-y-3">
           <p className="text-2xl font-semibold tracking-tight">copr</p>
           <p className="max-w-xs text-sm leading-relaxed text-muted-foreground">
-            Zambia’s multi-vendor fashion marketplace. Local brands. Local
-            shoppers. Delivered across Lusaka.
+            Buy and sell anything with people across Zambia. List your finds.
+            Shop unique pieces. Delivered in Lusaka.
           </p>
         </div>
         {columns.map((col) => (
@@ -60,7 +60,7 @@ export function SiteFooter() {
       <div className="border-t border-border-subtle">
         <div className="mx-auto flex max-w-6xl flex-col gap-2 px-4 py-6 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
           <p>© {new Date().getFullYear()} copr. Prices in Zambian Kwacha (K).</p>
-          <p>Made for Lusaka shoppers</p>
+          <p>Made for Lusaka shoppers & sellers</p>
         </div>
       </div>
     </footer>

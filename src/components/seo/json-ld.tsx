@@ -14,7 +14,7 @@ export function organizationJsonLd(siteUrl: string) {
     name: "copr",
     url: siteUrl,
     description:
-      "Multi-vendor fashion marketplace for Zambian brands and shoppers.",
+      "Peer-to-peer marketplace where people in Zambia buy and sell anything.",
     areaServed: {
       "@type": "City",
       name: "Lusaka",

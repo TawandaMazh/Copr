@@ -32,7 +32,7 @@ export default function SellerOverviewPage() {
           <p className="text-muted-foreground">{brand.tagline}</p>
         </div>
         <Button asChild>
-          <Link href="/seller/products/new">Add product</Link>
+          <Link href="/seller/products/new">List an item</Link>
         </Button>
       </div>
 
@@ -51,8 +51,8 @@ export default function SellerOverviewPage() {
 
       {brand.status === "pending" && (
         <GlassCard className="border-primary/20 bg-primary/5 p-5 text-sm text-muted-foreground">
-          Your brand is pending admin approval. You can keep editing products —
-          they go live on the shop once you’re approved.
+          Your shop is under a quick review. You can keep drafting listings —
+          they go fully live once approved.
         </GlassCard>
       )}
 
@@ -65,8 +65,7 @@ export default function SellerOverviewPage() {
         </div>
         {orders.length === 0 ? (
           <p className="text-sm text-muted-foreground">
-            No orders for your brand yet. Share your public brand page once
-            you’re approved to get sales.
+            No orders yet. Share your shop page and keep listing to get sales.
           </p>
         ) : (
           <ul className="divide-y divide-border-subtle">

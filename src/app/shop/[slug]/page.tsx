@@ -111,7 +111,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
       {related.length > 0 && (
         <section>
           <h2 className="mb-6 text-2xl font-semibold tracking-tight">
-            More from {brand?.name}
+            More from {brand?.name ?? "this seller"}
           </h2>
           <div className="grid grid-cols-2 gap-4 md:grid-cols-4 lg:gap-6">
             {related.map((item) => (

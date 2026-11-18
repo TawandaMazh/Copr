@@ -145,7 +145,7 @@ export function FilterPanel({ className }: { className?: string }) {
         </div>
       </FilterGroup>
 
-      <FilterGroup title="Brand">
+      <FilterGroup title="Seller">
         <div className="flex max-h-40 flex-col gap-1 overflow-y-auto pr-1">
           {brands.map((brand) => (
             <button

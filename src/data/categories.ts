@@ -73,4 +73,67 @@ export const categories: Category[] = [
       "https://images.unsplash.com/photo-1518611012118-696072aa579a?w=800&q=80",
     productCount: 0,
   },
+  {
+    id: "cat-electronics",
+    name: "Electronics",
+    slug: "electronics",
+    description: "Phones, headphones, cameras, and gadgets.",
+    image:
+      "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=800&q=80",
+    productCount: 0,
+  },
+  {
+    id: "cat-home",
+    name: "Home",
+    slug: "home",
+    description: "Furniture, decor, kitchenware, and living essentials.",
+    image:
+      "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800&q=80",
+    productCount: 0,
+  },
+  {
+    id: "cat-beauty",
+    name: "Beauty",
+    slug: "beauty",
+    description: "Skincare, haircare, fragrance, and grooming.",
+    image:
+      "https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=800&q=80",
+    productCount: 0,
+  },
+  {
+    id: "cat-kids",
+    name: "Kids",
+    slug: "kids",
+    description: "Clothes, toys, and gear for little ones.",
+    image:
+      "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?w=800&q=80",
+    productCount: 0,
+  },
+  {
+    id: "cat-sports",
+    name: "Sports",
+    slug: "sports",
+    description: "Kits, balls, bikes, and outdoor gear.",
+    image:
+      "https://images.unsplash.com/photo-1461896836934-ffe607ba6851?w=800&q=80",
+    productCount: 0,
+  },
+  {
+    id: "cat-books",
+    name: "Books",
+    slug: "books",
+    description: "Novels, textbooks, comics, and study guides.",
+    image:
+      "https://images.unsplash.com/photo-1512820790803-83ca734da794?w=800&q=80",
+    productCount: 0,
+  },
+  {
+    id: "cat-other",
+    name: "Other",
+    slug: "other",
+    description: "Anything else you want to list and sell.",
+    image:
+      "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=800&q=80",
+    productCount: 0,
+  },
 ];

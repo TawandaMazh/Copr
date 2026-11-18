@@ -1,8 +1,8 @@
 # copr
 
-Multi-vendor fashion marketplace for **Zambian brands** and shoppers — think ASOS, built for Lusaka. Brands hold their own stock and fulfil orders; copr takes a commission (default **15%**, configurable in admin).
+Peer-to-peer marketplace for Zambia — **buy and sell anything**. Think Depop: people list clothes, gadgets, home finds, books, and more; shoppers buy in Kwacha with Lusaka delivery. Sellers keep their stock and fulfil orders; copr takes a commission (default **15%**, configurable in admin).
 
-**Current: Phase 5** — Performance, SEO, accessibility, empty/error states, dark-mode polish.
+**Current focus:** Open listing (anyone can sell), broader categories, and discovery that feels like a marketplace feed.
 
 ---
 
@@ -34,25 +34,15 @@ npm run build && npm run typecheck
 
 ---
 
-## Phase 5 polish
+## Sell anything
 
-- **SEO** — `sitemap.xml`, `robots.txt`, web manifest, richer Open Graph / Twitter metadata, Organization + WebSite + Product JSON-LD
-- **Performance** — route `loading.tsx` skeletons, AVIF/WebP image sizes, font `display: swap`, reduced-motion for Framer Motion + CSS
-- **Accessibility** — skip-to-content, `sr-only`, breadcrumb/`aria-*` fixes, cart Escape + body scroll lock, meaningful image alts
-- **Empty / error** — shared `EmptyState`, polished `not-found`, `error.tsx` + `global-error.tsx`
-- **Dark mode** — improved muted text contrast on navy glass
+[/sell](http://localhost:3000/sell) → **Start selling** opens a shop immediately (no approval wait). List fashion, electronics, home, beauty, kids, sports, books, or other. Each listing has a **condition** (new / like new / good / fair).
 
 ---
 
-## Admin (Phase 4)
+## Admin
 
-Open [/admin](http://localhost:3000/admin) → **Continue as demo admin**. Moderate brands, products, orders, payouts, disputes, reviews, and commission settings.
-
----
-
-## Seller (Phase 3)
-
-[/sell](http://localhost:3000/sell) → apply or claim a demo brand. New applications stay **pending** until admin approval.
+Open [/admin](http://localhost:3000/admin) → **Continue as demo admin**. Moderate shops, products, orders, payouts, disputes, reviews, and commission settings. Admins can still suspend shops.
 
 ---
 
@@ -62,9 +52,10 @@ Live project: `koyosnsrparlhljvybok` · production: [copr-phi.vercel.app](https:
 
 1. Copy `.env.example` → `.env.local` (URL + keys are documented in [`supabase/APPLY.md`](supabase/APPLY.md))
 2. Schema, RLS, seed, and storage buckets are applied; finish Auth URLs + storage RLS via the checklist in `APPLY.md`
-3. Auth → Email OTP (Phone optional for +260 SMS)
+3. Apply newer migrations (including marketplace categories) if your project is behind
+4. Auth → Email OTP (Phone optional for +260 SMS)
 
-With keys set, the app loads **brands/products/categories from Supabase** (falls back to local seed if the API is unreachable). Signed-in shoppers sync **cart, wishlist, addresses, and orders** to Supabase; guests stay on local zustand.
+With keys set, the app loads **sellers/products/categories from Supabase** (falls back to local seed if the API is unreachable). Signed-in shoppers sync **cart, wishlist, addresses, and orders** to Supabase; guests stay on local zustand.
 
 ---
 
@@ -79,17 +70,6 @@ With keys set, the app loads **brands/products/categories from Supabase** (falls
 | `NEXT_PUBLIC_DEFAULT_COMMISSION_PERCENT` | Default `15` |
 | `NEXT_PUBLIC_DELIVERY_FEE_KWACHA` | Default `50` |
 | `NEXT_PUBLIC_DELIVERY_CITY` | `Lusaka` |
-
----
-
-## Roadmap
-
-1. ~~Phase 1 — Design system + catalogue~~
-2. ~~Phase 2 — Schema/RLS, auth, cart, wishlist, MockProvider checkout~~
-3. ~~Phase 3 — Seller dashboard~~
-4. ~~Phase 4 — Admin (commission, payouts, moderation, analytics, reviews)~~
-5. ~~Phase 5 — Performance, SEO, a11y, empty/error states, dark-mode QA~~
-6. Theme system preset + auth/session fixes · global search · delivery auto-confirm ← *you are here*
 
 ---
 

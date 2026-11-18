@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 
 export const runtime = "edge";
-export const alt = "copr — Zambian fashion marketplace";
+export const alt = "copr — buy & sell anything";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -42,7 +42,7 @@ export default function OpenGraphImage() {
             opacity: 0.92,
           }}
         >
-          Zambian fashion, from local brands to your door.
+          Buy and sell anything.
         </p>
         <p style={{ marginTop: 28, fontSize: 22, opacity: 0.75 }}>
           Shop in Kwacha · Delivered in Lusaka

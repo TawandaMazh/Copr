@@ -1,4 +1,10 @@
-import type { Brand, CategorySlug, Product, ProductVariant } from "@/types";
+import type {
+  Brand,
+  CategorySlug,
+  Product,
+  ProductCondition,
+  ProductVariant,
+} from "@/types";
 import type { PayoutRecord } from "@/types/commerce";
 
 export type BrandApplicationStatus =
@@ -19,6 +25,7 @@ export interface SellerProductInput {
   name: string;
   description: string;
   categorySlug: CategorySlug;
+  condition: ProductCondition;
   images: string[];
   tags: string[];
   variants: Array<{

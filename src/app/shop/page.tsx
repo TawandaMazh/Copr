@@ -11,12 +11,12 @@ import { PageContainer } from "@/components/layout/page-container";
 export const metadata: Metadata = {
   title: "Shop",
   description:
-    "Browse dresses, chitenge, and city staples from Zambian brands — priced in Kwacha.",
+    "Browse clothes, electronics, home finds, and more from people selling on copr — priced in Kwacha.",
   alternates: { canonical: "/shop" },
   openGraph: {
-    title: "Shop Zambian fashion · copr",
+    title: "Shop anything · copr",
     description:
-      "Multi-brand catalogue with Lusaka delivery. Filter by category, brand, size, and colour.",
+      "Peer-to-peer marketplace with Lusaka delivery. Filter by category, seller, size, and colour.",
   },
 };
 
@@ -63,8 +63,8 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
           Shop
         </h1>
         <p className="text-muted-foreground">
-          {products.length} piece{products.length === 1 ? "" : "s"} from Zambian
-          brands
+          {products.length} listing{products.length === 1 ? "" : "s"} from
+          sellers on copr
         </p>
       </div>
 

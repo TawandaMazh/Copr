@@ -17,7 +17,30 @@ import { Button } from "@/components/ui/button";
 import { GlassCard } from "@/components/ui/glass-card";
 import { ImageUploadField } from "@/components/seller/image-upload-field";
 import { PRODUCT_IMAGES_BUCKET } from "@/lib/supabase/storage";
+import {
+  PRODUCT_CONDITIONS,
+  conditionLabel,
+  productCondition,
+} from "@/lib/commerce/conditions";
 import { Plus, Trash2 } from "lucide-react";
+
+const CATEGORY_LABELS: Record<(typeof categorySlugs)[number], string> = {
+  dresses: "Dresses",
+  tops: "Tops",
+  bottoms: "Bottoms",
+  outerwear: "Outerwear",
+  traditional: "Traditional",
+  footwear: "Footwear",
+  accessories: "Accessories",
+  activewear: "Activewear",
+  electronics: "Electronics",
+  home: "Home",
+  beauty: "Beauty",
+  kids: "Kids",
+  sports: "Sports",
+  books: "Books",
+  other: "Other",
+};
 
 export function ProductForm({ product }: { product?: SellerProduct }) {
   const router = useRouter();
@@ -33,8 +56,11 @@ export function ProductForm({ product }: { product?: SellerProduct }) {
           name: product.name,
           description: product.description,
           categorySlug: product.categorySlug,
+          condition: productCondition(product),
           images: product.images.join("\n"),
-          tags: product.tags.join(", "),
+          tags: product.tags
+            .filter((t) => !t.startsWith("condition:"))
+            .join(", "),
           isPublished: product.isPublished,
           featured: product.featured,
           variants: product.variants.map((v) => ({
@@ -47,13 +73,14 @@ export function ProductForm({ product }: { product?: SellerProduct }) {
       : {
           name: "",
           description: "",
-          categorySlug: "dresses",
+          categorySlug: "other",
+          condition: "good",
           images: "",
           tags: "",
           isPublished: true,
           featured: false,
           variants: [
-            { size: "M", colour: "Black", stock: 5, price: 450 },
+            { size: "One Size", colour: "Black", stock: 1, price: 100 },
           ],
         },
   });
@@ -71,7 +98,7 @@ export function ProductForm({ product }: { product?: SellerProduct }) {
         router.push(`/seller/products/${saved.id}`);
       } catch (e) {
         form.setError("images", {
-          message: e instanceof Error ? e.message : "Check product details",
+          message: e instanceof Error ? e.message : "Check listing details",
         });
       }
     });
@@ -81,11 +108,15 @@ export function ProductForm({ product }: { product?: SellerProduct }) {
     <form onSubmit={onSubmit} className="space-y-4">
       <GlassCard className="grid gap-3 p-5 sm:grid-cols-2">
         <Field
-          label="Name"
+          label="Title"
           error={form.formState.errors.name?.message}
           className="sm:col-span-2"
         >
-          <input className="field" {...form.register("name")} />
+          <input
+            className="field"
+            placeholder="What are you selling?"
+            {...form.register("name")}
+          />
         </Field>
         <Field
           label="Category"
@@ -94,15 +125,27 @@ export function ProductForm({ product }: { product?: SellerProduct }) {
           <select className="field" {...form.register("categorySlug")}>
             {categorySlugs.map((c) => (
               <option key={c} value={c}>
-                {c}
+                {CATEGORY_LABELS[c]}
               </option>
             ))}
           </select>
         </Field>
-        <Field label="Tags (comma-separated)">
+        <Field
+          label="Condition"
+          error={form.formState.errors.condition?.message}
+        >
+          <select className="field" {...form.register("condition")}>
+            {PRODUCT_CONDITIONS.map((c) => (
+              <option key={c} value={c}>
+                {conditionLabel(c)}
+              </option>
+            ))}
+          </select>
+        </Field>
+        <Field label="Tags (comma-separated)" className="sm:col-span-2">
           <input
             className="field"
-            placeholder="linen, weekend"
+            placeholder="vintage, phone, weekend"
             {...form.register("tags")}
           />
         </Field>
@@ -111,11 +154,16 @@ export function ProductForm({ product }: { product?: SellerProduct }) {
           error={form.formState.errors.description?.message}
           className="sm:col-span-2"
         >
-          <textarea className="field" rows={4} {...form.register("description")} />
+          <textarea
+            className="field"
+            rows={4}
+            placeholder="Size, wear, what’s included…"
+            {...form.register("description")}
+          />
         </Field>
         <ImageUploadField
           className="sm:col-span-2"
-          label="Images (upload or paste URLs, one per line)"
+          label="Photos (upload or paste URLs, one per line)"
           bucket={PRODUCT_IMAGES_BUCKET}
           pathPrefix={`products/${product?.id ?? "new"}`}
           multiline
@@ -134,7 +182,7 @@ export function ProductForm({ product }: { product?: SellerProduct }) {
         />
         <label className="flex items-center gap-2 text-sm">
           <input type="checkbox" {...form.register("isPublished")} />
-          Published on shop
+          Listed on shop
         </label>
         <label className="flex items-center gap-2 text-sm">
           <input type="checkbox" {...form.register("featured")} />
@@ -144,17 +192,22 @@ export function ProductForm({ product }: { product?: SellerProduct }) {
 
       <GlassCard className="space-y-3 p-5">
         <div className="flex items-center justify-between">
-          <h2 className="font-semibold tracking-tight">Variants</h2>
+          <div>
+            <h2 className="font-semibold tracking-tight">Price & options</h2>
+            <p className="text-xs text-muted-foreground">
+              Use One Size for non-fashion items. Stock 1 for unique pieces.
+            </p>
+          </div>
           <Button
             type="button"
             size="sm"
             variant="secondary"
             onClick={() =>
-              append({ size: "M", colour: "Navy", stock: 3, price: 450 })
+              append({ size: "One Size", colour: "Black", stock: 1, price: 100 })
             }
           >
             <Plus className="h-4 w-4" strokeWidth={1.5} />
-            Add variant
+            Add option
           </Button>
         </div>
         {form.formState.errors.variants?.message && (
@@ -208,7 +261,7 @@ export function ProductForm({ product }: { product?: SellerProduct }) {
                 size="icon"
                 disabled={fields.length === 1}
                 onClick={() => removeVariant(index)}
-                aria-label="Remove variant"
+                aria-label="Remove option"
               >
                 <Trash2 className="h-4 w-4" strokeWidth={1.5} />
               </Button>
@@ -219,7 +272,7 @@ export function ProductForm({ product }: { product?: SellerProduct }) {
 
       <div className="flex flex-wrap gap-2">
         <Button type="submit" size="lg" disabled={pending}>
-          {product ? "Save product" : "Create product"}
+          {product ? "Save listing" : "List item"}
         </Button>
         {product && (
           <Button
@@ -228,7 +281,7 @@ export function ProductForm({ product }: { product?: SellerProduct }) {
             size="lg"
             disabled={pending}
             onClick={() => {
-              if (confirm("Delete this product?")) {
+              if (confirm("Delete this listing?")) {
                 remove(product.id);
                 router.push("/seller/products");
               }

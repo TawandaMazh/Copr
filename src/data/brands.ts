@@ -151,6 +151,66 @@ export const brands: Brand[] = [
     isVerified: true,
     foundedYear: 2014,
   },
+  {
+    id: "seller-thandiwe",
+    name: "Thandiwe M.",
+    slug: "thandiwe-m",
+    tagline: "Closet clears & handmade finds.",
+    story:
+      "Lusaka-based seller listing clothes, beauty, and handmade pieces from my cupboard and weekend markets.",
+    location: "Lusaka",
+    logo: "https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=200&h=200&fit=crop&q=80",
+    banner:
+      "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1400&q=80",
+    featured: true,
+    isVerified: false,
+    foundedYear: 2024,
+  },
+  {
+    id: "seller-chanda",
+    name: "Chanda K.",
+    slug: "chanda-k",
+    tagline: "Tech, toys & textbooks.",
+    story:
+      "Student seller clearing gadgets, kids’ gear, and course books between semesters.",
+    location: "Lusaka",
+    logo: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&q=80",
+    banner:
+      "https://images.unsplash.com/photo-1498049794561-7780e7231661?w=1400&q=80",
+    featured: true,
+    isVerified: false,
+    foundedYear: 2025,
+  },
+  {
+    id: "seller-mwansa",
+    name: "Mwansa Home",
+    slug: "mwansa-home",
+    tagline: "Furniture & flat essentials.",
+    story:
+      "Downsizing a Woodlands flat — chairs, kitchenware, and vintage bits ready for a new home.",
+    location: "Lusaka",
+    logo: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&h=200&fit=crop&q=80",
+    banner:
+      "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=1400&q=80",
+    featured: true,
+    isVerified: false,
+    foundedYear: 2023,
+  },
+  {
+    id: "seller-kabwe",
+    name: "Kabwe Sports",
+    slug: "kabwe-sports",
+    tagline: "Boots, kits & weekend gear.",
+    story:
+      "Sunday-league player selling spare boots, speakers, and outdoor kit after a clear-out.",
+    location: "Kabwe",
+    logo: "https://images.unsplash.com/photo-1568602471122-7832951cc4c5?w=200&h=200&fit=crop&q=80",
+    banner:
+      "https://images.unsplash.com/photo-1461896836934-ffe607ba6851?w=1400&q=80",
+    featured: false,
+    isVerified: false,
+    foundedYear: 2024,
+  },
 ];
 
 export function getBrandById(id: string): Brand | undefined {

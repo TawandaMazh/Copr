@@ -1,6 +1,8 @@
 import { Hero } from "@/components/home/hero";
+import { CategoryChips } from "@/components/home/category-chips";
+import { JustListed } from "@/components/home/just-listed";
 import { FeaturedBrands } from "@/components/home/featured-brands";
-import { NewIn } from "@/components/home/new-in";
+import { SellCta } from "@/components/home/sell-cta";
 import { TrendingCategories } from "@/components/home/trending-categories";
 import { PageContainer } from "@/components/layout/page-container";
 import {
@@ -12,7 +14,7 @@ import {
 export default async function HomePage() {
   const [featuredBrands, newProducts, categories] = await Promise.all([
     listFeaturedBrands(),
-    listNewProducts(8),
+    listNewProducts(12),
     listCategoriesWithCounts(),
   ]);
 
@@ -20,8 +22,10 @@ export default async function HomePage() {
     <>
       <Hero />
       <PageContainer>
+        <CategoryChips categories={categories} />
+        <JustListed products={newProducts} />
+        <SellCta />
         <FeaturedBrands brands={featuredBrands} />
-        <NewIn products={newProducts} />
         <TrendingCategories categories={categories} />
       </PageContainer>
     </>

@@ -140,6 +140,12 @@ export function mapProduct(row: DbProduct): Product {
     sku: v.sku,
   }));
 
+  const tags = row.tags ?? [];
+  const conditionTag = tags.find((t) => t.startsWith("condition:"));
+  const condition = conditionTag
+    ? (conditionTag.slice("condition:".length) as Product["condition"])
+    : undefined;
+
   return {
     id: appIdFromUuid(row.id),
     slug: row.slug,
@@ -149,7 +155,8 @@ export function mapProduct(row: DbProduct): Product {
     categorySlug,
     images,
     variants,
-    tags: row.tags ?? [],
+    tags,
+    condition,
     featured: row.featured,
     trending: row.trending,
     isNew: row.is_new,

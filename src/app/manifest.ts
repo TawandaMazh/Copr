@@ -2,16 +2,16 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "copr — Zambian fashion marketplace",
+    name: "copr — buy & sell anything",
     short_name: "copr",
     description:
-      "Shop local Zambian brands. Prices in Kwacha. Delivery in Lusaka.",
+      "List anything and shop unique finds. Prices in Kwacha. Delivery in Lusaka.",
     start_url: "/",
     display: "standalone",
     background_color: "#F5F8FF",
     theme_color: "#1E5EFF",
     lang: "en-ZM",
-    categories: ["shopping", "fashion"],
+    categories: ["shopping", "lifestyle"],
     icons: [
       {
         src: "/icon",

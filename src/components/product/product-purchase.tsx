@@ -7,6 +7,10 @@ import type { Product } from "@/types";
 import { getAvailableColours, getAvailableSizes } from "@/data";
 import { resolveBrand } from "@/lib/catalogue";
 import { isProductNew, brandIsVerified } from "@/lib/product-display";
+import {
+  conditionLabel,
+  productCondition,
+} from "@/lib/commerce/conditions";
 import { PriceTag } from "@/components/ui/price-tag";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -38,6 +42,12 @@ export function ProductPurchase({
   const [sizeGuideOpen, setSizeGuideOpen] = useState(false);
   const showNew = isProductNew(product);
   const verified = brandIsVerified(brand);
+  const condition = productCondition(product);
+  const fashionSizing =
+    sizes.some((s) => s !== "One Size") ||
+    ["dresses", "tops", "bottoms", "outerwear", "traditional", "footwear", "activewear"].includes(
+      product.categorySlug,
+    );
 
   const variant = useMemo(
     () =>
@@ -77,7 +87,7 @@ export function ProductPurchase({
             {verified && (
               <span className="inline-flex items-center gap-0.5 normal-case tracking-normal text-primary">
                 <BadgeCheck className="h-3.5 w-3.5" strokeWidth={1.75} />
-                <span className="sr-only">Verified brand</span>
+                <span className="sr-only">Verified seller</span>
               </span>
             )}
           </Link>
@@ -87,7 +97,8 @@ export function ProductPurchase({
         </h1>
         <div className="flex flex-wrap items-center gap-3">
           <PriceTag amount={variant.price} size="lg" />
-          {showNew && <Badge variant="new">New</Badge>}
+          <Badge variant="secondary">{conditionLabel(condition)}</Badge>
+          {showNew && <Badge variant="new">Just listed</Badge>}
           {reviewCount > 0 && reviewRating != null && (
             <span className="text-sm text-muted-foreground">
               {reviewRating.toFixed(1)} · {reviewCount} review
@@ -125,15 +136,19 @@ export function ProductPurchase({
 
       <div className="space-y-3">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <p className="text-sm font-medium">Size</p>
+          <p className="text-sm font-medium">
+            {fashionSizing ? "Size" : "Option"}
+          </p>
           <div className="flex flex-wrap gap-3 text-xs">
-            <button
-              type="button"
-              className="font-medium text-primary hover:underline focus-ring rounded"
-              onClick={() => setSizeGuideOpen(true)}
-            >
-              Size guide
-            </button>
+            {fashionSizing && (
+              <button
+                type="button"
+                className="font-medium text-primary hover:underline focus-ring rounded"
+                onClick={() => setSizeGuideOpen(true)}
+              >
+                Size guide
+              </button>
+            )}
             <Link
               href="/returns"
               className="font-medium text-muted-foreground hover:text-primary hover:underline focus-ring rounded"
@@ -168,10 +183,10 @@ export function ProductPurchase({
                   Only {variant.stock} left ·{" "}
                 </span>
               )}
-              {variant.stock} in stock · Fulfilled by {brand?.name}
+              {variant.stock} available · Sold by {brand?.name}
             </>
           ) : (
-            "Out of stock for this variant"
+            "Sold out for this option"
           )}
         </p>
       </div>
@@ -203,7 +218,7 @@ export function ProductPurchase({
 
       <p className="text-xs leading-relaxed text-muted-foreground">
         Delivery across Lusaka · Pickup points at checkout · Secure payment —
-        the brand is paid only after your order is delivered.
+        the seller is paid only after your order is delivered.
       </p>
 
       <SizeGuideDialog open={sizeGuideOpen} onOpenChange={setSizeGuideOpen} />

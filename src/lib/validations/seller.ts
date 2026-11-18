@@ -1,5 +1,6 @@
 import { z } from "zod";
 import type { CategorySlug, ProductColour, ProductSize } from "@/types";
+import { PRODUCT_CONDITIONS } from "@/lib/commerce/conditions";
 
 const categorySlugs = [
   "dresses",
@@ -10,6 +11,13 @@ const categorySlugs = [
   "footwear",
   "accessories",
   "activewear",
+  "electronics",
+  "home",
+  "beauty",
+  "kids",
+  "sports",
+  "books",
+  "other",
 ] as const satisfies readonly CategorySlug[];
 
 const sizes = [
@@ -39,9 +47,13 @@ const colours = [
 ] as const satisfies readonly ProductColour[];
 
 export const brandApplySchema = z.object({
-  name: z.string().trim().min(2, "Brand name required").max(60),
-  tagline: z.string().trim().min(4, "Add a short tagline").max(80),
-  story: z.string().trim().min(20, "Tell a bit more of your story").max(800),
+  name: z.string().trim().min(2, "Shop name required").max(60),
+  tagline: z.string().trim().min(4, "Add a short bio").max(80),
+  story: z
+    .string()
+    .trim()
+    .min(12, "Tell buyers a bit about what you sell")
+    .max(800),
   location: z.string().trim().min(2, "Location required").max(60),
   foundedYear: z.number().int().min(1980).max(new Date().getFullYear()),
   logo: z.union([
@@ -60,7 +72,7 @@ export const brandApplySchema = z.object({
 export const brandProfileSchema = z.object({
   name: z.string().trim().min(2).max(60),
   tagline: z.string().trim().min(4).max(80),
-  story: z.string().trim().min(20).max(800),
+  story: z.string().trim().min(12).max(800),
   location: z.string().trim().min(2).max(60),
   foundedYear: z.number().int().min(1980).max(new Date().getFullYear()),
   logo: z.union([z.literal(""), z.string().url()]),
@@ -77,12 +89,13 @@ export const productVariantSchema = z.object({
 });
 
 export const productFormSchema = z.object({
-  name: z.string().trim().min(2, "Product name required").max(80),
+  name: z.string().trim().min(2, "Listing title required").max(80),
   description: z.string().trim().min(20, "Add a richer description").max(1000),
   categorySlug: z.enum(categorySlugs),
+  condition: z.enum(PRODUCT_CONDITIONS),
   images: z.string().trim().min(1, "Add at least one image URL"),
   tags: z.string().trim().optional(),
-  variants: z.array(productVariantSchema).min(1, "Add at least one variant"),
+  variants: z.array(productVariantSchema).min(1, "Add at least one option"),
   isPublished: z.boolean(),
   featured: z.boolean(),
 });
